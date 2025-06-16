@@ -1,33 +1,40 @@
 import { Route, Routes } from "react-router";
 import "./App.css";
-import DashboardLayout from "./layouts/DashboardLayout";
-import DummyHome from "./pages/app/DummyHome";
-import DummyLogin from "./pages/authentication/DummyLogin";
 import AuthLayout from "./layouts/AuthLayout";
+import Login from "./pages/authentication/Login";
+import { AuthRoute } from "./routes/authentication/AuthRoutes";
+import { OnboardRoutes } from "./routes/onboarding/OnboardRoutes";
+import { appRoutes } from "./routes/app/appRoutes";
 
 function App() {
   return (
     <Routes>
       <Route
-        path="/"
-        element={
-          <div className="text-7xl">
-            Project Template || Please read readme file
-          </div>
-        }
+        path="login"
+        element={<Login/>}
       />
 
-      <Route path="app" element={<DashboardLayout />}>
-        <Route path="dashboard" element={<DummyHome />} />
+      <Route path="app">
+        {appRoutes?.map((Link , i) => (
+          <Route path={Link.url} key={i} element={Link.page} />
+        ))}
       </Route>
 
       <Route path="auth" element={<AuthLayout />}>
-        <Route path="login" element={<DummyLogin />} />
+        {AuthRoute?.map((Link , i) => (
+          <Route path={Link.url} key={i} element={Link.page} />
+        ))}
+      </Route>
+
+      <Route path="onboarding" >
+        {OnboardRoutes?.map((Link , i) => (
+          <Route path={Link.url} key={i} element={Link.page} />
+        ))}
       </Route>
 
       <Route
         path="*"
-        element={<div className="text-7xl">Page Not Found</div>}
+        element={<Login/>}
       />
     </Routes>
   );
