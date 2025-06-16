@@ -7,7 +7,6 @@ import { signInSchema } from "../../schema/authentication/dummyLoginSchema";
 import { NavLink, useNavigate } from "react-router";
 import { FiLoader } from "react-icons/fi";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { Logo } from "../../assets/export";
 
 const DummyLogin = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -35,7 +34,6 @@ const DummyLogin = () => {
 
   return (
     <div className="w-full h-auto flex flex-col items-center p-6 justify-center md:w-[499px] md:h-[548px]  rounded-[19px] bg-white">
-      <img src={Logo} alt="orange_logo" className="w-[148.4px]" />
       <div className="w-auto flex flex-col mt-4 justify-center items-center">
         <h2 className="text-[32px] font-bold leading-[48px]">Welcome Back</h2>
         <p className="text-[18px] font-normal text-center leading-[27px] text-[#3C3C43D9]">

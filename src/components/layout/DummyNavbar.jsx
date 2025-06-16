@@ -1,9 +1,7 @@
-import { Logo } from "../../assets/export";
 
 const DummyNavbar = () => {
   return (
     <div className="w-full h-full px-4 flex justify-between items-center">
-      <img src={Logo} loading="lazy" alt="logo-organization" className="h-8" />
 
       <span className="w-12 h-8 rounded-full bg-[#45c4f9]/20 flex items-center px-1 justify-start gap-1">
         <img

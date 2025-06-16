@@ -3,7 +3,6 @@ import DummyNavbar from "../components/layout/DummyNavbar";
 import DummySidebaar from "../components/layout/DummySidebaar";
 import { useEffect, useState } from "react";
 import NoInternetModal from "../components/global/NoInternet";
-import { NoInternetImage } from "../assets/export";
 
 const DashboardLayout = () => {
   const [openNoInternet, setOpenNoInternet] = useState(false);
@@ -19,7 +18,6 @@ const DashboardLayout = () => {
       <div className="w-full bg-[#1c1c1c] h-10 ">
         <DummyNavbar />
       </div>
-      <img src={NoInternetImage} alt="" className="hidden" />
       <div className="w-full h-screen flex justify-start items-start">
         <div className="w-60 h-[calc(100%-2.5rem)] bg-gray-50 ">
           <DummySidebaar />

@@ -1,5 +1,4 @@
 import Modal from "react-modal";
-import { NoInternetImage } from "../../assets/export";
 
 const NoInternetModal = ({ isOpen }) => {
   return (
@@ -13,11 +12,7 @@ const NoInternetModal = ({ isOpen }) => {
     >
       <div className="bg-white rounded-[16px] shadow-lg   items-center flex flex-col justify-center gap-3   text-center">
         <div className="flex justify-center mb-4">
-          <img
-            src={NoInternetImage}
-            alt=""
-            className="h-full w-full object-cover mix-blend-multiply rounded-[16px]"
-          />
+        
         </div>
         <button
           onClick={() => window.location.reload()}
