@@ -1,0 +1,73 @@
+import { useState } from "react";
+import { FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
+import logomain from "../../assets/logomain.webp";
+import logoback from "../../assets/backloginimage.webp";
+import Input from "../../components/global/Input";
+import { NavLink, useNavigate } from "react-router";
+import Button from "../../components/global/Button";
+
+export default function ForgetPassword() {
+    const [email, setEmail] = useState("");
+    const navigate = useNavigate("");
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        alert("Sending OTP...");
+        navigate("/auth/verify-otp", {state:{email}});
+    };
+
+    return (
+        <div className="min-h-screen flex bg-[#f4f8ff] overflow-hidden">
+            {/* Left Section - Form */}
+            <div className="w-full lg:w-1/2 flex justify-center items-start p-0 lg:p-12">
+                <div className="w-full max-w-md pt-[4em] pr-[4em]">
+                    {/* Logo */}
+                    <div className="text-left mb-6">
+                        <button type="button" onClick={() => navigate(-1)} >
+                            <FaArrowLeft size={25} />
+                        </button>
+                        <h2 className="text-[36px] mt-2 font-[600] leading-[48px] tracking-normal capitalize pt-[20px]">
+                            forgot password
+                        </h2>
+                        <p className="text-[17px] font-normal text-start mt-2 leading-[27px] text-[#868686]">
+                            Please enter your registered email to recover your password
+                        </p>
+                    </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div>
+                            <Input
+                                label="Email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter email here"
+
+                            />
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
+                        >
+                            
+                                <span>Send OTP</span>
+                        </button>
+
+
+                    </form>
+                </div>
+            </div>
+
+            {/* Right Section - Background Image */}
+            <div className="hidden lg:block lg:w-1/2 h-screen">
+                <img
+                    src={logoback}
+                    alt="Background"
+                    className="w-full h-full object-cover rounded-bl-[4em] rounded-tl-[2em]"
+                />
+            </div>
+        </div>
+    );
+}
