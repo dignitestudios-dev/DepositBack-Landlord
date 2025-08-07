@@ -1,7 +1,11 @@
 import React from "react";
-import { Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router";
 
-const AuthLayout = () => {
+const AuthLayout = ({ token }) => {
+  console.log("🚀 ~ AuthLayout ~ token:", token);
+  if (token) {
+    return <Navigate to="/app/Dashboard" replace />;
+  }
   return (
     <div className="w-full h-full">
       <Outlet />

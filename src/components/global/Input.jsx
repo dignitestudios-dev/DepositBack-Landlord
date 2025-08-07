@@ -10,21 +10,32 @@ export default function Input({
   placeholder,
   showToggle = false,
   className,
+  onBlur,
+  error,
+  touched,
+  name,
+  maxLength,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div>
-      <label className="block text-[15px] font-[500] text-gray-800 mb-2">{label}</label>
+      <label className="block text-[15px] font-[500] text-gray-800 mb-2">
+        {label}
+      </label>
       <div className="relative">
         <input
           type={showToggle ? (showPassword ? "text" : "password") : type}
           value={value}
+          name={name}
           onChange={onChange}
           placeholder={placeholder}
+          onBlur={onBlur}
+          maxLength={maxLength}
           required
-          className={`w-full px-4 py-3 text-sm rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-12 ${className || ""}`}
-
+          className={`w-full px-4 py-3 text-sm rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-12 ${
+            className || ""
+          }`}
         />
         {showToggle && (
           <button
@@ -36,6 +47,7 @@ export default function Input({
           </button>
         )}
       </div>
+      {error && touched && <p className="text-red-600 text-[12px]">{error}</p>}
     </div>
   );
 }

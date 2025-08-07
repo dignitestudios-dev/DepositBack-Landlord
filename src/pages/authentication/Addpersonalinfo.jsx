@@ -1,29 +1,99 @@
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { useNavigate } from "react-router";
 import logoback from "../../assets/backloginimage.webp";
 import Input from "../../components/global/Input";
 import { FaArrowLeft } from "react-icons/fa";
+import { formatFullName, formatSsnLast } from "../../lib/helpers";
+
+const initialState = {
+  idFront: null,
+  idFrontPreview: null,
+  idBack: null,
+  idBackPreview: null,
+  profileImage: null,
+  profilePreview: null,
+};
+
+function fileReducer(state, action) {
+  switch (action.type) {
+    case "SET_FRONT":
+      return {
+        ...state,
+        idFront: action.file,
+        idFrontPreview: action.preview,
+      };
+    case "SET_BACK":
+      return {
+        ...state,
+        idBack: action.file,
+        idBackPreview: action.preview,
+      };
+    case "SET_PROFILE":
+      return {
+        ...state,
+        profileImage: action.file,
+        profilePreview: action.preview,
+      };
+    case "RESET":
+      return initialState;
+    default:
+      return state;
+  }
+}
 
 export default function Addpersonalinfo() {
   const [Fullname, setFullname] = useState("");
   const [Ssnnumber, setSsnnumber] = useState("");
-  const [idFront, setIdFront] = useState(null);
-  const [idBack, setIdBack] = useState(null);
+  const [errors, setErrors] = useState({
+    fullname: "",
+    ssn: "",
+    idFront: "",
+    idBack: "",
+    profileImage: "",
+  });
+
   const navigate = useNavigate();
-  const [profileImage, setProfileImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newErrors = {
+      fullname: !Fullname.trim() ? "Full name is required" : "",
+      ssn: !Ssnnumber.trim()
+        ? "SSN is required"
+        : Ssnnumber.trim().length !== 4
+        ? "SSN must be exactly 4 digits"
+        : "",
+      idFront: !files.idFront ? "Front ID is required" : "",
+      idBack: !files.idBack ? "Back ID is required" : "",
+      profileImage: !files.profileImage ? "Profile image is required" : "",
+    };
+
+    setErrors(newErrors);
+    const hasErrors = Object.values(newErrors).some((error) => error !== "");
+    if (hasErrors) return;
+
     alert("Successfully Submit...");
-    navigate("/onboarding/subscription-plans", { state: { email: "example@email.com" } }); // Fix 'email' reference
+    navigate("/onboarding/subscription-plans", {
+      state: { email: "example@email.com" },
+    }); // Fix 'email' reference
   };
 
-  const handleFileChange = (e) => {
+  const [files, dispatch] = useReducer(fileReducer, initialState);
+
+  const handleFileChange = (e, field) => {
     const file = e.target.files[0];
-    if (file) {
-      setProfileImage(file);
-      setPreviewUrl(URL.createObjectURL(file));
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+
+    if (field === "profileImage") {
+      dispatch({ type: "SET_PROFILE", file, preview });
+      setErrors((prev) => ({ ...prev, profileImage: "" }));
+    } else if (field === "idFront") {
+      dispatch({ type: "SET_FRONT", file, preview });
+      setErrors((prev) => ({ ...prev, idFront: "" }));
+    } else if (field === "idBack") {
+      dispatch({ type: "SET_BACK", file, preview });
+      setErrors((prev) => ({ ...prev, idBack: "" }));
     }
   };
 
@@ -33,7 +103,7 @@ export default function Addpersonalinfo() {
       <div className="w-full lg:w-1/2 flex justify-center items-start p-0 lg:p-12">
         <div className="w-full max-w-md pt-[4em]">
           <div className="text-left mb-6">
-            <button type="button" onClick={() => navigate(-1)} >
+            <button type="button" onClick={() => navigate(-1)}>
               <FaArrowLeft size={25} />
             </button>
             <h2 className="text-[34px] mt-2 font-[600] leading-[48px] tracking-normal capitalize pt-[20px]">
@@ -43,9 +113,16 @@ export default function Addpersonalinfo() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="flex items-center gap-4">
-              <label htmlFor="profilePic" className="w-16 h-16 rounded-full border-2 border-dashed border-blue-500 flex items-center justify-center cursor-pointer overflow-hidden">
-                {previewUrl ? (
-                  <img src={previewUrl} alt="Profile Preview" className="w-full h-full object-cover" />
+              <label
+                htmlFor="profilePic"
+                className="w-16 h-16 rounded-full border-2 border-dashed border-blue-500 flex items-center justify-center cursor-pointer overflow-hidden"
+              >
+                {files.profilePreview ? (
+                  <img
+                    src={files.profilePreview}
+                    alt="Profile Preview"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <span className="text-2xl text-blue-500">+</span>
                 )}
@@ -53,55 +130,110 @@ export default function Addpersonalinfo() {
                   id="profilePic"
                   type="file"
                   accept="image/png, image/jpeg"
-                  onChange={handleFileChange}
+                  onChange={(e) => handleFileChange(e, "profileImage")}
                   className="hidden"
                 />
               </label>
-              <label htmlFor="profilePic" className="text-blue-600 font-medium cursor-pointer">Upload Profile Picture</label>
+              <label
+                htmlFor="profilePic"
+                className="text-blue-600 font-medium cursor-pointer"
+              >
+                Upload Profile Picture
+              </label>
             </div>
-
-
+            {errors.profileImage && (
+              <p className="text-red-500 text-xs">{errors.profileImage}</p>
+            )}
             <Input
               label="Full Name"
               type="text"
               value={Fullname}
-              onChange={(e) => setFullname(e.target.value)}
+              onChange={(e) => setFullname(formatFullName(e.target.value))}
               placeholder="Enter Full Name"
             />
+            {errors.fullname && (
+              <p className="text-red-500 text-xs">{errors.fullname}</p>
+            )}
             <Input
               label="Last four digits of SSN"
               type="tel"
               value={Ssnnumber}
-              onChange={(e) => setSsnnumber(e.target.value)}
-              placeholder="xxx"
+              onChange={(e) =>
+                setSsnnumber(formatSsnLast(e.target.value, setErrors))
+              }
+              placeholder="xxxx"
             />
+            {errors.ssn && <p className="text-red-500 text-xs">{errors.ssn}</p>}
 
             {/* Government ID Upload Front */}
-            <label htmlFor="idFront" className="border-2 border-dashed bg-white border-blue-500 rounded-lg p-10 text-center cursor-pointer block">
-              <div className="text-gray-700 font-medium mb-2">Upload “Government ID Front”</div>
-              <div className="text-gray-400 text-xs mb-1">Upto 20MB JPG, PNG</div>
+            <label
+              htmlFor="idFront"
+              className={`border-2 border-dashed bg-white border-blue-500 rounded-lg ${
+                files.idFrontPreview ? "p-0" : "p-10"
+              } text-center cursor-pointer block`}
+            >
+              {files.idFrontPreview ? (
+                <img
+                  src={files.idFrontPreview}
+                  alt="Profile Preview"
+                  className="w-full h-[120px] object-cover"
+                />
+              ) : (
+                <>
+                  <div className="text-gray-700 font-medium mb-2">
+                    Upload “Government ID Front”
+                  </div>
+                  <div className="text-gray-400 text-xs mb-1">
+                    Upto 20MB JPG, PNG
+                  </div>
+                </>
+              )}
               <input
                 id="idFront"
                 type="file"
                 accept="image/png, image/jpeg"
-                onChange={(e) => setIdFront(e.target.files[0])}
+                onChange={(e) => handleFileChange(e, "idFront")}
                 className="hidden"
               />
-              {idFront && <p className="text-xs text-green-600 mt-2">{idFront.name}</p>}
             </label>
+            {errors.idFront && (
+              <p className="text-red-500 text-xs">{errors.idFront}</p>
+            )}
 
-            <label htmlFor="idBack" className="border-2 border-dashed bg-white border-blue-500 rounded-lg p-10 text-center cursor-pointer block">
-              <div className="text-gray-700 font-medium mb-2">Upload “Government ID Back”</div>
-              <div className="text-gray-400 text-xs mb-1">Upto 20MB JPG, PNG</div>
+            <label
+              htmlFor="idBack"
+              className={`border-2 border-dashed bg-white border-blue-500 rounded-lg ${
+                files.idBackPreview ? "p-0" : "p-10"
+              } text-center cursor-pointer block`}
+            >
+              {files.idBackPreview ? (
+                <img
+                  src={files.idBackPreview}
+                  alt="Profile Preview"
+                  className="w-full h-[120px] object-cover"
+                />
+              ) : (
+                <>
+                  <div className="text-gray-700 font-medium mb-2">
+                    Upload “Government ID Front”
+                  </div>
+                  <div className="text-gray-400 text-xs mb-1">
+                    Upto 20MB JPG, PNG
+                  </div>
+                </>
+              )}
+
               <input
                 id="idBack"
                 type="file"
                 accept="image/png, image/jpeg"
-                onChange={(e) => setIdBack(e.target.files[0])}
+                onChange={(e) => handleFileChange(e, "idBack")}
                 className="hidden"
               />
-              {idBack && <p className="text-xs text-green-600 mt-2">{idBack.name}</p>}
             </label>
+            {errors.idBack && (
+              <p className="text-red-500 text-xs">{errors.idBack}</p>
+            )}
 
             <button
               type="submit"

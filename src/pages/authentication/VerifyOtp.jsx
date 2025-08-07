@@ -3,13 +3,18 @@ import { FaArrowLeft } from "react-icons/fa";
 import logoback from "../../assets/backloginimage.webp";
 import { useNavigate } from "react-router";
 import { useLocation } from "react-router";
+import SubmitButton from "../../components/global/SubmitButton";
+import axios from "../../axios";
+import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 
 export default function VerifyOtp() {
   const navigate = useNavigate();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
   const location = useLocation();
-  const {email} = location.state || {};
+  const { email } = location.state || {};
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/\D/, ""); // Allow only digits
@@ -30,7 +35,10 @@ export default function VerifyOtp() {
 
   const handlePaste = (e) => {
     e.preventDefault();
-    const pasteData = e.clipboardData.getData("text").slice(0, otp.length).split("");
+    const pasteData = e.clipboardData
+      .getData("text")
+      .slice(0, otp.length)
+      .split("");
     const newOtp = [...otp];
     pasteData.forEach((char, idx) => {
       if (/\d/.test(char)) {
@@ -38,11 +46,12 @@ export default function VerifyOtp() {
       }
     });
     setOtp(newOtp);
-    const nextIndex = pasteData.length < otp.length ? pasteData.length : otp.length - 1;
+    const nextIndex =
+      pasteData.length < otp.length ? pasteData.length : otp.length - 1;
     inputs.current[nextIndex]?.focus();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (otp.some((digit) => digit === "")) {
       alert("Please enter complete OTP.");
@@ -50,7 +59,23 @@ export default function VerifyOtp() {
     }
     const otpValue = otp.join("");
     alert(`Verifying OTP: ${otpValue}`);
-    navigate("/auth/reset-password");
+    navigate("/auth/reset-password", { state: { email } });
+    try {
+      setLoading(true);
+      const response = await axios.post("/auth/validatePassOTP", {
+        code: otpValue,
+        email: email,
+        role: "landlord",
+      });
+      if (response.status === 200) {
+        SuccessToast("Otp Verified");
+        navigate("/auth/reset-password");
+      }
+    } catch (error) {
+      ErrorToast(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,9 +87,12 @@ export default function VerifyOtp() {
             <button type="button" onClick={() => navigate(-1)}>
               <FaArrowLeft size={25} />
             </button>
-            <h2 className="text-[36px] mt-2 font-bold capitalize pt-[20px]">Verification</h2>
+            <h2 className="text-[36px] mt-2 font-bold capitalize pt-[20px]">
+              Verification
+            </h2>
             <p className="text-[17px] text-[#868686] mt-2">
-              Enter the OTP sent to <span className="font-semibold text-black">{email}</span>
+              Enter the OTP sent to{" "}
+              <span className="font-semibold text-black">{email}</span>
             </p>
           </div>
 
@@ -85,12 +113,14 @@ export default function VerifyOtp() {
               ))}
             </div>
 
-            <button
+            <SubmitButton text="Verify" loading={loading} type="submit" />
+
+            {/* <button
               type="submit"
               className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
             >
               Verify
-            </button>
+            </button> */}
           </form>
         </div>
       </div>

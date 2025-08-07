@@ -1,6 +1,6 @@
-import React from 'react';
-import { PhotoProvider, PhotoView } from 'react-photo-view';
-import 'react-photo-view/dist/react-photo-view.css';
+import React from "react";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import "react-photo-view/dist/react-photo-view.css";
 
 const ImageGallery = ({ images }) => {
   if (!images || images.length === 0) return null;

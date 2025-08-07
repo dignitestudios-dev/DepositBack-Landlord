@@ -42,5 +42,4 @@ export const AuthRoute = [
     name: "Signup-otp",
     isPublic: true,
   },
-
-]
+];
