@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import logoback from "../../assets/backloginimage.webp";
 import { useNavigate } from "react-router";
@@ -7,15 +7,23 @@ import Modal from "../../components/global/Modal";
 import axios from "../../axios";
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 import SubmitButton from "../../components/global/SubmitButton";
+import CountDown from "./CountDown";
+import { AppContext } from "../../context/AppContext";
 
 export default function SignupOTP() {
+  const { loginContext } = useContext(AppContext);
+
   const navigate = useNavigate();
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", "", ""]);
   const [showModal, setShowModal] = useState(false);
   const inputs = useRef([]);
   const location = useLocation();
   const { email } = location.state || {};
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const [isActive, setIsActive] = useState(true);
+  const [seconds, setSeconds] = useState(200);
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/\D/, ""); // Allow only digits
@@ -55,11 +63,10 @@ export default function SignupOTP() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (otp.some((digit) => digit === "")) {
-      alert("Please enter complete OTP.");
+      ErrorToast("Please enter complete OTP.");
       return;
     }
     const otpValue = otp.join("");
-    setShowModal(true);
 
     try {
       setLoading(true);
@@ -69,7 +76,10 @@ export default function SignupOTP() {
         role: "landlord",
       });
       if (response.status === 200) {
-        SuccessToast("Otp Verified");
+        let data = response?.data?.data;
+        // SuccessToast("Otp Verified");
+        loginContext(data);
+
         setShowModal(true);
       }
     } catch (error) {
@@ -77,6 +87,34 @@ export default function SignupOTP() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      setResendLoading(true);
+      let obj = {
+        email: email,
+        role: "landlord",
+      };
+
+      const response = await axios.post("/auth/sendOTP", obj);
+
+      if (response.status === 201) {
+        SuccessToast(response?.data?.message);
+        setResendLoading(false);
+        setOtp(Array(5).fill("")); // Reset OTP fields
+        handleRestart();
+      }
+    } catch (err) {
+      ErrorToast(err?.response?.data?.message);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleRestart = () => {
+    setSeconds(200);
+    setIsActive(true);
   };
 
   return (
@@ -98,7 +136,7 @@ export default function SignupOTP() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex gap-3">
+            <div className="flex gap-6">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -113,7 +151,33 @@ export default function SignupOTP() {
                 />
               ))}
             </div>
-            <div className="pt-2">
+
+            <div className="flex items-center justify-start gap-2 relative z-10">
+              <p className=" text-[16px] leading-[21.6px] text-[#565656]">
+                Didn&apos;t receive the code yet?
+                {isActive ? (
+                  <span className="inline-block ml-1 align-middle">
+                    <CountDown
+                      isActive={isActive}
+                      setIsActive={setIsActive}
+                      seconds={seconds}
+                      setSeconds={setSeconds}
+                    />
+                  </span>
+                ) : (
+                  <span
+                    type="button"
+                    disabled={resendLoading}
+                    onClick={handleResendOtp}
+                    className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent font-medium pl-1 cursor-pointer"
+                  >
+                    {resendLoading ? "Resending..." : "Resend"}
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <div className="pt-0">
               <SubmitButton text="Verify" loading={loading} type="submit" />
             </div>
             {/* <button

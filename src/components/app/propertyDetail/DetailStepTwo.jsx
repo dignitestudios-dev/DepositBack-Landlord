@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PiIdentificationBadge } from "react-icons/pi";
+import { ErrorToast } from "../../global/Toaster";
 
-const DetailStepTwo = ({ prevStep, nextStep }) => {
+const DetailStepTwo = ({
+  prevStep,
+  nextStep,
+  stepTwoData,
+  inspectionDetail,
+}) => {
+  console.log("🚀 ~ DetailStepTwo ~ stepTwoData:", stepTwoData);
   const [mediaFiles, setMediaFiles] = useState([]);
   const [documentFiles, setDocumentFiles] = useState([]);
   const handleFileChange = (e) => {
@@ -11,17 +18,44 @@ const DetailStepTwo = ({ prevStep, nextStep }) => {
     );
     const documents = files.filter((file) => file.type === "application/pdf");
 
-    setMediaFiles([...mediaFiles, ...imagesAndVideos]);
-    setDocumentFiles([...documentFiles, ...documents]);
+    setMediaFiles((prev) => [...prev, ...imagesAndVideos]);
+    setDocumentFiles((prev) => [...prev, ...documents]);
   };
 
   const removeMedia = (index) => {
-    setMediaFiles(mediaFiles.filter((_, i) => i !== index));
+    setMediaFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const removeDocument = (index) => {
-    setDocumentFiles(documentFiles.filter((_, i) => i !== index));
+    setDocumentFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const handleNext = () => {
+    if (mediaFiles.length > 0 || documentFiles.length > 0) {
+      inspectionDetail({ documentFiles, mediaFiles });
+      nextStep();
+    } else {
+      ErrorToast("Please upload at least one media or document file.");
+    }
+  };
+
+  useEffect(() => {
+    if (stepTwoData) {
+      if (
+        Array.isArray(stepTwoData.mediaFiles) &&
+        stepTwoData.mediaFiles.length > 0
+      ) {
+        setMediaFiles(stepTwoData.mediaFiles);
+      }
+      if (
+        Array.isArray(stepTwoData.documentFiles) &&
+        stepTwoData.documentFiles.length > 0
+      ) {
+        setDocumentFiles(stepTwoData.documentFiles);
+      }
+    }
+  }, [stepTwoData]);
+
   return (
     <div className="bg-[#F9FAFA] mt-20 rounded-xl shadow-lg p-8">
       <p className="text-black pb-6">
@@ -109,7 +143,7 @@ const DetailStepTwo = ({ prevStep, nextStep }) => {
           Back
         </button>
         <button
-          onClick={nextStep}
+          onClick={handleNext}
           className="px-[10em] py-3 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-medium"
         >
           Next

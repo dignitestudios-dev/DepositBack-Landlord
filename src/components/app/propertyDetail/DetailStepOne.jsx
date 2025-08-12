@@ -1,4 +1,5 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
+import { ErrorToast } from "../../global/Toaster";
 
 const initialState = {
   form: {
@@ -64,6 +65,12 @@ const formReducer = (state, action) => {
           : value;
 
       const error = validateField(field, formattedValue, state);
+      const updatedErrors = { ...state.errors };
+      if (error) {
+        updatedErrors[field] = error;
+      } else {
+        delete updatedErrors[field];
+      }
 
       return {
         ...state,
@@ -72,10 +79,7 @@ const formReducer = (state, action) => {
           [field]: formattedValue,
           ...(field === "state" ? { city: "" } : {}), // Reset city if state changes
         },
-        errors: {
-          ...state.errors,
-          [field]: error,
-        },
+        errors: updatedErrors,
       };
     }
 
@@ -96,8 +100,9 @@ const formReducer = (state, action) => {
   }
 };
 
-const DetailStepOne = ({ nextStep }) => {
+const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
   const [state, dispatch] = useReducer(formReducer, initialState);
+
   const { form, errors } = state;
 
   // Example state list
@@ -122,6 +127,34 @@ const DetailStepOne = ({ nextStep }) => {
   const removeMedias = (index) => {
     setPropertyMedia((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const handleNext = () => {
+    const hasEmptyFields = Object.values(state.form).some((value) => {
+      // Handles null, undefined, empty string, or array with no items
+      if (typeof value === "string") return value.trim() === "";
+      if (Array.isArray(value)) return value.length === 0;
+      return !value;
+    });
+
+    if (!hasEmptyFields && Object.keys(state.errors).length === 0) {
+      nextStep();
+      propertyDetail(state.form);
+    } else {
+      ErrorToast("Please fill in all valid/required fields.");
+    }
+  };
+
+  useEffect(() => {
+    if (stepOneData && Object.keys(stepOneData).length > 0) {
+      Object.entries(stepOneData).forEach(([field, value]) => {
+        dispatch({
+          type: "UPDATE_FIELD",
+          field,
+          value,
+        });
+      });
+    }
+  }, [stepOneData]);
 
   return (
     <div className="bg-[#F9FAFA] mt-20 rounded-xl shadow-lg p-8">
@@ -456,7 +489,7 @@ const DetailStepOne = ({ nextStep }) => {
 
       <div className="mt-8 flex items-center justify-center gap-3">
         <button
-          onClick={nextStep}
+          onClick={handleNext}
           className="px-[10em] py-3 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-medium"
         >
           Next

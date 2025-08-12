@@ -1,32 +1,27 @@
-import { Outlet } from "react-router";
-import DummyNavbar from "../components/layout/DummyNavbar";
-import DummySidebaar from "../components/layout/DummySidebaar";
-import { useEffect, useState } from "react";
-import NoInternetModal from "../components/global/NoInternet";
+import { Navigate, Outlet } from "react-router";
 
-const DashboardLayout = () => {
-  const [openNoInternet, setOpenNoInternet] = useState(false);
+import Header from "../components/global/Header";
+import Chatai from "../components/global/Chatai";
+import Footer from "../components/global/Footer";
 
-  useEffect(() => {
-    if (!navigator.onLine) {
-      // Handle no internet connection
-      setOpenNoInternet(true);
-    }
-  }, []);
+const DashboardLayout = ({ token, userData }) => {
+  // if (!token) {
+  //   return <Navigate to="/auth/login" replace />;
+  // }
+
+  // if (!userData?.isSessionComplete) {
+  //   return <Navigate to="/onboarding/personal-info" replace />;
+  // }
+
+  // if (!userData?.isSubscriptionPaid) {
+  //   return <Navigate to="/onboarding/subscription-plans" replace />;
+  // }
   return (
-    <div className="w-full h-screen flex flex-col justify-start items-start">
-      <div className="w-full bg-[#1c1c1c] h-10 ">
-        <DummyNavbar />
-      </div>
-      <div className="w-full h-screen flex justify-start items-start">
-        <div className="w-60 h-[calc(100%-2.5rem)] bg-gray-50 ">
-          <DummySidebaar />
-        </div>
-        <div className="w-[calc(100%-15rem)] h-[calc(100%-2.5rem)] p-4 ">
-          <NoInternetModal isOpen={openNoInternet} />
-          <Outlet />
-        </div>
-      </div>
+    <div className="min-h-screen">
+      <Header />
+      <Outlet />
+      <Chatai />
+      <Footer />
     </div>
   );
 };

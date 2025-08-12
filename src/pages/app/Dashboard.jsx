@@ -36,7 +36,6 @@ const Dashboard = () => {
     1,
     ""
   );
-  console.log("🚀 ~ Dashboard ~ data:", data);
 
   const PropertyFilterModal = ({ isOpen, onClose, onApply }) => {
     const [propertyType, setPropertyType] = useState("Apartment");
@@ -137,164 +136,158 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <div className="max-w-[90em] mx-auto py-6 px-[4em]">
-        <div className="flex flex-wrap justify-between items-center gap-6 p-0">
-          <div className="text-left">
-            <h1 className="text-3xl font-[500]">
-              Hello, <span className="font-[600]">Justin!</span>
-            </h1>
-            <p className="mt-2 text-2xl font-medium text-black pt-2">
-              My Properties
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            {/* Search Bar */}
-            <SearchBar placeholder="Search" />
-
-            {/* Settings Icon */}
-            <div className="flex items-center justify-center bg-gradient-to-r w-[4em] h-10 from-[#003897] to-[#0151DA] rounded-full cursor-pointer">
-              <VscSettings
-                color="white"
-                size={24}
-                onClick={() => setFilterOpen(true)}
-              />
-            </div>
-
-            {/* Add Property Button */}
-            <button
-              type="button" // Change type to button to prevent page reload
-              className="py-3 px-6 w-[16em] bg-gradient-to-r from-[#003897] to-[#0151DA] text-white rounded-full font-semibold hover:opacity-90 transition"
-              onClick={() => setModalOpen(true)} // Open the modal when clicked
-            >
-              + Add Property
-            </button>
-          </div>
+    <div className="max-w-[90em] mx-auto py-6 px-[4em]">
+      <div className="flex flex-wrap justify-between items-center gap-6 p-0">
+        <div className="text-left">
+          <h1 className="text-3xl font-[500]">
+            Hello, <span className="font-[600]">Justin!</span>
+          </h1>
+          <p className="mt-2 text-2xl font-medium text-black pt-2">
+            My Properties
+          </p>
         </div>
 
-        {/* Property Cards Grid */}
-        {loading ? (
-          <DashboardSkeletonLoader />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
-            {data.map((property, index) => (
-              <div
-                key={index}
-                className="bg-white p-3 rounded-2xl shadow-lg overflow-hidden"
-              >
-                {/* Property Image */}
-                <div className="relative">
-                  <img
-                    src={property.images?.[0] || "/default-property.jpg"} // fallback image
-                    alt="Property"
-                    className="w-full h-[13em] object-cover rounded-2xl"
-                  />
-                  {/* Status Badge */}
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          {/* Search Bar */}
+          <SearchBar placeholder="Search" />
+
+          {/* Settings Icon */}
+          <div className="flex items-center justify-center bg-gradient-to-r w-[4em] h-10 from-[#003897] to-[#0151DA] rounded-full cursor-pointer">
+            <VscSettings
+              color="white"
+              size={24}
+              onClick={() => setFilterOpen(true)}
+            />
+          </div>
+
+          {/* Add Property Button */}
+          <button
+            type="button" // Change type to button to prevent page reload
+            className="py-3 px-6 w-[16em] bg-gradient-to-r from-[#003897] to-[#0151DA] text-white rounded-full font-semibold hover:opacity-90 transition"
+            onClick={() => setModalOpen(true)} // Open the modal when clicked
+          >
+            + Add Property
+          </button>
+        </div>
+      </div>
+
+      {/* Property Cards Grid */}
+      {loading ? (
+        <DashboardSkeletonLoader />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
+          {data.map((property, index) => (
+            <div
+              key={index}
+              className="bg-white p-3 rounded-2xl shadow-lg overflow-hidden"
+            >
+              {/* Property Image */}
+              <div className="relative">
+                <img
+                  src={property.images?.[0] || "/default-property.jpg"} // fallback image
+                  alt="Property"
+                  className="w-full h-[13em] object-cover rounded-2xl"
+                />
+                {/* Status Badge */}
+                <span
+                  className={`absolute top-2 right-2 px-3 py-1 text-sm text-white rounded-full ${
+                    property.tenant ? "bg-green-500" : "bg-red-500"
+                  }`}
+                >
+                  {property.tenant ? "Active" : "Vacant"}
+                </span>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-4">
+                <div className="flex justify-between items-center">
                   <span
-                    className={`absolute top-2 right-2 px-3 py-1 text-sm text-white rounded-full ${
-                      property.tenant ? "bg-green-500" : "bg-red-500"
-                    }`}
+                    className="text-[18px] font-[500] cursor-pointer"
+                    onClick={() => {
+                      navigate(`/app/property-detail/${property._id}`, {
+                        state: { propertyDetail: property },
+                      });
+                    }}
                   >
-                    {property.tenant ? "Active" : "Vacant"}
+                    {property.name}
                   </span>
+                  <p className="mt-2 text-lg font-semibold text-[#0151DA]">
+                    ${property.rent}
+                  </p>
                 </div>
 
-                {/* Card Body */}
-                <div className="p-4">
-                  <div className="flex justify-between items-center">
-                    <span
-                      className="text-[18px] font-[500] cursor-pointer"
+                <div className="flex gap-1 pt-2 items-center">
+                  <LuMapPin size={16} />
+                  <p className="text-gray-500 font-[500] text-sm">
+                    {property.address}
+                  </p>
+                </div>
+
+                <span className="text-sm text-black">
+                  Unique Code: &nbsp;
+                  <span className="text-blue-600 font-semibold">
+                    {property.uniquePropertyCode}
+                  </span>
+                </span>
+
+                {/* Tenant Info and Chat */}
+                <div className="flex gap-3 justify-between pt-3">
+                  <div className="flex gap-3">
+                    <img
+                      src={
+                        property.tenant?.profilePicture || "/default-user.jpg"
+                      }
+                      className="h-10 w-10 rounded-full object-cover cursor-pointer"
+                      alt="Tenant Avatar"
+                    />
+                    <div>
+                      <span className="text-1xl">
+                        {property.tenant?.name || "No Tenant"}
+                      </span>
+                      <p className="text-sm text-gray-500">Tenant</p>
+                    </div>
+                  </div>
+                  <div>
+                    <div
+                      className="bg-[#0151DA] p-3 rounded-xl cursor-pointer"
                       onClick={() => {
-                        navigate(`/app/property-detail/${property._id}`, {
-                          state: { propertyDetail: property },
-                        });
+                        navigate("/app/messages");
                       }}
                     >
-                      {property.name}
-                    </span>
-                    <p className="mt-2 text-lg font-semibold text-[#0151DA]">
-                      ${property.rent}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-1 pt-2 items-center">
-                    <LuMapPin size={16} />
-                    <p className="text-gray-500 font-[500] text-sm">
-                      {property.address}
-                    </p>
-                  </div>
-
-                  <span className="text-sm text-black">
-                    Unique Code: &nbsp;
-                    <span className="text-blue-600 font-semibold">
-                      {property.uniquePropertyCode}
-                    </span>
-                  </span>
-
-                  {/* Tenant Info and Chat */}
-                  <div className="flex gap-3 justify-between pt-3">
-                    <div className="flex gap-3">
-                      <img
-                        src={
-                          property.tenant?.profilePicture || "/default-user.jpg"
-                        }
-                        className="h-10 w-10 rounded-full object-cover cursor-pointer"
-                        alt="Tenant Avatar"
-                      />
-                      <div>
-                        <span className="text-1xl">
-                          {property.tenant?.name || "No Tenant"}
-                        </span>
-                        <p className="text-sm text-gray-500">Tenant</p>
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        className="bg-[#0151DA] p-3 rounded-xl cursor-pointer"
-                        onClick={() => {
-                          navigate("/app/messages");
-                        }}
-                      >
-                        <IoChatbubbleEllipsesOutline size={20} color="white" />
-                      </div>
+                      <IoChatbubbleEllipsesOutline size={20} color="white" />
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+      )}
 
-        {/* Add Property Modal */}
-        <Addmorepropertymodal
-          isOpen={modalOpen}
-          onAction={() => {
-            navigate(`/app/add-property-details`);
-            setModalOpen(false);
-          }} // Close modal when action is taken
-          onSecondaryAction={() => {
-            setModalOpen(false);
-          }}
-          data={modalData}
-        />
+      {/* Add Property Modal */}
+      <Addmorepropertymodal
+        isOpen={modalOpen}
+        onAction={() => {
+          navigate(`/app/add-property-details`);
+          setModalOpen(false);
+        }} // Close modal when action is taken
+        onSecondaryAction={() => {
+          setModalOpen(false);
+        }}
+        data={modalData}
+      />
 
-        <PropertyFilterModal
-          isOpen={filterOpen}
-          onClose={() => {
-            setFilterOpen(false);
-            setFilters(null);
-          }}
-          onApply={(data) => {
-            setFilters(data);
-            setFilterOpen(false);
-          }}
-        />
-      </div>
-      <Chatai />
-
-      <Footer />
+      <PropertyFilterModal
+        isOpen={filterOpen}
+        onClose={() => {
+          setFilterOpen(false);
+          setFilters(null);
+        }}
+        onApply={(data) => {
+          setFilters(data);
+          setFilterOpen(false);
+        }}
+      />
     </div>
   );
 };

@@ -20,7 +20,7 @@ const PropertyDetail = () => {
   const { id } = useParams();
   const location = useLocation();
   const propertyDetail = location.state?.propertyDetail;
-  console.log("🚀 ~ PropertyDetail ~ propertyDetail:", propertyDetail);
+
   const [showModal, setShowModal] = useState(false);
   const [update, setUpdate] = useState(false);
 
@@ -43,6 +43,10 @@ const PropertyDetail = () => {
     images,
     tenant,
     paymentStatus,
+    landlordAgreements,
+    landlordPropertyConditionImages,
+    landlordPropertyConditionVideos,
+    landlordRules,
   } = propertyDetail;
 
   return (
@@ -257,7 +261,17 @@ const PropertyDetail = () => {
               </h5>
               <div>
                 <div
-                  onClick={() => navigate("/app/documents")}
+                  onClick={() =>
+                    navigate("/app/documents", {
+                      state: {
+                        landlordAgreements,
+                        landlordPropertyConditionImages,
+                        landlordPropertyConditionVideos,
+                        landlordRules,
+                        propertyId: id,
+                      },
+                    })
+                  }
                   className="bg-white flex justify-between rounded-2xl p-3 items-center mb-3"
                 >
                   <button className="font-[500]">Documents</button>

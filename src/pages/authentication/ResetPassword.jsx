@@ -1,26 +1,25 @@
 import { useState } from "react";
-import { FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
-import logomain from "../../assets/logomain.webp";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 import logoback from "../../assets/backloginimage.webp";
 import Input from "../../components/global/Input";
-import { NavLink, useNavigate } from "react-router";
-import Button from "../../components/global/Button";
+import { useLocation, useNavigate } from "react-router";
 import Modal from "../../components/global/Modal";
 import { useFormik } from "formik";
 import { updatePasswordValues } from "../../init/authValues";
 import { updatePasswordSchema } from "../../schema/authSchema";
 import axios from "../../axios";
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
+import SubmitButton from "../../components/global/SubmitButton";
 
 export default function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [newpassword, setnewPassword] = useState("");
-  const [error, seterror] = useState("");
+
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
-  const { email } = location.state || {};
+  const { resetToken, email } = location.state || {};
 
   const navigate = useNavigate("");
 
@@ -36,20 +35,17 @@ export default function ResetPassword() {
           role: "landlord",
           password: values.password,
           confirmPassword: values.cPassword,
-          resetToken:
-            "58f2a3f47c27f819081fa96341e925add12756663c91ddc2b4b2d8d572220177",
+          resetToken: resetToken,
         };
         try {
           setLoading(true);
           const response = await axios.post("/auth/updatePassOTP", obj);
           if (response.status === 200) {
             SuccessToast("Success");
-            console.log("response--> ", response);
-            navigate("/app/Dashboard");
+            navigate("/auth/login");
           }
         } catch (error) {
           ErrorToast(error.response.data.message);
-          // navigate("/auth/signup-otp", { state: { email: values.email } });
         } finally {
           setLoading(false);
         }
@@ -138,12 +134,11 @@ export default function ResetPassword() {
               </button>
             </div>
 
-            <button
+            <SubmitButton
+              text="Update Password"
+              loading={loading}
               type="submit"
-              className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
-            >
-              <span>Update Password</span>
-            </button>
+            />
           </form>
           <Modal
             isOpen={showModal}

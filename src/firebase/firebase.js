@@ -6,17 +6,17 @@ import { getMessaging } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_FIREBASE_KEY,
-  // Update this api key with your own firebase api key
-  // authDomain: "rentibles-app.firebaseapp.com",
-  // projectId: "rentibles-app",
-  // storageBucket: "rentibles-app.firebasestorage.app",
-  // messagingSenderId: "366992554576",
-  // appId: "1:366992554576:web:8c8781df54b276fc1eef55",
-  // measurementId: "G-V0F642L156",
+  authDomain: "depositback.firebaseapp.com",
+  projectId: "depositback",
+  storageBucket: "depositback.firebasestorage.app",
+  messagingSenderId: "294865074710",
+  appId: "1:294865074710:web:d95fd524163519b68b1337",
+  measurementId: "G-S7BX38TDF7",
 };
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+console.log("🚀 ~ auth:", auth);
 export const googleProvider = new GoogleAuthProvider();
 export const appleProvider = new OAuthProvider("apple.com");
 export const db = getFirestore(app);

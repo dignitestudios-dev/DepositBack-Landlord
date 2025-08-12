@@ -12,9 +12,16 @@ import { phoneFormatter } from "../../lib/helpers";
 import axios from "../../axios";
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 import SubmitButton from "../../components/global/SubmitButton";
+import {
+  createUserWithEmailAndPassword,
+  getIdToken,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../../firebase/firebase";
 
 export default function Signup() {
   const navigate = useNavigate("");
+
   const [loading, setLoading] = useState(false);
 
   const { values, errors, touched, handleChange, handleBlur, handleSubmit } =
@@ -30,36 +37,75 @@ export default function Signup() {
         cPassword: true,
       },
       onSubmit: async (values) => {
-        let formattedPhoneNumber = values?.number.startsWith("+1")
-          ? values?.number
-          : `+1${values?.number}`;
-
-        let payload = {};
-
-        payload = {
-          email: values.email.toLocaleLowerCase(),
-          phoneNo: formattedPhoneNumber,
-          password: values.password,
-          confirmPassword: values.password,
-          role: "landlord",
-          idToken: "123",
-        };
         try {
           setLoading(true);
-          const response = await axios.post("/auth/emailSignUp", payload);
-          console.log("response--> ", response);
-          if (response.status === 200) {
-            SuccessToast("Success");
-            navigate("/auth/signup-otp", { state: { email: values.email } });
+          const newUser = await createUserWithEmailAndPassword(
+            auth,
+            values.email.toLocaleLowerCase(),
+            "Test@123"
+          );
+          const token = await getIdToken(newUser.user);
+          if (token) {
+            handelSignUp(values, token);
           }
         } catch (error) {
           console.log("🚀 ~ Signup ~ error:", error);
-          ErrorToast(error.response.data.message);
-        } finally {
-          setLoading(false);
+          if (error?.message?.includes("auth/email-already-in-use")) {
+            // Try to sign in the
+            try {
+              const userCredential = await signInWithEmailAndPassword(
+                auth,
+                values.email.toLocaleLowerCase(),
+                "Test@123"
+              );
+              const user = userCredential?.user;
+              //   // Get the ID token
+              const token = await getIdToken(user);
+              if (token) {
+                handelSignUp(values, token);
+              } else {
+                ErrorToast("Token Not Found");
+                setLoading(false);
+              }
+            } catch (err) {
+              console.log("🚀 ~ ~ firebase Two is ~ err:", err);
+              ErrorToast("Email is already in use");
+              setLoading(false);
+            }
+          }
         }
       },
     });
+
+  const handelSignUp = async (values, idToken) => {
+    let formattedPhoneNumber = values?.number.startsWith("+1")
+      ? values?.number
+      : `+1${values?.number}`;
+
+    let payload = {};
+
+    payload = {
+      email: values.email.toLocaleLowerCase(),
+      phoneNo: formattedPhoneNumber,
+      password: values.password,
+      confirmPassword: values.password,
+      role: "landlord",
+      idToken,
+    };
+    try {
+      const response = await axios.post("/auth/emailSignUp", payload);
+      console.log("response--> ", response);
+      if (response.status === 201) {
+        SuccessToast("Account created successfully");
+        navigate("/auth/signup-otp", { state: { email: values.email } });
+      }
+    } catch (error) {
+      console.log("🚀 ~ Signup ~ error:", error);
+      ErrorToast(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   //   const handleSubmit = (e) => {
   //     e.preventDefault();

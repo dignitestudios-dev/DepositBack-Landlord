@@ -1,9 +1,12 @@
-import { useReducer, useState } from "react";
+import { useContext, useReducer, useState } from "react";
 import { useNavigate } from "react-router";
 import logoback from "../../assets/backloginimage.webp";
 import Input from "../../components/global/Input";
-import { FaArrowLeft } from "react-icons/fa";
 import { formatFullName, formatSsnLast } from "../../lib/helpers";
+import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
+import axios from "../../axios";
+import SubmitButton from "../../components/global/SubmitButton";
+import { AppContext } from "../../context/AppContext";
 
 const initialState = {
   idFront: null,
@@ -42,6 +45,9 @@ function fileReducer(state, action) {
 }
 
 export default function Addpersonalinfo() {
+  const [loading, setLoading] = useState(false);
+  const { loginContext } = useContext(AppContext);
+
   const [Fullname, setFullname] = useState("");
   const [Ssnnumber, setSsnnumber] = useState("");
   const [errors, setErrors] = useState({
@@ -54,8 +60,9 @@ export default function Addpersonalinfo() {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const newErrors = {
       fullname: !Fullname.trim() ? "Full name is required" : "",
       ssn: !Ssnnumber.trim()
@@ -72,10 +79,37 @@ export default function Addpersonalinfo() {
     const hasErrors = Object.values(newErrors).some((error) => error !== "");
     if (hasErrors) return;
 
-    alert("Successfully Submit...");
-    navigate("/onboarding/subscription-plans", {
-      state: { email: "example@email.com" },
-    }); // Fix 'email' reference
+    let formData = new FormData();
+
+    formData.append("name", Fullname);
+    formData.append("lastFourSSN", Ssnnumber);
+
+    if (files.idFront) {
+      formData.append("governmentIdFront", files.idFront);
+    }
+    if (files.idBack) {
+      formData.append("governmentIdBack", files.idBack);
+    }
+    if (files.profileImage) {
+      formData.append("profilePicture", files.profileImage);
+    }
+
+    try {
+      const response = await axios.post("/users/complete", formData);
+
+      if (response.status === 200) {
+        let data = response?.data?.data;
+
+        loginContext(data);
+        SuccessToast("Account created successfully");
+        navigate("/onboarding/subscription-plans");
+      }
+    } catch (error) {
+      console.log("🚀 ~ Signup ~ error:", error);
+      ErrorToast(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const [files, dispatch] = useReducer(fileReducer, initialState);
@@ -101,11 +135,11 @@ export default function Addpersonalinfo() {
     <div className="min-h-screen flex bg-[#f4f8ff] overflow-hidden">
       {/* Left Section - Form */}
       <div className="w-full lg:w-1/2 flex justify-center items-start p-0 lg:p-12">
-        <div className="w-full max-w-md pt-[4em]">
+        <div className="w-full max-w-md pt-[1.5em]">
           <div className="text-left mb-6">
-            <button type="button" onClick={() => navigate(-1)}>
+            {/* <button type="button" onClick={() => navigate(-1)}>
               <FaArrowLeft size={25} />
-            </button>
+            </button> */}
             <h2 className="text-[34px] mt-2 font-[600] leading-[48px] tracking-normal capitalize pt-[20px]">
               Add Personal Information
             </h2>
@@ -235,12 +269,13 @@ export default function Addpersonalinfo() {
               <p className="text-red-500 text-xs">{errors.idBack}</p>
             )}
 
-            <button
+            {/* <button
               type="submit"
               className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
             >
               <span>Next</span>
-            </button>
+            </button> */}
+            <SubmitButton text="Next" loading={loading} type="submit" />
           </form>
         </div>
       </div>

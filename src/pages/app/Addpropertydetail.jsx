@@ -3,6 +3,8 @@ import Propertydetails from "../../assets/addproperty/Propertydetails.png";
 import Stripeaccount from "../../assets/addproperty/Stripeaccount.png";
 import Uniquepropertycode from "../../assets/addproperty/Uniquepropertycode.png";
 import Inspectiondetails from "../../assets/addproperty/Inspectiondetails.png";
+import UvImage from "../../assets/addproperty/UvImage.png";
+
 import line from "../../assets/addproperty/Line.png";
 import Stripe from "../../assets/addproperty/Stripe.png";
 import { FaArrowLeft, FaChevronRight } from "react-icons/fa";
@@ -12,8 +14,11 @@ import DetailStepOne from "../../components/app/propertyDetail/DetailStepOne";
 import { PiIdentificationBadge } from "react-icons/pi";
 import DetailStepTwo from "../../components/app/propertyDetail/DetailStepTwo";
 import DetailStepThree from "../../components/app/propertyDetail/DetailStepThree";
+import DetailStepFour from "../../components/app/propertyDetail/DetailStepFour";
+import { useNavigate } from "react-router";
 
 const AddPropertyDetail = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
 
   const [accountholderName, setAccountholderName] = useState("");
@@ -23,6 +28,10 @@ const AddPropertyDetail = () => {
   const [isStripeLinked, setIsStripeLinked] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [stepOneData, setStepOneData] = useState({});
+  const [stepTwoData, setStepTwoData] = useState({});
+  const [stepThreeData, setStepThreeData] = useState({});
+  const [stepFourData, setStepFourData] = useState({});
 
   const modalData = {
     title: "Add More Properties",
@@ -39,6 +48,7 @@ const AddPropertyDetail = () => {
   const steps = [
     { img: Propertydetails, label: "Property Details" },
     { img: Inspectiondetails, label: "Inspection Details" },
+    { img: UvImage, label: "UV Images" },
     { img: Uniquepropertycode, label: "Unique Property Code" },
     { img: Stripeaccount, label: "Stripe Account" },
   ];
@@ -91,15 +101,32 @@ const AddPropertyDetail = () => {
         </div>
 
         {/* Step Content */}
-        {step === 1 && <DetailStepOne nextStep={nextStep} />}
-
-        {step === 2 && (
-          <DetailStepTwo nextStep={nextStep} prevStep={prevStep} />
+        {step === 1 && (
+          <DetailStepOne
+            nextStep={nextStep}
+            stepOneData={stepOneData}
+            propertyDetail={(data) => setStepOneData(data)}
+          />
         )}
 
-        {step === 3 && <DetailStepThree nextStep={nextStep} />}
+        {step === 2 && (
+          <DetailStepTwo
+            nextStep={nextStep}
+            prevStep={prevStep}
+            stepTwoData={stepTwoData}
+            inspectionDetail={(data) => setStepTwoData(data)}
+          />
+        )}
+
+        {step === 3 && (
+          <DetailStepThree nextStep={nextStep} stepThreeData={stepThreeData} />
+        )}
 
         {step === 4 && (
+          <DetailStepFour nextStep={nextStep} stepFourData={stepFourData} />
+        )}
+
+        {step === 5 && (
           <div className="bg-[#F9FAFA] mt-20 rounded-xl shadow-lg p-8">
             {!showStripeForm ? (
               // === Step 1: Connect your Stripe Account screen ===
@@ -255,6 +282,7 @@ const AddPropertyDetail = () => {
               onSecondaryAction={() => {
                 console.log("Continue Clicked");
                 setModalOpen(false);
+                navigate("/app/dashboard");
               }}
               data={modalData}
             />

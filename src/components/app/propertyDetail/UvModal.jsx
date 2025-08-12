@@ -1,6 +1,6 @@
 import { TiWarning } from "react-icons/ti";
 
-export default function Modal({ isOpen, onClose, onAction, data }) {
+export default function UvModal({ isOpen, onClose, data }) {
   if (!isOpen) return null;
 
   const {
@@ -19,42 +19,40 @@ export default function Modal({ isOpen, onClose, onAction, data }) {
     ),
     title = "Title Here",
     description = "Description here...",
-    actionText,
+    actionText = "Yes",
   } = data || {};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-      <div
-        onClick={onClose}
-        className="bg-white rounded-2xl p-6 w-full max-w-[26em] text-center shadow-lg relative"
-      >
-        {/* {typeof onClose === "function" && (
-                    <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 text-black hover:text-gray-600 font-[400] text-4xl"
-                        aria-label="Close modal"
-                    >
-                        &times;
-                    </button>
-                )} */}
-
+      <div className="bg-white rounded-2xl p-6 w-full max-w-[26em] text-center shadow-lg relative">
         <div className="flex justify-center mb-4">
           <div
             className={`w-20 h-20 ${iconBgColor} rounded-full flex items-center justify-center`}
           >
-            {icon}
+            <TiWarning size={40} color="white" />
           </div>
         </div>
         <h2 className="text-2xl font-[600] mb-2">{title}</h2>
         <p className="text-gray-600 mb-6 font-normal">{description}</p>
-        {actionText && (
+        <div className="flex items-center justify-between w-full gap-2">
           <button
-            onClick={onAction}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition"
+            onClick={onClose}
+            className="w-full py-2 rounded-full bg-gray-200 text-gray-700 "
           >
-            {actionText}
+            No
           </button>
-        )}
+          <button
+            // disabled={loading}
+            type="button"
+            onClick={onClose}
+            className="w-full py-2 bg-gradient-to-r from-[#003897] to-[#0151DA] text-white rounded-full hover:opacity-90 transition"
+          >
+            <div className="flex justify-center items-center">
+              <span className="mr-1">Yes</span>
+              {/* {loading && <RiLoader5Line className="animate-spin text-lg" />} */}
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   );

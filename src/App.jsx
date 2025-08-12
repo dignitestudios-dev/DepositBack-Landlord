@@ -7,6 +7,8 @@ import { OnboardRoutes } from "./routes/onboarding/OnboardRoutes";
 import { appRoutes } from "./routes/app/appRoutes";
 import { useContext } from "react";
 import { AppContext } from "./context/AppContext";
+import OnBoardLayout from "./layouts/OnBoardLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 function App() {
   const { token, userData } = useContext(AppContext);
@@ -15,7 +17,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Login />} />
 
-      <Route path="app">
+      <Route path="app" element={<DashboardLayout />}>
         {appRoutes?.map((Link, i) => (
           <Route path={Link.url} key={i} element={Link.page} />
         ))}
@@ -27,7 +29,10 @@ function App() {
         ))}
       </Route>
 
-      <Route path="onboarding">
+      <Route
+        path="onboarding"
+        element={<OnBoardLayout token={token} userData={userData} />}
+      >
         {OnboardRoutes?.map((Link, i) => (
           <Route path={Link.url} key={i} element={Link.page} />
         ))}

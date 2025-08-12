@@ -6,18 +6,23 @@ import { useLocation } from "react-router";
 import SubmitButton from "../../components/global/SubmitButton";
 import axios from "../../axios";
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
+import CountDown from "./CountDown";
 
 export default function VerifyOtp() {
   const navigate = useNavigate();
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", "", ""]);
   const inputs = useRef([]);
   const location = useLocation();
   const { email } = location.state || {};
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const [isActive, setIsActive] = useState(true);
+  const [seconds, setSeconds] = useState(10);
 
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e, index) => {
-    const value = e.target.value.replace(/\D/, ""); // Allow only digits
+    const value = e.target.value.replace(/\D/, "");
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
@@ -54,12 +59,10 @@ export default function VerifyOtp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (otp.some((digit) => digit === "")) {
-      alert("Please enter complete OTP.");
+      ErrorToast("Please enter complete OTP.");
       return;
     }
     const otpValue = otp.join("");
-    alert(`Verifying OTP: ${otpValue}`);
-    navigate("/auth/reset-password", { state: { email } });
     try {
       setLoading(true);
       const response = await axios.post("/auth/validatePassOTP", {
@@ -68,14 +71,45 @@ export default function VerifyOtp() {
         role: "landlord",
       });
       if (response.status === 200) {
+        console.log("--> ", response.data.resetToken);
+        let resetToken = response.data.resetToken;
+        console.log("🚀 ~ handleSubmit ~ resetToken:", resetToken);
         SuccessToast("Otp Verified");
-        navigate("/auth/reset-password");
+        navigate("/auth/reset-password", { state: { resetToken, email } });
       }
     } catch (error) {
       ErrorToast(error.response.data.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      setResendLoading(true);
+      let obj = {
+        email: email,
+        role: "landlord",
+      };
+
+      const response = await axios.post("/auth/sendPassOTP", obj);
+
+      if (response.status === 201) {
+        SuccessToast(response?.data?.message);
+        setResendLoading(false);
+        setOtp(Array(5).fill("")); // Reset OTP fields
+        handleRestart();
+      }
+    } catch (err) {
+      ErrorToast(err?.response?.data?.message);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleRestart = () => {
+    setSeconds(10);
+    setIsActive(true);
   };
 
   return (
@@ -97,7 +131,7 @@ export default function VerifyOtp() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex gap-3">
+            <div className="flex gap-6">
               {otp.map((digit, index) => (
                 <input
                   key={index}
@@ -111,6 +145,30 @@ export default function VerifyOtp() {
                   className="w-[50px] h-[55px] rounded-[12px] text-blue-600 bg-transparent outline-none text-center border border-gray-400 text-xl focus:border-blue-600"
                 />
               ))}
+            </div>
+            <div className="flex items-center justify-start gap-2 relative z-10">
+              <p className=" text-[16px] leading-[21.6px] text-[#565656]">
+                Didn&apos;t receive the code yet?
+                {isActive ? (
+                  <span className="inline-block ml-1 align-middle">
+                    <CountDown
+                      isActive={isActive}
+                      setIsActive={setIsActive}
+                      seconds={seconds}
+                      setSeconds={setSeconds}
+                    />
+                  </span>
+                ) : (
+                  <span
+                    type="button"
+                    disabled={resendLoading}
+                    onClick={handleResendOtp}
+                    className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent font-medium pl-1 cursor-pointer"
+                  >
+                    {resendLoading ? "Resending..." : "Resend"}
+                  </span>
+                )}
+              </p>
             </div>
 
             <SubmitButton text="Verify" loading={loading} type="submit" />
