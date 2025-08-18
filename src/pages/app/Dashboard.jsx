@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import Header from "../../components/global/Header";
-import Footer from "../../components/global/Footer";
+import { useState } from "react";
+
 import SearchBar from "../../components/global/Searchbar";
 import Homeone from "../../assets/Homeone.png";
 import Hometwo from "../../assets/Hometwo.png";
@@ -11,7 +10,6 @@ import user from "../../assets/user.png";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import Addmorepropertymodal from "../../components/global/Addmorepropertymodal";
 import { useNavigate } from "react-router";
-import Chatai from "../../components/global/Chatai";
 import { useFetchData } from "../../hooks/api/Get";
 import DashboardSkeletonLoader from "../../components/app/dashboard/DashboardSkeletonLoader";
 
@@ -19,7 +17,7 @@ const Dashboard = () => {
   const [modalOpen, setModalOpen] = useState(false); // Manage modal visibility
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({});
-  console.log("🚀 ~ Dashboard ~ filters:", filters);
+
   const navigate = useNavigate("");
 
   const modalData = {
@@ -30,7 +28,7 @@ const Dashboard = () => {
     actionTextTwo: "Cancel",
   };
 
-  const { data, loading, pagination } = useFetchData(
+  const { data, loading } = useFetchData(
     `/properties`,
     { status: filters?.propertyStatus, type: filters?.propertyType },
     1,
@@ -194,7 +192,7 @@ const Dashboard = () => {
                     property.tenant ? "bg-green-500" : "bg-red-500"
                   }`}
                 >
-                  {property.tenant ? "Active" : "Vacant"}
+                  {property.tenant ? "Active" : "Inactive"}
                 </span>
               </div>
 
@@ -234,9 +232,7 @@ const Dashboard = () => {
                 <div className="flex gap-3 justify-between pt-3">
                   <div className="flex gap-3">
                     <img
-                      src={
-                        property.tenant?.profilePicture || "/default-user.jpg"
-                      }
+                      src={property.tenant?.profilePicture || user}
                       className="h-10 w-10 rounded-full object-cover cursor-pointer"
                       alt="Tenant Avatar"
                     />
@@ -244,7 +240,9 @@ const Dashboard = () => {
                       <span className="text-1xl">
                         {property.tenant?.name || "No Tenant"}
                       </span>
-                      <p className="text-sm text-gray-500">Tenant</p>
+                      <p className="text-sm text-gray-500">
+                        {property.tenant?.name ? "Tenant" : "--"}
+                      </p>
                     </div>
                   </div>
                   <div>

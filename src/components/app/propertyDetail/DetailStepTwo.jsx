@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { PiIdentificationBadge } from "react-icons/pi";
 import { ErrorToast } from "../../global/Toaster";
+import axios from "../../../axios";
+import { RiLoader5Line } from "react-icons/ri";
 
 const DetailStepTwo = ({
   prevStep,
   nextStep,
+  stepOneData,
   stepTwoData,
   inspectionDetail,
 }) => {
-  console.log("🚀 ~ DetailStepTwo ~ stepTwoData:", stepTwoData);
+  const [loading, setLoading] = useState(false);
   const [mediaFiles, setMediaFiles] = useState([]);
   const [documentFiles, setDocumentFiles] = useState([]);
   const handleFileChange = (e) => {
@@ -30,10 +33,39 @@ const DetailStepTwo = ({
     setDocumentFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (mediaFiles.length > 0 || documentFiles.length > 0) {
-      inspectionDetail({ documentFiles, mediaFiles });
-      nextStep();
+      try {
+        setLoading(true);
+        const formData = new FormData();
+
+        mediaFiles.forEach((file) => {
+          if (file.type.startsWith("image/")) {
+            formData.append("landlordPropertyConditionImages", file);
+          } else {
+            formData.append("landlordPropertyConditionVideos", file);
+          }
+        });
+
+        documentFiles.forEach((file) => {
+          formData.append("landlordAgreements", file);
+        });
+        formData.append("currentDate", new Date().toLocaleString());
+
+        const response = await axios.put(
+          `/properties/${stepOneData?.propertyId}/updateDocs`,
+          formData
+        );
+
+        if (response.status === 200) {
+          inspectionDetail({ documentFiles, mediaFiles });
+          nextStep();
+        }
+      } catch (error) {
+        ErrorToast(error?.response?.data?.message);
+      } finally {
+        setLoading(false);
+      }
     } else {
       ErrorToast("Please upload at least one media or document file.");
     }
@@ -143,10 +175,14 @@ const DetailStepTwo = ({
           Back
         </button>
         <button
+          disabled={loading}
           onClick={handleNext}
           className="px-[10em] py-3 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-medium"
         >
-          Next
+          <div className="flex justify-center items-center">
+            <span className="mr-1">Next</span>
+            {loading && <RiLoader5Line className="animate-spin text-lg" />}
+          </div>
         </button>
       </div>
     </div>

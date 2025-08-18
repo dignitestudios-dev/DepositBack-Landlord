@@ -1,27 +1,26 @@
 import { useEffect, useReducer, useState } from "react";
-import { ErrorToast } from "../../global/Toaster";
 import { useNavigate } from "react-router";
-import AddContactPersonModal from "./AddContactPersonModal";
+import AddContactPersonModal from "./../propertyDetail/AddContactPersonModal";
+import { ErrorToast } from "./../../global/Toaster";
 import axios from "../../../axios";
 
 const initialState = {
   form: {
-    propertyName: "",
+    name: "",
     address: "",
     city: "",
     state: "",
-    zipCode: "",
-    rentAmount: "",
-    dueDate: "",
-    propertyType: "",
+    zipcode: "",
+    rent: "",
+    rentDueDate: "",
+    type: "",
   },
   errors: {},
 };
 
 const validateField = (field, value, state) => {
-  console.log("🚀 ~ validateField ~ state:", state);
   switch (field) {
-    case "propertyName":
+    case "name":
       if (!value.trim()) return "Property name is required";
       return "";
     case "address":
@@ -33,21 +32,18 @@ const validateField = (field, value, state) => {
     case "city":
       if (!value) return "City is required";
       return "";
-    case "zipCode":
+    case "zipcode":
       if (!/^\d{5}$/.test(value)) return "Zip Code must be 5 digits";
       return "";
-    case "rentAmount":
+    case "rent":
       if (!/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0)
         return "Enter a valid rent amount";
       return "";
-    case "dueDate":
+    case "rentDueDate":
       if (!value || !/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0)
         return "Due Date is required";
       return "";
-    case "propertyType":
-      if (!value) return "Property type is required";
-      return "";
-    case "depositAmount":
+    case "deposit":
       // Allow empty value (optional field)
       if (!value) return "";
 
@@ -64,6 +60,9 @@ const validateField = (field, value, state) => {
       if (!/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0) {
         return "Enter valid late fee amount";
       }
+      return "";
+    case "type":
+      if (!value) return "Property type is required";
       return "";
     default:
       return "";
@@ -121,9 +120,9 @@ const formReducer = (state, action) => {
   }
 };
 
-const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
+const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
   const navigate = useNavigate();
-  const [lateFeePolicy, setLateFeePolicy] = useState("");
+
   const [personsData, setPersonsData] = useState([]);
   const [propertyMedia, setPropertyMedia] = useState([]);
   const [mediaError, setMediaError] = useState(null);
@@ -154,89 +153,80 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
   };
 
   const handleContactPerson = () => {
-    const hasEmptyFields = Object.values(state.form).some((value) => {
-      // Handles null, undefined, empty string, or array with no items
-      if (typeof value === "string") return value.trim() === "";
-      if (Array.isArray(value)) return value.length === 0;
-      return !value;
-    });
-
-    if (propertyMedia.length === 0) {
-      setMediaError("Upload Property Images");
+    if (propertyMedia?.length === 0) {
+      ErrorToast("Upload Property Images");
+      return;
+    }
+    if (!form.city) {
+      ErrorToast("Please select the city");
+      return;
+    }
+    if (Object.keys(errors).length > 0) {
+      ErrorToast("Please fill all required fields");
       return;
     }
 
-    if (!hasEmptyFields && Object.keys(state.errors).length === 0) {
-      setContactPersons(true);
-    } else {
-      ErrorToast("Please fill in all valid/required fields.");
-    }
+    setContactPersons(true);
   };
 
-  const handleNext = async () => {
-    const hasEmptyFields = Object.values(state.form).some((value) => {
-      // Handles null, undefined, empty string, or array with no items
-      if (typeof value === "string") return value.trim() === "";
-      if (Array.isArray(value)) return value.length === 0;
-      return !value;
-    });
+  const handleUpdateProperty = async () => {
+    try {
+      setLoading(true);
 
-    if (propertyMedia.length === 0) {
-      setMediaError("Upload Property Images");
-      return;
-    }
+      // const dayOnly = form.dueDate
+      //   ? new Date(form.dueDate).getDate().toString()
+      //   : "";
 
-    if (!hasEmptyFields && Object.keys(state.errors).length === 0) {
-      try {
-        setLoading(true);
+      const formData = new FormData();
+      formData.append("currentDate", new Date().toLocaleString());
+      formData.append("name", form.name || "");
+      formData.append("type", form.type || "");
+      formData.append("description", form?.description || "");
+      formData.append("address", form.address || "");
+      formData.append("city", form.city || "");
+      formData.append("state", form.state || "");
+      formData.append("zipcode", form.zipcode || "");
+      formData.append("deposit", form.deposit || "");
+      formData.append("rent", form.rent || "");
+      formData.append("rentDueDate", form.rentDueDate);
+      formData.append("lateFeeAmount", form.lateFeeAmount);
 
-        // const dayOnly = form.dueDate
-        //   ? new Date(form.dueDate).getDate().toString()
-        //   : "";
+      personsData.forEach((person, index) => {
+        formData.append(`contactPersons[${index}][name]`, person.name);
+        formData.append(`contactPersons[${index}][phone]`, person.phone);
+      });
 
-        const formData = new FormData();
-        formData.append("name", form.propertyName || "");
-        formData.append("type", form.propertyType || "");
-        formData.append("description", form?.description || "");
-        formData.append("address", form.address || "");
-        formData.append("city", form.city || "");
-        formData.append("state", form.state || "");
-        formData.append("zipcode", form.zipCode || "");
-        formData.append("deposit", form.depositAmount || "");
-        formData.append("rent", form.rentAmount || "");
-        formData.append("dueDate", form.dueDate);
-        formData.append("lateFeeAmount", form.lateFeeAmount);
-
-        personsData.forEach((person, index) => {
-          formData.append(`contactPersons[${index}][name]`, person.name);
-          formData.append(`contactPersons[${index}][phone]`, person.phone);
-        });
-
-        // Step Two files
-        propertyMedia.forEach((file) => {
+      propertyMedia.forEach((file) => {
+        if (typeof file !== "string") {
           formData.append("images", file);
-        });
-
-        const response = await axios.post("/properties", formData);
-        if (response.status === 200) {
-          let { uniquePropertyCode, id } = response.data.data;
-
-          setContactPersons(false);
-          nextStep();
-          propertyDetail({
-            ...state.form,
-            propertyCode: uniquePropertyCode,
-            propertyId: id,
-          });
         }
-      } catch (error) {
-        console.log("🚀 ~ handlePropertySubmit ~ error:", error.response.data);
-        ErrorToast(error.response.data.message);
-      } finally {
-        setLoading(false);
+      });
+      propertyMedia.forEach((file) => {
+        if (typeof file === "string") {
+          formData.append("existingImages", file);
+        }
+      });
+
+      const response = await axios.put(
+        `/properties/${stepOneData?._id}`,
+        formData
+      );
+      if (response.status === 200) {
+        let { uniquePropertyCode, id } = response.data.data;
+
+        setContactPersons(false);
+        nextStep();
+        propertyDetail({
+          ...state.form,
+          propertyCode: uniquePropertyCode,
+          propertyId: id,
+        });
       }
-    } else {
-      ErrorToast("Please fill in all valid/required fields.");
+    } catch (error) {
+      console.log("🚀 ~ handlePropertySubmit ~ error:", error.response.data);
+      ErrorToast(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -249,6 +239,8 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
           value,
         });
       });
+      let images = stepOneData?.images;
+      setPropertyMedia(images);
     }
   }, [stepOneData]);
 
@@ -283,7 +275,7 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
             className="relative w-28 h-28 rounded overflow-hidden"
           >
             <img
-              src={URL.createObjectURL(file)}
+              src={typeof file === "string" ? file : URL.createObjectURL(file)}
               alt="preview"
               className="w-full h-full object-cover rounded"
             />
@@ -306,30 +298,28 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
           <input
             type="text"
             placeholder="Property Name"
-            value={form.propertyName}
+            value={form.name}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
-                field: "propertyName",
+                field: "name",
                 value: e.target.value,
               })
             }
             className="w-full p-3 border rounded-full"
           />
-          {errors.propertyName && (
-            <p className="text-red-500 text-sm">{errors.propertyName}</p>
-          )}
+          {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
         <div className="w-full">
           <label className="block mb-1 text-sm font-medium text-gray-700">
             Property Type
           </label>
           <select
-            value={form.propertyType}
+            value={form.type}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
-                field: "propertyType",
+                field: "type",
                 value: e.target.value,
               })
             }
@@ -346,9 +336,7 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
             <option value="Townhouse">Townhouse</option>
             <option value="Duplex">Duplex</option>
           </select>
-          {errors.propertyType && (
-            <p className="text-red-500 text-sm">{errors.propertyType}</p>
-          )}
+          {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
         </div>
       </div>
 
@@ -485,7 +473,7 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
         {/* Zip Code */}
         <div>
           <label
-            htmlFor="zipCode"
+            htmlFor="zipcode"
             className="block mb-1 text-sm font-medium text-gray-700"
           >
             Zip Code
@@ -493,25 +481,25 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
           <input
             type="text"
             placeholder="Zip Code"
-            value={form.zipCode}
+            value={form.zipcode}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
-                field: "zipCode",
+                field: "zipcode",
                 value: e.target.value,
               })
             }
             className="w-full p-3 border rounded-full"
           />
-          {errors.zipCode && (
-            <p className="text-red-500 text-sm">{errors.zipCode}</p>
+          {errors.zipcode && (
+            <p className="text-red-500 text-sm">{errors.zipcode}</p>
           )}
         </div>
 
         {/* Rent Amount */}
         <div>
           <label
-            htmlFor="rentAmount"
+            htmlFor="rent"
             className="block mb-1 text-sm font-medium text-gray-700"
           >
             Rent Amount
@@ -519,43 +507,41 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
           <input
             type="text"
             placeholder="Rent Amount"
-            value={form.rentAmount}
+            value={form.rent}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
-                field: "rentAmount",
+                field: "rent",
                 value: e.target.value,
               })
             }
             className="w-full p-3 border rounded-full"
           />
-          {errors.rentAmount && (
-            <p className="text-red-500 text-sm">{errors.rentAmount}</p>
-          )}
+          {errors.rent && <p className="text-red-500 text-sm">{errors.rent}</p>}
         </div>
 
         {/* Due Date */}
         <div>
           <label
-            htmlFor="dueDate"
+            htmlFor="rentDueDate"
             className="block mb-1 text-sm font-medium text-gray-700"
           >
             Due Date
           </label>
           <input
             type="text"
-            value={form.dueDate}
+            value={form.rentDueDate}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
-                field: "dueDate",
+                field: "rentDueDate",
                 value: e.target.value,
               })
             }
             className="w-full p-3 border rounded-full"
           />
-          {errors.dueDate && (
-            <p className="text-red-500 text-sm">{errors.dueDate}</p>
+          {errors.rentDueDate && (
+            <p className="text-red-500 text-sm">{errors.rentDueDate}</p>
           )}
         </div>
 
@@ -583,30 +569,36 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
             }
             className="w-full p-3 border border-gray-300 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {errors.lateFeeAmount && (
+            <p className="text-red-500 text-sm">{errors.lateFeeAmount}</p>
+          )}
         </div>
 
         {/* Deposit Amount */}
         <div>
           <label
-            htmlFor="depositAmount"
+            htmlFor="deposit"
             className="block mb-1 text-sm font-medium text-gray-700"
           >
             Deposit Amount
           </label>
           <input
-            id="depositAmount"
+            id="deposit"
             type="text"
             placeholder="Enter deposit amount"
-            value={form.depositAmount}
+            value={form.deposit}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
-                field: "depositAmount",
+                field: "deposit",
                 value: e.target.value,
               })
             }
             className="w-full p-3 border border-gray-300 rounded-3xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {errors.deposit && (
+            <p className="text-red-500 text-sm">{errors.deposit}</p>
+          )}
         </div>
       </div>
 
@@ -629,15 +621,16 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
       {contactPersons && (
         <AddContactPersonModal
           onClose={() => {
-            handleNext();
+            handleUpdateProperty();
           }}
           loading={loading}
           personsData={personsData}
           setPersonsData={setPersonsData}
+          type="edit"
         />
       )}
     </div>
   );
 };
 
-export default DetailStepOne;
+export default EditPropertyDetail;

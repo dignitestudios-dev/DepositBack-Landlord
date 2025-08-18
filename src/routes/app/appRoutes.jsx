@@ -8,6 +8,7 @@ import Paymentmethodplan from "../../pages/app/Paymentmethodplan";
 import Photo from "../../pages/app/Photo";
 import Privacypolicy from "../../pages/app/Privacypolicy";
 import PropertyDetail from "../../pages/app/PropertyDetail";
+import PropertyEdit from "../../pages/app/PropertyEdit";
 import Receiptsanddeductions from "../../pages/app/Receiptsanddeductions";
 import Renthistory from "../../pages/app/Renthistory";
 import Resources from "../../pages/app/Resources";
@@ -22,29 +23,24 @@ import Viewprofile from "../../pages/app/Viewprofile";
 
 export const appRoutes = [
   {
+    url: "dashboard",
+    page: <Dashboard />,
+    name: "Dashboard",
+    isPublic: true,
+  },
+  {
     url: "add-property-details",
     page: <AddPropertyDetail />,
     name: "Add Property Details",
     isPublic: true,
   },
   {
-    url: "terms-and-conditions",
-    page: <Termsandconditions />,
-    name: "Terms And Conditions",
+    url: "edit-property",
+    page: <PropertyEdit />,
+    name: "Edit Property Details",
     isPublic: true,
   },
-  {
-    url: "privacy-policy",
-    page: <Privacypolicy />,
-    name: "Privacy policy",
-    isPublic: true,
-  },
-  {
-    url: "dashboard",
-    page: <Dashboard />,
-    name: "Dashboard",
-    isPublic: true,
-  },
+
   {
     url: "property-detail/:id",
     page: <PropertyDetail />,
@@ -145,6 +141,18 @@ export const appRoutes = [
     url: "settings",
     page: <Setting />,
     name: "Setting",
+    isPublic: true,
+  },
+  {
+    url: "terms-and-conditions",
+    page: <Termsandconditions />,
+    name: "Terms And Conditions",
+    isPublic: true,
+  },
+  {
+    url: "privacy-policy",
+    page: <Privacypolicy />,
+    name: "Privacy policy",
     isPublic: true,
   },
 ];

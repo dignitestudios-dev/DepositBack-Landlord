@@ -50,7 +50,7 @@ export default function Modal({ isOpen, onClose, onAction, data }) {
         {actionText && (
           <button
             onClick={onAction}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition"
+            className={`w-full px-4 py-3 ${iconBgColor} text-white rounded-full font-semibold hover:${iconBgColor} transition`}
           >
             {actionText}
           </button>

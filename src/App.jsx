@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import "./App.css";
 import AuthLayout from "./layouts/AuthLayout";
 import Login from "./pages/authentication/Login";
@@ -15,20 +15,12 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-
-      <Route path="app" element={<DashboardLayout />}>
-        {appRoutes?.map((Link, i) => (
-          <Route path={Link.url} key={i} element={Link.page} />
-        ))}
-      </Route>
-
+      <Route path="/" element={<Navigate to="/auth/login" />} />
       <Route path="auth" element={<AuthLayout token={token} />}>
         {AuthRoute?.map((Link, i) => (
           <Route path={Link.url} key={i} element={Link.page} />
         ))}
       </Route>
-
       <Route
         path="onboarding"
         element={<OnBoardLayout token={token} userData={userData} />}
@@ -37,7 +29,11 @@ function App() {
           <Route path={Link.url} key={i} element={Link.page} />
         ))}
       </Route>
-
+      <Route path="app" element={<DashboardLayout />}>
+        {appRoutes?.map((Link, i) => (
+          <Route path={Link.url} key={i} element={Link.page} />
+        ))}
+      </Route>
       <Route
         path="*"
         element={<div className="text-7xl">Page Not Found</div>}

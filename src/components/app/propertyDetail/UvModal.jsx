@@ -1,25 +1,13 @@
 import { TiWarning } from "react-icons/ti";
 
-export default function UvModal({ isOpen, onClose, data }) {
+export default function UvModal({ isOpen, onYes, onClose, data }) {
   if (!isOpen) return null;
 
   const {
     iconBgColor = "bg-blue-600",
-    icon = (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-10 w-10 text-white"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
-    ),
+
     title = "Title Here",
     description = "Description here...",
-    actionText = "Yes",
   } = data || {};
 
   return (
@@ -44,7 +32,7 @@ export default function UvModal({ isOpen, onClose, data }) {
           <button
             // disabled={loading}
             type="button"
-            onClick={onClose}
+            onClick={onYes}
             className="w-full py-2 bg-gradient-to-r from-[#003897] to-[#0151DA] text-white rounded-full hover:opacity-90 transition"
           >
             <div className="flex justify-center items-center">

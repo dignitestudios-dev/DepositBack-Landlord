@@ -11,7 +11,6 @@ import { FaArrowLeft, FaChevronRight } from "react-icons/fa";
 import Modal from "../../components/global/Modal";
 import Addmorepropertymodal from "../../components/global/Addmorepropertymodal";
 import DetailStepOne from "../../components/app/propertyDetail/DetailStepOne";
-import { PiIdentificationBadge } from "react-icons/pi";
 import DetailStepTwo from "../../components/app/propertyDetail/DetailStepTwo";
 import DetailStepThree from "../../components/app/propertyDetail/DetailStepThree";
 import DetailStepFour from "../../components/app/propertyDetail/DetailStepFour";
@@ -30,8 +29,6 @@ const AddPropertyDetail = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [stepOneData, setStepOneData] = useState({});
   const [stepTwoData, setStepTwoData] = useState({});
-  const [stepThreeData, setStepThreeData] = useState({});
-  const [stepFourData, setStepFourData] = useState({});
 
   const modalData = {
     title: "Add More Properties",
@@ -50,7 +47,7 @@ const AddPropertyDetail = () => {
     { img: Inspectiondetails, label: "Inspection Details" },
     { img: UvImage, label: "UV Images" },
     { img: Uniquepropertycode, label: "Unique Property Code" },
-    { img: Stripeaccount, label: "Stripe Account" },
+    // { img: Stripeaccount, label: "Stripe Account" },
   ];
 
   return (
@@ -114,19 +111,26 @@ const AddPropertyDetail = () => {
             nextStep={nextStep}
             prevStep={prevStep}
             stepTwoData={stepTwoData}
+            stepOneData={stepOneData}
             inspectionDetail={(data) => setStepTwoData(data)}
           />
         )}
 
         {step === 3 && (
-          <DetailStepThree nextStep={nextStep} stepThreeData={stepThreeData} />
+          <DetailStepThree
+            nextStep={nextStep}
+            propertyId={stepOneData?.propertyId}
+          />
         )}
 
         {step === 4 && (
-          <DetailStepFour nextStep={nextStep} stepFourData={stepFourData} />
+          <DetailStepFour
+            nextStep={nextStep}
+            uniquePropertyCode={stepOneData?.propertyCode}
+          />
         )}
 
-        {step === 5 && (
+        {/* {step === 5 && (
           <div className="bg-[#F9FAFA] mt-20 rounded-xl shadow-lg p-8">
             {!showStripeForm ? (
               // === Step 1: Connect your Stripe Account screen ===
@@ -251,10 +255,11 @@ const AddPropertyDetail = () => {
 
                 <div className="mt-8 flex items-center justify-center gap-3">
                   <button
-                    onClick={() => setShowModal(true)}
+                    disabled={loading}
+                    onClick={handlePropertySubmit}
                     className="px-[10em] py-3 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-medium"
                   >
-                    Next
+                    {loading ? "Loading..." : "Next"}
                   </button>
                 </div>
               </>
@@ -287,7 +292,7 @@ const AddPropertyDetail = () => {
               data={modalData}
             />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
