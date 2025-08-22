@@ -2,47 +2,12 @@ import { useContext, useReducer, useState } from "react";
 import { useNavigate } from "react-router";
 import logoback from "../../assets/backloginimage.webp";
 import Input from "../../components/global/Input";
-import { formatFullName, formatSsnLast } from "../../lib/helpers";
+import { fileReducer, formatFullName, formatSsnLast } from "../../lib/helpers";
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 import axios from "../../axios";
 import SubmitButton from "../../components/global/SubmitButton";
 import { AppContext } from "../../context/AppContext";
-
-const initialState = {
-  idFront: null,
-  idFrontPreview: null,
-  idBack: null,
-  idBackPreview: null,
-  profileImage: null,
-  profilePreview: null,
-};
-
-function fileReducer(state, action) {
-  switch (action.type) {
-    case "SET_FRONT":
-      return {
-        ...state,
-        idFront: action.file,
-        idFrontPreview: action.preview,
-      };
-    case "SET_BACK":
-      return {
-        ...state,
-        idBack: action.file,
-        idBackPreview: action.preview,
-      };
-    case "SET_PROFILE":
-      return {
-        ...state,
-        profileImage: action.file,
-        profilePreview: action.preview,
-      };
-    case "RESET":
-      return initialState;
-    default:
-      return state;
-  }
-}
+import { personalInfoValues } from "../../init/authValues";
 
 export default function Addpersonalinfo() {
   const [loading, setLoading] = useState(false);
@@ -112,7 +77,7 @@ export default function Addpersonalinfo() {
     }
   };
 
-  const [files, dispatch] = useReducer(fileReducer, initialState);
+  const [files, dispatch] = useReducer(fileReducer, personalInfoValues);
 
   const handleFileChange = (e, field) => {
     const file = e.target.files[0];

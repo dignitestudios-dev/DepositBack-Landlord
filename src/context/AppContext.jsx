@@ -1,11 +1,13 @@
 import { createContext, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router";
+import { useFetchData } from "../hooks/api/Get";
 
 const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
   const navigate = useNavigate();
+  const [update, setUpdate] = useState();
   const [token, setToken] = useState(() => Cookies.get("token"));
 
   const [userData, setUserData] = useState(() => {
@@ -34,9 +36,24 @@ const AppProvider = ({ children }) => {
     navigate("/auth/login");
   };
 
+  const { data: notification, loading: isLoading } = useFetchData(
+    `/notification`,
+    {},
+    1,
+    update
+  );
+
   return (
     <AppContext.Provider
-      value={{ token, loginContext, logoutContext, userData }}
+      value={{
+        token,
+        loginContext,
+        logoutContext,
+        userData,
+        notification,
+        isLoading,
+        setUpdate,
+      }}
     >
       {children}
     </AppContext.Provider>

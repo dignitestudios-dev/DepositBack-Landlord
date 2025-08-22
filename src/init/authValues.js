@@ -16,3 +16,12 @@ export const updatePasswordValues = {
   password: "",
   cPassword: "",
 };
+
+export const personalInfoValues = {
+  idFront: null,
+  idFrontPreview: null,
+  idBack: null,
+  idBackPreview: null,
+  profileImage: null,
+  profilePreview: null,
+};

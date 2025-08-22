@@ -1,20 +1,23 @@
-import React, { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import logo from "../../assets/mainlogowhite.png";
 import { IoLogOut, IoNotificationsOutline } from "react-icons/io5";
-import user from "../../assets/user.png";
 import { useNavigate } from "react-router";
 import { AppContext } from "../../context/AppContext";
+import { getDateFormat } from "../../lib/helpers";
 
 const Header = () => {
   const navigate = useNavigate("");
-  const { logoutContext } = useContext(AppContext);
+  const { logoutContext, notification, userData } = useContext(AppContext);
+
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [userPopup, setUserPopup] = useState(false);
   const [logoutpopup, setLogoutpopup] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const togglePopup = () => {
     if (userPopup) setUserPopup(false);
     setIsPopupOpen(!isPopupOpen);
+    setUnreadCount(0);
   };
 
   const toggleUserpopup = () => {
@@ -22,36 +25,10 @@ const Header = () => {
     setUserPopup(!userPopup);
   };
 
-  const notifications = [
-    {
-      title: "View Request Accepted",
-      time: "7:30 PM",
-      message:
-        "Lorem ipsum dolor sit amet consectetur. In volutpat et mattis ut tristique viverra blandit.",
-      unreadCount: 1,
-    },
-    {
-      title: "Lease Date Dispute Received",
-      time: "7:30 PM",
-      message:
-        "Lorem ipsum dolor sit amet consectetur. In volutpat et mattis ut tristique viverra blandit.",
-      unreadCount: 1,
-    },
-    {
-      title: "Tenant Moved Out",
-      time: "7:30 PM",
-      message:
-        "Lorem ipsum dolor sit amet consectetur. In volutpat et mattis ut tristique viverra blandit.",
-      unreadCount: 0,
-    },
-    {
-      title: "Title goes here",
-      time: "7:30 PM",
-      message:
-        "Lorem ipsum dolor sit amet consectetur. In volutpat et mattis ut tristique viverra blandit.",
-      unreadCount: 0,
-    },
-  ];
+  useEffect(() => {
+    let count = notification.filter((item) => !item.isRead);
+    setUnreadCount(count);
+  }, [notification]);
 
   return (
     <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] flex justify-between items-center rounded-3xl px-[6em] py-4 shadow-md ml-[1em] mr-[1em] mt-[1em]">
@@ -100,6 +77,11 @@ const Header = () => {
 
         {/* Notification Icon with Popup toggle */}
         <div className="relative">
+          {unreadCount?.length > 0 && (
+            <span className="absolute -top-2 text-sm bg-red-600 h-5 w-5 items-center flex justify-center text-white rounded-full">
+              {unreadCount?.length}
+            </span>
+          )}
           <IoNotificationsOutline
             className="text-white text-2xl cursor-pointer"
             onClick={togglePopup}
@@ -109,29 +91,37 @@ const Header = () => {
             <div className="absolute top-12 z-10 right-0 w-[26em] p-4 bg-white shadow-lg rounded-lg border border-slate-200">
               <h3 className="text-lg font-semibold">Notifications</h3>
               <div className="mt-4 space-y-4">
-                {notifications.map((notification, index) => (
+                {notification.slice(0, 3).map((notification, index) => (
                   <div key={index}>
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">
                         {notification.title}
                       </span>
                       <span className="text-[13px] font-medium">
-                        {notification.time}
+                        {getDateFormat(notification.createdAt)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center pt-1 pb-1">
                       <p className="text-[13px] mr-[3em]">
-                        {notification.message}
+                        {notification.description}
                       </p>
-                      {notification.unreadCount > 0 && (
+                      {/* {notification.unreadCount > 0 && (
                         <span className="text-sm bg-red-600 h-5 w-8 items-center flex justify-center text-white rounded-full">
                           {notification.unreadCount}
                         </span>
-                      )}
+                      )} */}
                     </div>
                     <hr />
                   </div>
                 ))}
+                <div className="flex justify-center items-center ">
+                  <button
+                    onClick={() => navigate("/app/notifications")}
+                    className="text-sm text-blue-600 font-medium px-4 py-1 rounded-lg hover:bg-blue-50 cursor-pointer transition"
+                  >
+                    View All
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -139,14 +129,14 @@ const Header = () => {
 
         {/* User Avatar */}
         <img
-          src={user}
+          src={userData?.profilePicture}
           className="h-10 w-10 rounded-full object-cover cursor-pointer"
           alt="User Avatar"
           onClick={toggleUserpopup}
         />
 
         {userPopup && (
-          <div className="absolute top-[6em] right-10 w-[9em] p-4 bg-white shadow-lg rounded-lg border border-slate-200">
+          <div className="z-10 absolute top-[6em] right-10 w-[9em] p-4 bg-white shadow-lg rounded-lg border border-slate-200">
             <div className="space-y-3">
               <span
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"

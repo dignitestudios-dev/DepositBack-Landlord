@@ -86,25 +86,31 @@ const PropertyDetail = () => {
           </h1>
         </div>
         <div className="flex gap-4">
-          <button
-            onClick={() => setIsDelete(true)}
-            className="bg-[#FF3B30] text-white flex items-center gap-3 rounded-3xl px-4 py-2  font-medium"
-          >
-            <RiDeleteBinFill />
-            Delete
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              navigate(`/app/edit-property`, {
-                state: { propertyDetail },
-              });
-            }}
-            className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white flex items-center gap-3 rounded-3xl px-4 py-2 font-medium"
-          >
-            <RiEdit2Fill />
-            Edit
-          </button>
+          {tenant ? (
+            <></>
+          ) : (
+            <>
+              <button
+                onClick={() => setIsDelete(true)}
+                className="bg-[#FF3B30] text-white flex items-center gap-3 rounded-3xl px-4 py-2  font-medium"
+              >
+                <RiDeleteBinFill />
+                Delete
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate(`/app/edit-property`, {
+                    state: { propertyDetail },
+                  });
+                }}
+                className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white flex items-center gap-3 rounded-3xl px-4 py-2 font-medium"
+              >
+                <RiEdit2Fill />
+                Edit
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -298,6 +304,7 @@ const PropertyDetail = () => {
                 onClick={() =>
                   navigate("/app/documents", {
                     state: {
+                      propertyId: id,
                       landlordAgreements,
                       landlordRules,
                       landlordPropertyConditionImages,

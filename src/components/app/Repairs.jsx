@@ -1,152 +1,83 @@
-import React, { useState } from "react";
-import { FaCheck, FaLock } from "react-icons/fa";
-import Homeone from "../../assets/Homeone.png";
-import Hometwo from "../../assets/Hometwo.png";
-import Homethree from "../../assets/Homethree.png";
-import Homefour from "../../assets/Homefour.png";
-import { TiWarning } from "react-icons/ti";
-
-const repairPhotos = [
-  Homeone,
-  Hometwo,
-  Homethree,
-  Homefour,
-  Homeone,
-  Hometwo,
-  Homethree,
-  Homefour,
-];
+import { useState } from "react";
+import pdfIcon from "../../assets/pdficon.png";
 
 const Repairs = ({ rules }) => {
-  const [unlockedIndexes, setUnlockedIndexes] = useState([]);
-  const [previewItem, setPreviewItem] = useState(null);
-  const [showRequestModal, setShowRequestModal] = useState(false);
-  const [showAcceptedModal, setShowAcceptedModal] = useState(false);
-  const [targetIndex, setTargetIndex] = useState(null);
+  const [activePopup, setActivePopup] = useState(null); // track which popup is open
 
-  const handleRequestAccess = (index) => {
-    setTargetIndex(index);
-    setShowRequestModal(true);
+  const handleTogglePopup = (docId) => {
+    setActivePopup(activePopup === docId ? null : docId);
   };
 
-  const handleSendRequest = () => {
-    setShowRequestModal(false);
-    setShowAcceptedModal(true);
-    setTimeout(() => {
-      setUnlockedIndexes([...unlockedIndexes, targetIndex]);
-      setShowAcceptedModal(false);
-    }, 1500);
+  const handleDownload = (doc) => {
+    if (!doc?.fileUrl) {
+      alert("File URL is missing.");
+      return;
+    }
+
+    // Extract file name from URL or use default
+    const fileName = doc.title || "document.pdf";
+
+    // Create an anchor element
+    const link = document.createElement("a");
+    link.href = doc.fileUrl;
+    link.setAttribute("download", fileName); // Suggest filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setActivePopup(false);
   };
 
-  const isUnlocked = (index) => unlockedIndexes.includes(index);
+  const handleDelete = (docId) => {
+    alert(`Delete clicked for ID: ${docId}`);
+    setActivePopup(false);
+  };
 
   return (
     <div className="pt-4">
-      <h2 className="text-xl font-semibold mb-4">Photos</h2>
-      <div>No record uploaded</div>
-      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {repairPhotos.map((img, idx) => (
-          <div
-            key={idx}
-            className="relative cursor-pointer overflow-hidden rounded-lg"
-            onClick={() => isUnlocked(idx) && setPreviewItem(img)}
-          >
-            <img
-              src={img}
-              alt={`Repair ${idx}`}
-              className={`w-full h-[150px] object-cover rounded-md transition duration-300 ${
-                isUnlocked(idx) ? "" : "blur-sm"
-              }`}
-            />
-            {!isUnlocked(idx) && (
-              <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white">
-                <FaLock className="text-lg mb-1" />
-                <button
-                  className="bg-white text-gray-700 text-xs px-3 py-1 rounded-full"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRequestAccess(idx);
-                  }}
-                >
-                  Request Access
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div> */}
-
-      {/* Modal Preview */}
-      {/* {previewItem && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md p-4 relative">
-            <button
-              className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black"
-              onClick={() => setPreviewItem(null)}
+      {rules?.length > 0 && rules[0] !== undefined ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+          {rules?.map((doc) => (
+            <div
+              key={doc._id}
+              className="bg-white p-10 rounded-xl shadow-md text-center relative"
             >
-              ✕
-            </button>
-            <h3 className="text-sm font-semibold mb-2">Repair Photo</h3>
-            <img
-              src={previewItem}
-              alt="Preview"
-              className="w-full rounded-md mb-4"
-            />
-            <p className="text-xs text-gray-600">
-              This photo has been approved by the tenant. You may now view or
-              document it as needed.
-            </p>
-          </div>
-        </div>
-      )} */}
+              <img src={pdfIcon} alt="PDF Icon" className="h-[6em] mx-auto" />
+              <p className="mt-3 text-sm font-medium">
+                {doc.title || doc.fileKey}
+              </p>
 
-      {/* Request Tenant Files Popup */}
-      {/* {showRequestModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
-            <div className="bg-[#FF3B30] text-[#fff] p-6 w-fit mx-auto rounded-full mb-3">
-              <TiWarning size={40} />
-            </div>
-            <h2 className="font-semibold text-[20px] mb-2">
-              Request Tenant Files
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Would you like to request photos, videos, or documents from the
-              tenant for review?
-            </p>
-            <div className="flex justify-center gap-3">
-              <button
-                className="px-8 py-2 text-sm bg-gray-200 rounded-full"
-                onClick={() => setShowRequestModal(false)}
+              {/* 3-dot menu */}
+              <div
+                onClick={() => handleTogglePopup(doc._id)}
+                className="absolute top-3 right-5 text-gray-900 text-xl cursor-pointer"
               >
-                Cancel
-              </button>
-              <button
-                className="px-8 py-2 text-sm bg-[#FF3B30] text-white rounded-full"
-                onClick={handleSendRequest}
-              >
-                Send Request
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
+                &#8230;
+              </div>
 
-      {/* Request Accepted Modal */}
-      {/* {showAcceptedModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
-            <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white p-6 w-fit mx-auto rounded-full mb-3">
-              <FaCheck size={30} />
+              {/* Popup Menu */}
+              {activePopup === doc._id && (
+                <div className="absolute top-10 right-5 bg-white border shadow-md rounded-md w-32 text-left z-10">
+                  <button
+                    onClick={() => handleDownload(doc)}
+                    className="block w-full px-4 py-2 text-sm hover:bg-gray-100"
+                  >
+                    Download
+                  </button>
+                  <button
+                    onClick={() => handleDelete(doc.id)}
+                    className="block w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </div>
-            <h2 className="font-semibold text-lg mb-1">Request Accepted!</h2>
-            <p className="text-sm text-gray-600">
-              The tenant has accepted your request and now you have access to
-              view this file.
-            </p>
-          </div>
+          ))}
         </div>
-      )} */}
+      ) : (
+        <div>No Document Uploaded</div>
+      )}
     </div>
   );
 };

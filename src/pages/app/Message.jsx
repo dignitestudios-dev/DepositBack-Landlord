@@ -9,6 +9,7 @@ import userone from "../../assets/userone.png";
 import usertwo from "../../assets/usertwo.png";
 import user from "../../assets/user.png";
 import { useNavigate } from "react-router";
+import { useFetchData } from "../../hooks/api/Get";
 
 const users = [
   { id: 1, name: "Mike Smith (258496)", initials: "MS", image: userone },
@@ -127,6 +128,9 @@ const Message = () => {
     updated.splice(index, 1);
     setAttachments(updated);
   };
+
+  const { data, loading } = useFetchData(`/chat`, {}, 1, "");
+  console.log("🚀 ~ Message ~ data:", data);
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 py-10">

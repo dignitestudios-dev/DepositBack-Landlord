@@ -3,127 +3,13 @@ import { ErrorToast } from "../../global/Toaster";
 import { useNavigate } from "react-router";
 import AddContactPersonModal from "./AddContactPersonModal";
 import axios from "../../../axios";
-
-const initialState = {
-  form: {
-    propertyName: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    rentAmount: "",
-    dueDate: "",
-    propertyType: "",
-  },
-  errors: {},
-};
-
-const validateField = (field, value, state) => {
-  console.log("🚀 ~ validateField ~ state:", state);
-  switch (field) {
-    case "propertyName":
-      if (!value.trim()) return "Property name is required";
-      return "";
-    case "address":
-      if (!value.trim()) return "Address is required";
-      return "";
-    case "state":
-      if (!value) return "State is required";
-      return "";
-    case "city":
-      if (!value) return "City is required";
-      return "";
-    case "zipCode":
-      if (!/^\d{5}$/.test(value)) return "Zip Code must be 5 digits";
-      return "";
-    case "rentAmount":
-      if (!/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0)
-        return "Enter a valid rent amount";
-      return "";
-    case "dueDate":
-      if (!value || !/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0)
-        return "Due Date is required";
-      return "";
-    case "propertyType":
-      if (!value) return "Property type is required";
-      return "";
-    case "depositAmount":
-      // Allow empty value (optional field)
-      if (!value) return "";
-
-      // If entered, must be a valid number
-      if (!/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0) {
-        return "Enter valid deposit amount";
-      }
-      return "";
-    case "lateFeeAmount":
-      // Allow empty value (optional field)
-      if (!value) return "";
-
-      // If entered, must be a valid number
-      if (!/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0) {
-        return "Enter valid late fee amount";
-      }
-      return "";
-    default:
-      return "";
-  }
-};
-
-const formatInput = (value) =>
-  value
-    .replace(/^\s+/, "")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-
-const formReducer = (state, action) => {
-  switch (action.type) {
-    case "UPDATE_FIELD": {
-      const { field, value } = action;
-      const formattedValue =
-        field === "propertyName" || field === "address"
-          ? formatInput(value)
-          : value;
-
-      const error = validateField(field, formattedValue, state);
-      const updatedErrors = { ...state.errors };
-      if (error) {
-        updatedErrors[field] = error;
-      } else {
-        delete updatedErrors[field];
-      }
-
-      return {
-        ...state,
-        form: {
-          ...state.form,
-          [field]: formattedValue,
-          ...(field === "state" ? { city: "" } : {}), // Reset city if state changes
-        },
-        errors: updatedErrors,
-      };
-    }
-
-    case "VALIDATE_FORM": {
-      const errors = {};
-      for (const field in state.form) {
-        const error = validateField(field, state.form[field], state);
-        if (error) errors[field] = error;
-      }
-      return { ...state, errors };
-    }
-
-    case "RESET":
-      return initialState;
-
-    default:
-      return state;
-  }
-};
+import { addPropertyValues, propertyTypes } from "../../../init/propertyValues";
+import { propertyFormReducer } from "../../../lib/helpers";
+import stateCityData from "../../global/CountryData";
 
 const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
   const navigate = useNavigate();
-  const [lateFeePolicy, setLateFeePolicy] = useState("");
+  // const [lateFeePolicy, setLateFeePolicy] = useState("");
   const [personsData, setPersonsData] = useState([]);
   const [propertyMedia, setPropertyMedia] = useState([]);
   const [mediaError, setMediaError] = useState(null);
@@ -131,16 +17,9 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
   const [loading, setLoading] = useState(false);
   const [contactPersons, setContactPersons] = useState(false);
 
-  const [state, dispatch] = useReducer(formReducer, initialState);
+  const [state, dispatch] = useReducer(propertyFormReducer, addPropertyValues);
 
   const { form, errors } = state;
-
-  // Example state list
-  const states = {
-    California: ["Los Angeles", "San Diego", "San Francisco"],
-    Texas: ["Houston", "Dallas", "Austin"],
-    Florida: ["Miami", "Orlando", "Tampa"],
-  };
 
   const handleUploadPropertyimage = (e) => {
     setMediaError(null);
@@ -336,15 +215,11 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
             className="w-full p-3 border rounded-full"
           >
             <option value="">Select Dropdown</option>
-            <option value="Apartment">Apartment</option>
-            <option value="House">House</option>
-            <option value="Land">Land</option>
-            <option value="Warehouse">Warehouse</option>
-            <option value="Condo">Condo </option>
-            <option value="Retail">Retail</option>
-            <option value="Office"> Office </option>
-            <option value="Townhouse">Townhouse</option>
-            <option value="Duplex">Duplex</option>
+            {propertyTypes.map((type, index) => (
+              <option key={index} value={type}>
+                {type}
+              </option>
+            ))}
           </select>
           {errors.propertyType && (
             <p className="text-red-500 text-sm">{errors.propertyType}</p>
@@ -413,7 +288,7 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
             className="w-full p-3 border rounded-full"
           >
             <option value="">Select State</option>
-            {Object.keys(states).map((st) => (
+            {Object.keys(stateCityData).map((st) => (
               <option key={st} value={st}>
                 {st}
               </option>
@@ -456,7 +331,7 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
             className="w-full p-3 border rounded-full"
           >
             <option value="">Select City</option>
-            {states[form.state]?.map((city) => (
+            {stateCityData[form.state]?.map((city) => (
               <option key={city} value={city}>
                 {city}
               </option>

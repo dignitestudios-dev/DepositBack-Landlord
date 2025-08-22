@@ -1,37 +1,35 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import Header from "../../components/global/Header";
-import Footer from "../../components/global/Footer";
+
 import pdfIcon from "../../assets/pdficon.png";
+import linkIcon from "../../assets/linkImage.png";
+import textIcon from "../../assets/textImage.png";
 import SearchBar from "../../components/global/Searchbar";
 import { useNavigate } from "react-router";
 import { useFetchData } from "../../hooks/api/Get";
+import ResourceTextModal from "../../components/app/resources/ResourceTextModal";
 
 const Resources = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [textModal, setTextModal] = useState(false);
 
-  const documents = [
-    { id: 1, title: "Tenant Rights" },
-    { id: 2, title: "Security Deposit Laws" },
-    { id: 3, title: "Eviction Process" },
-    { id: 4, title: "Protection Laws" },
-    { id: 5, title: "Lease Termination" },
-    { id: 6, title: "Maintenance Laws" },
-  ];
+  const { data, loading, pagination } = useFetchData(`/laws`, {}, 1, "");
 
-  const filteredDocs = documents.filter((doc) =>
+  const filteredDocs = data.filter((doc) =>
     doc.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const { data, loading, pagination } = useFetchData(
-    `/resources`,
-    { states: "Florida,Texas" },
-    // { status: "" },
-    1,
-    ""
-  );
-  console.log("🚀 ~ Resources ~ data:", data);
+  const handleDocClick = (type, value) => {
+    console.log("🚀 ~ handleDocClick 33 ~ value:", value);
+    if (type === "form") {
+      window.open(value, "_blank", "noopener,noreferrer");
+    } else if (type === "link") {
+      window.open(value, "_blank", "noopener,noreferrer");
+    } else {
+      setTextModal(value);
+    }
+  };
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 pt-8 pb-20 text-[#333]">
@@ -49,22 +47,60 @@ const Resources = () => {
           <h1 className="text-3xl font-[600]">Resources</h1>
         </div>
         <div>
-          <SearchBar className="" placeholder="Search" />
+          <SearchBar
+            className=""
+            placeholder="Search"
+            setSearchTerm={setSearchTerm}
+            searchTerm={searchTerm}
+          />
         </div>
       </div>
 
       {/* Documents Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-        {filteredDocs.map((doc) => (
-          <div
-            key={doc.id}
-            className="bg-white rounded-xl p-6 text-center shadow cursor-pointer hover:shadow-md transition"
-          >
-            <img src={pdfIcon} alt="PDF Icon" className="h-[70px] mx-auto" />
-            <p className="mt-4 font-medium text-sm">{doc.title}</p>
-          </div>
-        ))}
+        {loading
+          ? // Skeleton Loader (show 6 items as placeholder)
+            Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl p-6 text-center shadow cursor-pointer"
+              >
+                {/* Circle / Icon placeholder */}
+                <div className="h-[70px] w-[70px] mx-auto rounded-md bg-gray-200 animate-pulse" />
+
+                {/* Title placeholder */}
+                <div className="mt-4 h-4 w-3/4 mx-auto rounded bg-gray-200 animate-pulse" />
+              </div>
+            ))
+          : filteredDocs.map((doc) => (
+              <div
+                onClick={() =>
+                  handleDocClick(
+                    doc?.formLink ? "form" : doc?.lawLink ? "link" : "text",
+                    doc?.formLink
+                      ? doc?.formLink
+                      : doc?.lawLink
+                      ? doc?.lawLink
+                      : doc?.text
+                  )
+                }
+                key={doc._id}
+                className="bg-white rounded-xl p-6 text-center shadow cursor-pointer hover:shadow-md transition"
+              >
+                <img
+                  src={
+                    doc?.formLink ? pdfIcon : doc?.lawLink ? linkIcon : textIcon
+                  }
+                  alt="PDF Icon"
+                  className="h-[70px] mx-auto"
+                />
+                <p className="mt-4 font-medium text-sm">{doc.title}</p>
+              </div>
+            ))}
       </div>
+      {textModal && (
+        <ResourceTextModal textModal={textModal} setTextModal={setTextModal} />
+      )}
     </div>
   );
 };

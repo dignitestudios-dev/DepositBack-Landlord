@@ -4,6 +4,7 @@ import Deposittracker from "../../pages/app/Deposittracker";
 import Documents from "../../pages/app/Documents";
 import Inspection from "../../pages/app/Inspection";
 import Message from "../../pages/app/Message";
+import Notifications from "../../pages/app/Notifications";
 import Paymentmethodplan from "../../pages/app/Paymentmethodplan";
 import Photo from "../../pages/app/Photo";
 import Privacypolicy from "../../pages/app/Privacypolicy";
@@ -129,6 +130,12 @@ export const appRoutes = [
     url: "payment-method-plan",
     page: <Paymentmethodplan />,
     name: "Payment method plan",
+    isPublic: true,
+  },
+  {
+    url: "notifications",
+    page: <Notifications />,
+    name: "Notificationss",
     isPublic: true,
   },
   {
