@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Header from "../../components/global/Header";
 import Footer from "../../components/global/Footer";
 import { IoSend } from "react-icons/io5";
@@ -10,6 +10,9 @@ import usertwo from "../../assets/usertwo.png";
 import user from "../../assets/user.png";
 import { useNavigate } from "react-router";
 import { useFetchData } from "../../hooks/api/Get";
+import { getUserChatsWithDetails } from "../../firebase/messages";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 
 const users = [
   { id: 1, name: "Mike Smith (258496)", initials: "MS", image: userone },
@@ -76,6 +79,9 @@ const Message = () => {
   const [chats, setChats] = useState(initialChats);
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState([]);
+  const [chatList, setChatList] = useState([]);
+  console.log("🚀 ~ Message ~ chatList:", chatList);
+
   const fileInputRef = useRef();
   const navigate = useNavigate("");
 
@@ -129,8 +135,21 @@ const Message = () => {
     setAttachments(updated);
   };
 
-  const { data, loading } = useFetchData(`/chat`, {}, 1, "");
-  console.log("🚀 ~ Message ~ data:", data);
+  useEffect(() => {
+    getUserChatsWithDetails(
+      "landlord",
+      "0RZOn1pB1PdYqWiWSf5WuhrsbmR2",
+      setChatList
+    );
+  }, []);
+
+  // const messagesRef = collection(db, "chats");
+
+  // onSnapshot(messagesRef, (snapshot) => {
+  //   snapshot.docs.forEach((doc) => {
+  //     console.log(doc.data());
+  //   });
+  // });
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 py-10">
