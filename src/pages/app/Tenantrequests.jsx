@@ -1,8 +1,7 @@
 // Tenantrequests.js
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
-import Header from "../../components/global/Header";
-import Footer from "../../components/global/Footer";
+
 import { FaArrowLeft } from "react-icons/fa";
 import user from "../../assets/user.png";
 import userone from "../../assets/userone.png";
@@ -51,27 +50,37 @@ const Tenantrequests = () => {
       {/* Conditional Rendering */}
       {!selectedRequest ? (
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          {requests.map((req, index) => (
-            <div
-              key={req.id}
-              className={`flex items-start gap-4 py-4 cursor-pointer hover:bg-gray-50 transition-all duration-200 rounded-xl px-2 ${
-                index !== requests.length - 1 ? "border-b border-gray-200" : ""
-              }`}
-              onClick={() => setSelectedRequest(req)}
-            >
-              <img
-                src={req.img}
-                alt={req.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <p className="text-[17px] leading-[1.6]">
-                Tenant <span className="font-semibold">{req.name}</span> has
-                entered the property code for ABC. Please review and approve
-                their request to connect to this property for move-in photos and
-                videos.
-              </p>
+          {data?.length > 0 ? (
+            <div>
+              {data.map((req, index) => (
+                <div
+                  key={req.id}
+                  className={`flex items-start gap-4 py-4 cursor-pointer hover:bg-gray-50 transition-all duration-200 rounded-xl px-2 ${
+                    index !== data.length - 1 ? "border-b border-gray-200" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedRequest(req);
+                  }}
+                >
+                  <img
+                    src={req?.tenant?.profilePicture}
+                    alt={req?.tenant?.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <p className="text-[17px] leading-[1.6]">
+                    Tenant{" "}
+                    <span className="font-semibold">{req?.tenant?.name}</span>{" "}
+                    has entered the property code for{" "}
+                    {req?.property?.uniquePropertyCode}. Please review and
+                    approve their request to connect to this property for
+                    move-in photos and videos.
+                  </p>
+                </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            <div>No record found</div>
+          )}
         </div>
       ) : (
         <TenantRequestDetails request={selectedRequest} />

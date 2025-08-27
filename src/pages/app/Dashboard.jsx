@@ -249,7 +249,9 @@ const Dashboard = () => {
                     <div
                       className="bg-[#0151DA] p-3 rounded-xl cursor-pointer"
                       onClick={() => {
-                        navigate("/app/messages");
+                        navigate("/app/messages", {
+                          state: { tenantId: property?.tenant?.uid },
+                        });
                       }}
                     >
                       <IoChatbubbleEllipsesOutline size={20} color="white" />

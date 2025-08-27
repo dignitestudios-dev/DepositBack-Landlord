@@ -6,6 +6,10 @@ import moment from "moment/moment";
 import { personalInfoValues } from "../init/authValues";
 import { addPropertyValues } from "../init/propertyValues";
 
+export const chatTime = (data) => {
+  return moment(data.toDate()).format("hh:mm A");
+};
+
 export const phoneFormatter = (input) => {
   if (typeof input !== "string") {
     return ""; // or return input if you want to keep original value

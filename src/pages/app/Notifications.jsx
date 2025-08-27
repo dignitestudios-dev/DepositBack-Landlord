@@ -116,12 +116,14 @@ const Notifications = () => {
                 ))}
             </div>
           ) : (
-            <div className=" h-[430px] overflow-y-auto ">
-              {filteredTasks?.map((item, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-center w-[95%]  border-gray-100">
-                    <div className="bg-white flex p-2 min-w-[84%] max-w-[90%]">
-                      {/* <div className="py-3 px-2 mt-1">
+            <div>
+              {filteredTasks?.length > 0 ? (
+                <div className=" h-[430px] overflow-y-auto ">
+                  {filteredTasks?.map((item, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between items-center w-[95%]  border-gray-100">
+                        <div className="bg-white flex p-2 min-w-[84%] max-w-[90%]">
+                          {/* <div className="py-3 px-2 mt-1">
                   <img
                     src={task.image}
                     alt="profile"
@@ -129,23 +131,23 @@ const Notifications = () => {
                   />
                 </div> */}
 
-                      <div className="py-3 px-2">
-                        <h1 className="text-[16px] font-bold">
-                          {convertText(item?.title)}
-                        </h1>
-                        <p className="text-[16px] text-primary-text ">
-                          {item?.description}
-                        </p>
-                      </div>
-                    </div>
+                          <div className="py-3 px-2">
+                            <h1 className="text-[16px] font-bold">
+                              {convertText(item?.title)}
+                            </h1>
+                            <p className="text-[16px] text-primary-text ">
+                              {item?.description}
+                            </p>
+                          </div>
+                        </div>
 
-                    <div className="w-[20%] flex flex-col items-center">
-                      <p className="text-xs mb-2">
-                        {moment(item?.createdAt).format(
-                          "MM-DD-YYYY - h:mm:ss A"
-                        )}
-                      </p>
-                      {/* {unReadLoadingId === item._id ? (
+                        <div className="w-[20%] flex flex-col items-center">
+                          <p className="text-xs mb-2">
+                            {moment(item?.createdAt).format(
+                              "MM-DD-YYYY - h:mm:ss A"
+                            )}
+                          </p>
+                          {/* {unReadLoadingId === item._id ? (
                         <p className="text-xs text-gray-500">Loading...</p>
                       ) : (
                         <span className="flex items-center pt-1">
@@ -157,11 +159,15 @@ const Notifications = () => {
                           />
                         </span>
                       )} */}
+                        </div>
+                      </div>
+                      <hr className="h-px my-2 ml-2 w-[90%] bg-gray-100 border" />
                     </div>
-                  </div>
-                  <hr className="h-px my-2 ml-2 w-[90%] bg-gray-100 border" />
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <div className="h-[430px]">No record found</div>
+              )}
             </div>
           )}
         </div>
