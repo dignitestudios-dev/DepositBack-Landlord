@@ -46,6 +46,7 @@ const PropertyDetail = () => {
     name,
     rent,
     address,
+    allowedDocs,
     uniquePropertyCode,
     leaseStartDate,
     leaseEndDate,
@@ -324,6 +325,8 @@ const PropertyDetail = () => {
                 onClick={() =>
                   navigate("/app/inspection", {
                     state: {
+                      propertyId: id,
+                      allowedDocs,
                       tenantMoveInImages,
                       tenantMoveInVideos,
                       tenantMoveOutImages,

@@ -53,19 +53,19 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
   };
 
   const handleNext = async () => {
-    const hasEmptyFields = Object.values(state.form).some((value) => {
-      // Handles null, undefined, empty string, or array with no items
-      if (typeof value === "string") return value.trim() === "";
-      if (Array.isArray(value)) return value.length === 0;
-      return !value;
-    });
+    // const hasEmptyFields = Object.values(state.form).some((value) => {
+    //   // Handles null, undefined, empty string, or array with no items
+    //   if (typeof value === "string") return value.trim() === "";
+    //   if (Array.isArray(value)) return value.length === 0;
+    //   return !value;
+    // });
 
     if (propertyMedia.length === 0) {
       setMediaError("Upload Property Images");
       return;
     }
 
-    if (!hasEmptyFields && Object.keys(state.errors).length === 0) {
+    if (Object.keys(state.errors).length === 0) {
       try {
         setLoading(true);
 

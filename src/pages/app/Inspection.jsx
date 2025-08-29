@@ -1,16 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowLeft, FaLock, FaPlay, FaCheck } from "react-icons/fa";
 import { TiWarning } from "react-icons/ti";
 import { useLocation, useNavigate } from "react-router";
 
 import Moveout from "../../components/app/Moveout";
+import { ErrorToast } from "../../components/global/Toaster";
+import axios from "../../axios";
 
 const Inspection = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { landlordPropertyConditionImages, landlordPropertyConditionVideos } =
-    location.state || {};
+  const {
+    propertyId,
+    allowedDocs,
+    tenantMoveInImages = [],
+    tenantMoveInVideos = [],
+    tenantMoveOutImages = [],
+    tenantMoveOutVideos = [],
+  } = location.state || {};
 
   const [viewMode, setViewMode] = useState("Move In");
   const [previewItem, setPreviewItem] = useState(null);
@@ -21,25 +29,62 @@ const Inspection = () => {
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showAllVideos, setShowAllVideos] = useState(false);
   const [viewingOnly, setViewingOnly] = useState(""); // '' | 'photos' | 'videos'
+  const [docType, setDocType] = useState("");
+  const [reqLoading, setReqLoading] = useState(false);
 
-  const isUnlocked = (index) => unlockedIndexes.includes(index);
-
-  const handleRequestAccess = (index) => {
+  const handleRequestAccess = (index, src) => {
     setTargetIndex(index);
+    setDocType(src.fileKey);
     setShowRequestModal(true);
   };
 
-  const handleSendRequest = () => {
-    setShowRequestModal(false);
-    setShowAcceptedModal(true);
-    setTimeout(() => {
-      setUnlockedIndexes([...unlockedIndexes, targetIndex]);
-      setShowAcceptedModal(false);
-    }, 1500);
+  const handleSendRequest = async () => {
+    console.log("--handleRequest--");
+    try {
+      setReqLoading(true);
+      const response = await axios.post(`/requests/docs`, {
+        property: propertyId,
+        documents: [docType],
+      });
+      if (response.status === 200) {
+        setShowRequestModal(false);
+        setShowAcceptedModal(true);
+        setTimeout(() => {
+          // setUnlockedIndexes([...unlockedIndexes, targetIndex]);
+          setShowAcceptedModal(false);
+        }, 1500);
+      }
+    } catch (error) {
+      console.log("🚀 ~ handleSendRequest ~ error:", error);
+      ErrorToast(error);
+    } finally {
+      setReqLoading(false);
+    }
   };
 
+  useEffect(() => {
+    const handleWatchedDoc = async () => {
+      console.log("--handleWatchedDoc--");
+      try {
+        const response = await axios.post(
+          `/requests/docs/watch/${propertyId}`,
+          {
+            documents: [allowedDocs[0]],
+          }
+        );
+      } catch (error) {
+        console.log("🚀 ~ handleSendRequest ~ error:", error);
+        ErrorToast(error);
+      }
+    };
+
+    if (allowedDocs?.length > 0) {
+      handleWatchedDoc();
+    }
+  }, []);
+
   return (
-    <div className="max-w-[1260px] mx-auto px-6 pt-8 pb-20">
+    <div className="max-w-[1260px] mx-auto px-6 pt-8 pb-20 min-h-screen bg-[#F6FAFF] text-[#333]">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
@@ -116,47 +161,44 @@ const Inspection = () => {
                   {showAllPhotos ? "Show less" : "View all photos"}
                 </button>
               </div>
-              {landlordPropertyConditionImages?.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {(showAllPhotos
-                    ? landlordPropertyConditionImages
-                    : landlordPropertyConditionImages?.slice(0, 8)
-                  )?.map((src, idx) => (
-                    <div
-                      key={idx}
-                      className="relative group border-2 border-transparent hover:border-blue-500 rounded-md overflow-hidden cursor-pointer"
-                      onClick={() =>
-                        isUnlocked(idx) &&
-                        setPreviewItem({ type: "image", src })
-                      }
-                    >
-                      <img
-                        src={src.fileUrl}
-                        alt={`Photo ${idx}`}
-                        className={`w-full h-[150px] object-cover rounded-md ${
-                          isUnlocked(idx) ? "" : "blur-sm"
-                        }`}
-                      />
-                      {!isUnlocked(idx) && (
-                        <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white">
-                          <FaLock className="text-lg mb-1" />
-                          <button
-                            className="bg-white text-gray-700 text-xs px-3 py-1 rounded-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRequestAccess(idx);
-                            }}
-                          >
-                            Request Access
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div>No record uploaded</div>
-              )}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {(showAllPhotos
+                  ? tenantMoveInImages
+                  : tenantMoveInImages.slice(0, 8)
+                ).map((src, idx) => (
+                  <div
+                    key={idx}
+                    className="relative group border-2 border-transparent hover:border-blue-500 rounded-md overflow-hidden cursor-pointer"
+                    // onClick={() =>
+                    //   isUnlocked(idx) && setPreviewItem({ type: "image", src })
+                    // }
+                  >
+                    <img
+                      src={src?.fileUrl}
+                      alt={`Photo ${idx}`}
+                      className={`w-full h-[150px] object-cover rounded-md ${
+                        allowedDocs.includes("tenantMoveInImages")
+                          ? ""
+                          : "blur-sm"
+                      }`}
+                    />
+                    {allowedDocs.length === 0 && (
+                      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white">
+                        <FaLock className="text-lg mb-1" />
+                        <button
+                          className="bg-white text-gray-700 text-xs px-3 py-1 rounded-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRequestAccess(idx, src);
+                          }}
+                        >
+                          Request Access
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -178,54 +220,51 @@ const Inspection = () => {
                   {showAllVideos ? "Show less" : "View all videos"}
                 </button>
               </div>
-              {landlordPropertyConditionVideos?.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {(showAllVideos
-                    ? landlordPropertyConditionVideos
-                    : landlordPropertyConditionVideos?.slice(0, 8)
-                  )?.map((src, idx) => (
-                    <div
-                      key={idx}
-                      className="relative group rounded-md overflow-hidden cursor-pointer"
-                      onClick={() =>
-                        isUnlocked(idx) &&
-                        setPreviewItem({ type: "video", src })
-                      }
-                    >
-                      <img
-                        src={src}
-                        alt={`Video ${idx}`}
-                        className={`w-full h-[150px] object-cover ${
-                          isUnlocked(idx) ? "" : "blur-sm"
-                        }`}
-                      />
-                      {isUnlocked(idx) && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="bg-white p-2 rounded-full shadow-lg">
-                            <FaPlay className="text-black" />
-                          </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {(showAllVideos
+                  ? tenantMoveInVideos
+                  : tenantMoveInVideos.slice(0, 8)
+                ).map((src, idx) => (
+                  <div
+                    key={idx}
+                    className="relative group rounded-md overflow-hidden cursor-pointer"
+                    // onClick={() =>
+                    //   isUnlocked(idx) && setPreviewItem({ type: "video", src })
+                    // }
+                  >
+                    <img
+                      src={src?.fileUrl}
+                      alt={`Video ${idx}`}
+                      className={`w-full h-[150px] object-cover ${
+                        allowedDocs.includes("tenantMoveInImages")
+                          ? ""
+                          : "blur-sm"
+                      }`}
+                    />
+                    {allowedDocs.includes("tenantMoveInImages") && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="bg-white p-2 rounded-full shadow-lg">
+                          <FaPlay className="text-black" />
                         </div>
-                      )}
-                      {!isUnlocked(idx) && (
-                        <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white">
-                          <FaLock className="text-lg mb-1" />
-                          <button
-                            className="bg-white text-gray-700 text-xs px-3 py-1 rounded-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRequestAccess(idx);
-                            }}
-                          >
-                            Request Access
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div>No record uploaded</div>
-              )}
+                      </div>
+                    )}
+                    {allowedDocs.length === 0 && (
+                      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-white">
+                        <FaLock className="text-lg mb-1" />
+                        <button
+                          className="bg-white text-gray-700 text-xs px-3 py-1 rounded-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRequestAccess(idx, src);
+                          }}
+                        >
+                          Request Access
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -242,14 +281,14 @@ const Inspection = () => {
                 <p className="text-sm font-semibold mb-2">Preview</p>
                 {previewItem.type === "image" ? (
                   <img
-                    src={previewItem.src.fileUrl}
+                    src={previewItem.src}
                     className="w-full h-auto rounded-md mb-4"
                     alt="Preview"
                   />
                 ) : (
                   <video
                     controls
-                    src={previewItem.src.fileUrl}
+                    src={previewItem.src}
                     className="w-full rounded-md mb-4"
                   />
                 )}
@@ -283,10 +322,11 @@ const Inspection = () => {
                     Cancel
                   </button>
                   <button
+                    disabled={reqLoading}
                     className="px-8 py-2 text-sm bg-[#FF3B30] text-white rounded-full"
                     onClick={handleSendRequest}
                   >
-                    Send Request
+                    {reqLoading ? "Requesting..." : "Send Request"}
                   </button>
                 </div>
               </div>
