@@ -10,6 +10,7 @@ import backID from "../../assets/idfront.png";
 import EditProfileModal from "../../components/app/EditProfileModal";
 import { useFetchData } from "../../hooks/api/Get";
 import ProfileSkeleton from "../../components/app/ProfileSkeleton";
+import logomain from "../../assets/logomain.webp";
 
 const ViewProfile = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const ViewProfile = () => {
           <div className="flex items-center p-8 rounded-2xl justify-between bg-white">
             <div className="flex items-center gap-6">
               <img
-                src={data?.profilePicture || "/default-user.png"}
+                src={data?.profilePicture || logomain}
                 alt="Profile"
                 className="w-[6em] h-[6em] rounded-full object-cover"
               />

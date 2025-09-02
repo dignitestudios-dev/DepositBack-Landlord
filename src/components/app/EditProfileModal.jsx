@@ -104,7 +104,25 @@ const EditProfileModal = ({ onClose }) => {
       formData?.append("lastFourSSN", state?.ssn);
       formData?.append("language", "english");
       formData?.append("name", state?.fullName);
-      formData?.append("profilePicture", state?.profileImage);
+// Assuming formData is a FormData object
+if (state?.profileImage) {
+  // Check if profileImage is a File object (i.e., a file)
+  if (state?.profileImage instanceof File) {
+    // If it's a file, append it to formData
+    formData.append("profilePicture", state?.profileImage);
+    console.log("Profile image is a file, appending to formData.");
+  } else {
+    // Otherwise, it's a URL (string), so we skip appending it to formData
+    try {
+      new URL(state?.profileImage); // Tries to create a URL object
+      // If it's a valid URL, do not append to formData
+      console.log("Profile image is a URL, skipping append.");
+    } catch (e) {
+      // If it's neither a URL nor a file, handle accordingly
+      console.error("Invalid profile image format.");
+    }
+  }
+}
       const response = await axios.put("/users", formData);
       if (response.status === 201 || response.status === 200) {
         onClose(true);

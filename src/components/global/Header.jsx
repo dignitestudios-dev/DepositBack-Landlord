@@ -4,6 +4,7 @@ import { IoLogOut, IoNotificationsOutline } from "react-icons/io5";
 import { useNavigate } from "react-router";
 import { AppContext } from "../../context/AppContext";
 import { getDateFormat } from "../../lib/helpers";
+import mainlogowhite from "../../assets/mainlogowhite.png";
 
 const Header = () => {
   const navigate = useNavigate("");
@@ -128,12 +129,12 @@ const Header = () => {
         </div>
 
         {/* User Avatar */}
-        <img
-          src={userData?.profilePicture}
-          className="h-10 w-10 rounded-full object-cover cursor-pointer"
-          alt="User Avatar"
-          onClick={toggleUserpopup}
-        />
+       <img
+  src={userData?.profilePicture || mainlogowhite}
+  className="h-10 w-10 rounded-full object-cover cursor-pointer"
+  alt="User Avatar"
+  onClick={toggleUserpopup}
+/>
 
         {userPopup && (
           <div className="z-10 absolute top-[6em] right-10 w-[9em] p-4 bg-white shadow-lg rounded-lg border border-slate-200">
