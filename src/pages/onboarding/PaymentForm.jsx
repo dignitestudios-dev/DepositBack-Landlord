@@ -67,7 +67,7 @@ const PaymentForm = ({ planData, setShowModal }) => {
           const response = await axios.post(
             "/subscription/stripeSubscription",
             {
-              sku: "landlord_plan_10_units",
+              sku: planData?.sku,
             }
           );
           console.log("🚀 ~ handleSubmit ~ response:", response);

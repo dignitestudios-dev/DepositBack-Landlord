@@ -11,43 +11,44 @@ export default function Subscriptionplans() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [subscriptionCancelled, setSubscriptionCancelled] = useState(false);
 
-  const basicPlanData = {
-    name: "Basic Plan",
-    type: "Monthly Plan",
-    price: "49.99",
-    features: [
-      "Lorem ipsum dolor sit amet consectetur eiusmod",
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Lorem ipsum dolor sit amet",
-      "Lorem ipsum dolor sit amet consectetur",
-      "Lorem ipsum dolor sit amet consectetur eiusmod",
-      "Lorem ipsum dolor sit amet",
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Lorem ipsum dolor sit amet consectetur",
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Lorem ipsum dolor sit amet",
-      "Lorem ipsum dolor sit amet consectetur eiusmod",
-    ],
-  };
-
-  const premiumPlanData = {
-    name: "Premium Plan",
-    type: "Yearly Plan",
-    price: "99.99",
-    features: [
-      "Lorem ipsum dolor sit amet consectetur eiusmod",
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Lorem ipsum dolor sit amet",
-      "Lorem ipsum dolor sit amet consectetur",
-      "Lorem ipsum dolor sit amet consectetur eiusmod",
-      "Lorem ipsum dolor sit amet",
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Lorem ipsum dolor sit amet consectetur",
-      "Lorem ipsum dolor sit amet consectetur adipiscing",
-      "Lorem ipsum dolor sit amet",
-      "Lorem ipsum dolor sit amet consectetur eiusmod",
-    ],
-  };
+  const planData = [
+    {
+      name: "Landlord Plan - 10 Units",
+      type: "Monthly Plan",
+      price: "190",
+      features: [
+        "Property Manager",
+        "Deposits Tracker",
+        "Track and Receive Rents",
+        "AI Chatbot",
+        "Knowledge Resource",
+      ],
+    },
+    {
+      name: "Landlord Plan - 20 Units",
+      type: "Monthly Plan",
+      price: "230",
+      features: [
+        "Property Manager",
+        "Deposits Tracker",
+        "Track and Receive Rents",
+        "AI Chatbot",
+        "Knowledge Resource",
+      ],
+    },
+    {
+      name: "Landlord Plan - 30 Units",
+      type: "Monthly Plan",
+      price: "280",
+      features: [
+        "Property Manager",
+        "Deposits Tracker",
+        "Track and Receive Rents",
+        "AI Chatbot",
+        "Knowledge Resource",
+      ],
+    },
+  ];
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 pt-8 pb-20 text-[#333]">
@@ -70,86 +71,66 @@ export default function Subscriptionplans() {
         {/* Subscription Plans */}
         <div className="flex justify-between items-start gap-10 mr-[4em] ml-[4em]">
           {/* Basic Plan */}
-          <div className="bg-gradient-to-r from-blue-700 to-blue-500 w-1/2 p-6 rounded-3xl text-white pb-[8em]">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm">Basic Plan</p>
-                <h1 className="text-xl font-[600]">Monthly Plan</h1>
-              </div>
-              <div className="flex gap-1">
-                <p className="text-2xl">$</p>
-                <p className="text-4xl font-[600]">49.99</p>
-              </div>
-            </div>
-            <div className="bg-white text-black p-8 rounded-2xl mt-3 -mr-10 -mb-[10em]">
-              <div className="space-y-4">
-                {basicPlanData.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <img src={checkmark} className="h-4 w-4" alt="checkmark" />
-                    <p className="text-sm">{feature}</p>
-                  </div>
-                ))}
 
-                <div className="flex items-center gap-3">
-                  {!subscriptionCancelled ? (
-                    <>
-                      <button
-                        onClick={() => setShowCancelModal(true)}
-                        className="w-[13em] px-4 py-3 bg-[#DC1D00] text-white rounded-full font-semibold text-center hover:opacity-90 transition"
+          {planData?.map((item, index) => (
+            <div
+              key={index}
+              className="bg-gradient-to-r from-blue-700 to-blue-500 w-1/2 p-6 rounded-3xl text-white pb-[8em]"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm">{item.name}</p>
+                  <h1 className="text-xl font-[600]">{item.type}</h1>
+                </div>
+                <div className="flex gap-1">
+                  <p className="text-2xl">$</p>
+                  <p className="text-4xl font-[600]">{item.price}</p>
+                </div>
+              </div>
+
+              <div className="bg-white text-black p-8 rounded-2xl mt-3 -mr-10 -mb-[10em]">
+                <div className="space-y-4">
+                  {item.features.map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <img
+                        src={checkmark}
+                        className="h-4 w-4"
+                        alt="checkmark"
+                      />
+                      <p className="text-sm">{feature}</p>
+                    </div>
+                  ))}
+
+                  <div className="flex items-center gap-3">
+                    {!subscriptionCancelled ? (
+                      <>
+                        <button
+                          onClick={() => setShowCancelModal(true)}
+                          className="w-[13em] px-4 py-3 bg-[#DC1D00] text-white rounded-full font-semibold text-center hover:opacity-90 transition"
+                        >
+                          Cancel Subscription
+                        </button>
+                        <p className="text-[14px] text-left text-gray-600 mt-1">
+                          Your subscription will expire on <br />
+                          <span className="text-red-600 font-semibold">
+                            30 September 2025
+                          </span>
+                        </p>
+                      </>
+                    ) : (
+                      <NavLink
+                        to="/app/payment-method-plan"
+                        state={item}
+                        className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
                       >
-                        Cancel Subscription
-                      </button>
-                      <p className="text-[14px] text-left text-gray-600 mt-1">
-                        Your subscription will expire on <br />
-                        <span className="text-red-600 font-semibold">
-                          30 September 2025
-                        </span>
-                      </p>
-                    </>
-                  ) : (
-                    <NavLink
-                      to="/app/payment-method-plan"
-                      state={basicPlanData}
-                      className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
-                    >
-                      Buy Now
-                    </NavLink>
-                  )}
+                        Buy Now
+                      </NavLink>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Premium Plan */}
-          <div className="bg-gradient-to-r from-blue-700 to-blue-500 w-1/2 p-6 rounded-3xl text-white pb-[8em]">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm">Premium Plan</p>
-                <h1 className="text-xl font-[600]">Yearly Plan</h1>
-              </div>
-              <div className="flex gap-1">
-                <p className="text-2xl">$</p>
-                <p className="text-4xl font-[600]">99.99</p>
-              </div>
-            </div>
-            <div className="bg-white text-black p-8 rounded-2xl mt-3 -mr-10 -mb-[10em]">
-              <div className="space-y-4">
-                {premiumPlanData.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <img src={checkmark} className="h-4 w-4" alt="checkmark" />
-                    <p className="text-sm">{feature}</p>
-                  </div>
-                ))}
-                <NavLink
-                  to="/app/payment-method-plan"
-                  state={premiumPlanData}
-                  className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
-                >
-                  Buy Now
-                </NavLink>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 

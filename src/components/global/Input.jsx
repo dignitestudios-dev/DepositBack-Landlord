@@ -15,6 +15,7 @@ export default function Input({
   touched,
   name,
   maxLength,
+  disabled,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -25,6 +26,7 @@ export default function Input({
       </label>
       <div className="relative">
         <input
+          disabled={disabled}
           type={showToggle ? (showPassword ? "text" : "password") : type}
           value={value}
           name={name}

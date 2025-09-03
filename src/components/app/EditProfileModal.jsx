@@ -11,6 +11,7 @@ import { AppContext } from "../../context/AppContext";
 import axios from "../../axios";
 import { ErrorToast, SuccessToast } from "../global/Toaster";
 import { RiLoader5Line } from "react-icons/ri";
+import { formatSsnLast, phoneFormatter } from "../../lib/helpers";
 
 const initialState = {
   fullName: "",
@@ -187,6 +188,7 @@ const EditProfileModal = ({ onClose }) => {
             <Input
               label="Email Address"
               type="email"
+              disabled={true}
               value={state.email}
               onChange={(e) =>
                 dispatch({
@@ -212,12 +214,13 @@ const EditProfileModal = ({ onClose }) => {
               <Input
                 label=""
                 type="text"
-                value={state.phone}
+                maxLength={14}
+                value={phoneFormatter(state.phone)}
                 onChange={(e) =>
                   dispatch({
                     type: "SET_FIELD",
                     field: "phone",
-                    value: e.target.value,
+                    value: e.target.value.replace(/\D/g, ""),
                   })
                 }
                 placeholder="Add phone number"
@@ -231,11 +234,12 @@ const EditProfileModal = ({ onClose }) => {
                 label="Last Four Digits Of SSN"
                 type="text"
                 value={state.ssn}
+                maxLength={4}
                 onChange={(e) =>
                   dispatch({
                     type: "SET_FIELD",
                     field: "ssn",
-                    value: e.target.value,
+                    value: formatSsnLast(e.target.value, setErrors),
                   })
                 }
                 placeholder="XXXX"
@@ -265,7 +269,7 @@ const EditProfileModal = ({ onClose }) => {
               <p className="text-sm font-medium mb-2">Front ID Card</p>
               <div className="relative">
                 <img
-                  src={state?.frontIDImage}
+                  src={state?.frontIDImage || state?.idFrontPreview}
                   alt="Front ID"
                   className="h-28 mx-auto rounded-md"
                 />
@@ -281,7 +285,7 @@ const EditProfileModal = ({ onClose }) => {
               <p className="text-sm font-medium mb-2">Back ID Card</p>
               <div className="relative">
                 <img
-                  src={state?.backIDImage}
+                  src={state?.backIDImage || state?.idBackPreview}
                   alt="Back ID"
                   className="h-28 mx-auto rounded-md"
                 />

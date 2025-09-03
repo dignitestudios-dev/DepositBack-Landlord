@@ -1,21 +1,30 @@
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
 
 import Header from "../components/global/Header";
 import Chatai from "../components/global/Chatai";
 import Footer from "../components/global/Footer";
 
 const DashboardLayout = ({ token, userData }) => {
-  // if (!token) {
-  //   return <Navigate to="/auth/login" replace />;
-  // }
+  console.log("🚀 ~ DashboardLayout ~ userData:", userData);
+  console.log("🚀 ~ DashboardLayout ~ token:", token);
+  const location = useLocation();
+  const path = location.pathname;
+  if (!token) {
+    return <Navigate to="/auth/login" replace />;
+  }
 
-  // if (!userData?.isSessionComplete) {
-  //   return <Navigate to="/onboarding/personal-info" replace />;
-  // }
+  if (
+    !userData?.isSessionComplete &&
+    !path.startsWith("/onboarding/personal-info")
+  ) {
+    return <Navigate to="/onboarding/personal-info" replace />;
+  }
 
-  // if (!userData?.isSubscriptionPaid) {
-  //   return <Navigate to="/onboarding/subscription-plans" replace />;
-  // }
+  if (userData?.isSessionComplete) {
+    if (!userData?.isSubscriptionPaid) {
+      return <Navigate to="/onboarding/subscription-plans" replace />;
+    }
+  }
   return (
     <div className="min-h-screen">
       <Header />

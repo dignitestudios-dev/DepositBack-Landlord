@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router";
 import checkmark from "../../assets/checkmark.png";
-import Applepay from "../../assets/ApplePay.png";
-import Googlepay from "../../assets/GooglePay.png";
+
 import Modal from "../../components/global/Modal";
 
 import { Elements } from "@stripe/react-stripe-js";

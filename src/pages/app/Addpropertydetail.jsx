@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Propertydetails from "../../assets/addproperty/Propertydetails.png";
 import Stripeaccount from "../../assets/addproperty/Stripeaccount.png";
 import Uniquepropertycode from "../../assets/addproperty/Uniquepropertycode.png";
@@ -15,29 +15,31 @@ import DetailStepTwo from "../../components/app/propertyDetail/DetailStepTwo";
 import DetailStepThree from "../../components/app/propertyDetail/DetailStepThree";
 import DetailStepFour from "../../components/app/propertyDetail/DetailStepFour";
 import { useNavigate } from "react-router";
+import { AppContext } from "../../context/AppContext";
 
 const AddPropertyDetail = () => {
   const navigate = useNavigate();
+  const { userData } = useContext(AppContext);
   const [step, setStep] = useState(1);
 
-  const [accountholderName, setAccountholderName] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [routingNumber, setRoutingNumber] = useState("");
-  const [showStripeForm, setShowStripeForm] = useState(false);
-  const [isStripeLinked, setIsStripeLinked] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  // const [accountholderName, setAccountholderName] = useState("");
+  // const [accountNumber, setAccountNumber] = useState("");
+  // const [routingNumber, setRoutingNumber] = useState("");
+  // const [showStripeForm, setShowStripeForm] = useState(false);
+  // const [isStripeLinked, setIsStripeLinked] = useState(false);
+  // const [showModal, setShowModal] = useState(false);
+  // const [modalOpen, setModalOpen] = useState(false);
   const [stepOneData, setStepOneData] = useState({});
   const [stepTwoData, setStepTwoData] = useState({});
 
-  const modalData = {
-    title: "Add More Properties",
-    description:
-      "Do you manage more rental properties? Add them now to streamline your experience.",
-    iconBgColor: "bg-blue-500",
-    actionText: "Add Another Property",
-    actionTextTwo: "Finish for now",
-  };
+  // const modalData = {
+  //   title: "Add More Properties",
+  //   description:
+  //     "Do you manage more rental properties? Add them now to streamline your experience.",
+  //   iconBgColor: "bg-blue-500",
+  //   actionText: "Add Another Property",
+  //   actionTextTwo: "Finish for now",
+  // };
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
@@ -49,6 +51,12 @@ const AddPropertyDetail = () => {
     { img: Uniquepropertycode, label: "Unique Property Code" },
     // { img: Stripeaccount, label: "Stripe Account" },
   ];
+
+  useEffect(() => {
+    if (userData?.stripeProfileStatus === "pending") {
+      window.location.href = userData?.stripeConnectLink;
+    }
+  }, [userData]);
 
   return (
     <div className="min-h-screen bg-[#ecf3fd] py-12 px-6">

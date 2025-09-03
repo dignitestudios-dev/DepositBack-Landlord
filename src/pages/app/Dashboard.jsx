@@ -1,9 +1,7 @@
 import { useState } from "react";
 
 import SearchBar from "../../components/global/Searchbar";
-import Homeone from "../../assets/Homeone.png";
-import Hometwo from "../../assets/Hometwo.png";
-import Homethree from "../../assets/Homefour.png";
+
 import { VscSettings } from "react-icons/vsc";
 import { LuMapPin } from "react-icons/lu";
 import user from "../../assets/user.png";

@@ -29,8 +29,8 @@ export async function getUserChatsWithDetails(currentRole, userId, callback) {
   const chatsRef = collection(db, "chats");
   const q = query(
     chatsRef,
-    where(`participants.${currentRole}`, "==", userId),
-    orderBy("timestamp", "desc")
+    where(`participants.${currentRole}`, "==", userId)
+    // orderBy("timestamp", "asc")
   );
 
   return onSnapshot(q, async (snapshot) => {
@@ -41,6 +41,7 @@ export async function getUserChatsWithDetails(currentRole, userId, callback) {
 
         // Example: if currentRole is tenant, otherRole = landlord
         const otherRole = currentRole === "tenant" ? "landlord" : "tenant";
+
         const otherUserId = participants[otherRole];
 
         if (otherUserId) {
@@ -49,6 +50,7 @@ export async function getUserChatsWithDetails(currentRole, userId, callback) {
 
           if (otherUserSnap.exists()) {
             const userDoc = otherUserSnap.data();
+
             const roleData = (userDoc.roles || {})[otherRole];
 
             if (roleData) {
@@ -73,8 +75,6 @@ export async function getUserChatsWithDetails(currentRole, userId, callback) {
 }
 
 export async function getOrCreateChat(currentUserId, tenantId) {
-  console.log("🚀 ~ 83 ===> ~ tenantId:", tenantId);
-  console.log("🚀 ~ 84 ====> ~ currentUserId:", currentUserId);
   const chatsRef = collection(db, "chats");
 
   // check if chat already exists between landlord and tenant
@@ -99,7 +99,6 @@ export async function getOrCreateChat(currentUserId, tenantId) {
     },
     timestamp: serverTimestamp(),
   });
-  console.log("🚀 ~ getOrCreateChat ~ docRef:", docRef);
 
   return docRef.id;
 }
@@ -118,7 +117,7 @@ export function listenToMessages(chatId, callback) {
   if (!chatId) return;
 
   const messagesRef = collection(db, "chats", chatId, "messages");
-  const q = query(messagesRef, orderBy("timestamp", "asc")); // oldest → newest
+  const q = query(messagesRef, orderBy("timestamp", "asc"));
 
   return onSnapshot(q, (snapshot) => {
     const messages = snapshot.docs.map((doc) => ({

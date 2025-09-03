@@ -42,7 +42,6 @@ const Message = () => {
   const [chatList, setChatList] = useState([]);
   console.log("🚀 ~ Message ~ chatList:", chatList);
   const [selectedMessages, setSelectedMessages] = useState([]);
-  console.log("🚀 ~ Message ~ selectedMessages:", selectedMessages);
 
   const [chatId, setChatId] = useState("");
 
@@ -105,7 +104,6 @@ const Message = () => {
       "landlord",
       userData?.uid,
       (chats) => {
-        console.log("Chats:", chats);
         setChatList(chats);
       }
     );
@@ -179,7 +177,7 @@ const Message = () => {
 
   onSnapshot(messagesRef, (snapshot) => {
     snapshot.docs.forEach((doc) => {
-      console.log(doc.data());
+      console.log("🚀 ~ Message ~ doc:", doc);
     });
   });
 

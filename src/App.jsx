@@ -30,7 +30,10 @@ function App() {
           <Route path={Link.url} key={i} element={Link.page} />
         ))}
       </Route>
-      <Route path="app" element={<DashboardLayout />}>
+      <Route
+        path="app"
+        element={<DashboardLayout token={token} userData={userData} />}
+      >
         {appRoutes?.map((Link, i) => (
           <Route path={Link.url} key={i} element={Link.page} />
         ))}

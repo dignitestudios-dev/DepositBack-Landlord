@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import { FaArrowLeft, FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router";
-import Header from "../../components/global/Header";
-import Footer from "../../components/global/Footer";
-import user from "../../assets/user.png";
-import usertwo from "../../assets/usertwo.png";
-import frontID from "../../assets/idfront.png";
-import backID from "../../assets/idfront.png";
+
 import EditProfileModal from "../../components/app/EditProfileModal";
 import { useFetchData } from "../../hooks/api/Get";
 import ProfileSkeleton from "../../components/app/ProfileSkeleton";
@@ -27,8 +22,6 @@ const ViewProfile = () => {
   };
 
   const { data, loading } = useFetchData(`/users/me`, {}, 1, "");
-  console.log("🚀 ~ ViewProfile ~ loading:", loading);
-  console.log("🚀 ~ ViewProfile ~ data:", data);
 
   return (
     <div className="min-h-screen bg-[#F6FAFF] text-[#333]">
