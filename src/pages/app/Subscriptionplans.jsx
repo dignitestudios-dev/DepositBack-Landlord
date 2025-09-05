@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router";
 import checkmark from "../../assets/checkmark.png";
-import Header from "../../components/global/Header";
-import Footer from "../../components/global/Footer";
 import { TiWarning } from "react-icons/ti";
+import { AppContext } from "../../context/AppContext"; // Importing context to access userData
+import axios from "../../axios";
+import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 
 export default function Subscriptionplans() {
   const navigate = useNavigate();
+  const { userData, token, logoutContext } = useContext(AppContext); // Access user data and token from context
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [subscriptionCancelled, setSubscriptionCancelled] = useState(false);
 
@@ -16,6 +18,7 @@ export default function Subscriptionplans() {
       name: "Landlord Plan - 10 Units",
       type: "Monthly Plan",
       price: "190",
+      subscriptionKey: "landlord_plan_10_units", // This key is used to match with user's subscription
       features: [
         "Property Manager",
         "Deposits Tracker",
@@ -28,6 +31,7 @@ export default function Subscriptionplans() {
       name: "Landlord Plan - 20 Units",
       type: "Monthly Plan",
       price: "230",
+      subscriptionKey: "landlord_plan_20_units", // Key for matching
       features: [
         "Property Manager",
         "Deposits Tracker",
@@ -40,6 +44,7 @@ export default function Subscriptionplans() {
       name: "Landlord Plan - 30 Units",
       type: "Monthly Plan",
       price: "280",
+      subscriptionKey: "landlord_plan_30_units", // Key for matching
       features: [
         "Property Manager",
         "Deposits Tracker",
@@ -49,6 +54,40 @@ export default function Subscriptionplans() {
       ],
     },
   ];
+
+  // Get the current subscription from userData
+  const userSubscriptionKey = userData?.subscriptionProduct; // Subscription key like "landlord_plan_10_units"
+  
+  // Find the plan that matches the user's current subscription
+  const currentPlan = planData.find(plan => plan.subscriptionKey === userSubscriptionKey);
+
+  // Handle cancel subscription logic
+  const cancelSubscription = async () => {
+    if (userData?.subscriptionProduct) {
+      try {
+        const response = await axios.post(
+          "/subscription/cancelStripeSubscription",
+          {
+            sku: userData.subscriptionProduct,  // Send the SKU (or subscription product) here
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,  // Add the authorization token if needed
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setSubscriptionCancelled(true);
+          SuccessToast("Subscription successfully cancelled!");
+          logoutContext();  // Log out the user after cancelling the subscription
+        }
+      } catch (error) {
+        console.error("Error cancelling subscription", error);
+        ErrorToast(error.response.data.message);
+      }
+    }
+  };
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 pt-8 pb-20 text-[#333]">
@@ -69,28 +108,27 @@ export default function Subscriptionplans() {
         </p>
 
         {/* Subscription Plans */}
-        <div className="flex justify-between items-start gap-10 mr-[4em] ml-[4em]">
-          {/* Basic Plan */}
-
-          {planData?.map((item, index) => (
+        <div className="flex justify-center items-start gap-10 mr-[4em] ml-[4em]">
+          {/* Display only the current plan */}
+          {currentPlan && (
             <div
-              key={index}
+              key={currentPlan.subscriptionKey}
               className="bg-gradient-to-r from-blue-700 to-blue-500 w-1/2 p-6 rounded-3xl text-white pb-[8em]"
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm">{item.name}</p>
-                  <h1 className="text-xl font-[600]">{item.type}</h1>
+                  <p className="text-sm">{currentPlan.name}</p>
+                  <h1 className="text-xl font-[600]">{currentPlan.type}</h1>
                 </div>
                 <div className="flex gap-1">
                   <p className="text-2xl">$</p>
-                  <p className="text-4xl font-[600]">{item.price}</p>
+                  <p className="text-4xl font-[600]">{currentPlan.price}</p>
                 </div>
               </div>
 
               <div className="bg-white text-black p-8 rounded-2xl mt-3 -mr-10 -mb-[10em]">
                 <div className="space-y-4">
-                  {item.features.map((feature, i) => (
+                  {currentPlan.features.map((feature, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <img
                         src={checkmark}
@@ -110,17 +148,11 @@ export default function Subscriptionplans() {
                         >
                           Cancel Subscription
                         </button>
-                        <p className="text-[14px] text-left text-gray-600 mt-1">
-                          Your subscription will expire on <br />
-                          <span className="text-red-600 font-semibold">
-                            30 September 2025
-                          </span>
-                        </p>
                       </>
                     ) : (
                       <NavLink
                         to="/app/payment-method-plan"
-                        state={item}
+                        state={currentPlan}
                         className="block w-full px-4 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-full font-semibold text-center hover:opacity-90 transition"
                       >
                         Buy Now
@@ -130,7 +162,7 @@ export default function Subscriptionplans() {
                 </div>
               </div>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -156,8 +188,8 @@ export default function Subscriptionplans() {
               </button>
               <button
                 onClick={() => {
+                  cancelSubscription();  // Call the cancel subscription function here
                   setShowCancelModal(false);
-                  setSubscriptionCancelled(true);
                 }}
                 className="px-8 py-2 text-sm bg-[#FF3B30] text-white rounded-full"
               >
