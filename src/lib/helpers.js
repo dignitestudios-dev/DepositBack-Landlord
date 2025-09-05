@@ -115,9 +115,15 @@ const validatePropertyField = (field, value) => {
         return "Enter a valid rent amount";
       return "";
     case "dueDate":
-      if (!value || !/^\d+(\.\d{1,2})?$/.test(value) || Number(value) <= 0)
-        return "Due Date is required";
+      if (!value || !/^\d+$/.test(value)) {
+        return "Due Date must be a valid number";
+      }
+      const day = Number(value);
+      if (day < 1 || day > 31) {
+        return "Due Date must be between 1 and 31";
+      }
       return "";
+
     case "propertyType":
       if (!value) return "Property type is required";
       return "";
@@ -188,3 +194,16 @@ export const propertyFormReducer = (state, action) => {
       return state;
   }
 };
+
+export const requiredPropertyFields = [
+  "address",
+  "city",
+  "depositAmount",
+  "description",
+  "dueDate",
+  "propertyName",
+  "propertyType",
+  "rentAmount",
+  "state",
+  "zipCode",
+];

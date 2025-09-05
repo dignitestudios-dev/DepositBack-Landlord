@@ -5,6 +5,7 @@ import usaflag from "../../../assets/usaflag.png";
 import { RiLoader5Line } from "react-icons/ri";
 
 const AddContactPersonModal = ({
+  setContactPersons,
   onClose,
   loading,
   personsData,
@@ -36,8 +37,14 @@ const AddContactPersonModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-[26em] text-center shadow-lg relative">
+    <div
+      onClick={() => setContactPersons(false)}
+      className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-2xl p-6 w-full max-w-[26em] text-center shadow-lg relative"
+      >
         <div className="flex justify-start">
           <h2 className="text-2xl font-[600] mb-2">Add Contact Persons</h2>
         </div>

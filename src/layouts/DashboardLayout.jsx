@@ -5,8 +5,6 @@ import Chatai from "../components/global/Chatai";
 import Footer from "../components/global/Footer";
 
 const DashboardLayout = ({ token, userData }) => {
-  console.log("🚀 ~ DashboardLayout ~ userData:", userData);
-  console.log("🚀 ~ DashboardLayout ~ token:", token);
   const location = useLocation();
   const path = location.pathname;
   if (!token) {

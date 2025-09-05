@@ -4,7 +4,10 @@ import { useNavigate } from "react-router";
 import AddContactPersonModal from "./AddContactPersonModal";
 import axios from "../../../axios";
 import { addPropertyValues, propertyTypes } from "../../../init/propertyValues";
-import { propertyFormReducer } from "../../../lib/helpers";
+import {
+  propertyFormReducer,
+  requiredPropertyFields,
+} from "../../../lib/helpers";
 import stateCityData from "../../global/CountryData";
 
 const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
@@ -33,11 +36,8 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
   };
 
   const handleContactPerson = () => {
-    const hasEmptyFields = Object.values(state.form).some((value) => {
-      // Handles null, undefined, empty string, or array with no items
-      if (typeof value === "string") return value.trim() === "";
-      if (Array.isArray(value)) return value.length === 0;
-      return !value;
+    const hasEmptyFields = requiredPropertyFields.some((field) => {
+      return !state.form[field] || state.form[field].trim() === "";
     });
 
     if (propertyMedia.length === 0) {
@@ -84,7 +84,9 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
         formData.append("deposit", form.depositAmount || "");
         formData.append("rent", form.rentAmount || "");
         formData.append("dueDate", form.dueDate);
-        formData.append("lateFeeAmount", form.lateFeeAmount);
+        if (form.lateFeeAmount && form.lateFeeAmount.trim() !== "") {
+          formData.append("lateFeeAmount", form.lateFeeAmount);
+        }
 
         personsData.forEach((person, index) => {
           formData.append(`contactPersons[${index}][name]`, person.name);
@@ -503,6 +505,7 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
       </div>
       {contactPersons && (
         <AddContactPersonModal
+          setContactPersons={setContactPersons}
           onClose={() => {
             handleNext();
           }}

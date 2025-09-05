@@ -24,6 +24,7 @@ const PropertyDetail = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [update, setUpdate] = useState(false);
+  const [remindLoading, setRemindLoading] = useState(false);
 
   const [isDelete, setIsDelete] = useState(false);
 
@@ -39,6 +40,22 @@ const PropertyDetail = () => {
       }
     } catch (error) {
       ErrorToast(error.response.data.message);
+    }
+  };
+
+  const handleReminder = async () => {
+    try {
+      setRemindLoading(true);
+      const response = await axios.post(
+        `/properties/rent/reminder/${contract}`
+      );
+      if (response.status === 200) {
+        setShowModal(true);
+      }
+    } catch (error) {
+      ErrorToast(error.response.data.message);
+    } finally {
+      setRemindLoading(false);
     }
   };
 
@@ -66,6 +83,8 @@ const PropertyDetail = () => {
     tenantMoveOutImages,
     tenantMoveOutVideos,
     uvLightImages,
+    depositTracker,
+    contract,
   } = propertyDetail;
 
   return (
@@ -264,15 +283,29 @@ const PropertyDetail = () => {
                   </p>
 
                   <div className="flex justify-between gap-3 pt-3 pb-3">
-                    <button
-                      className="w-full mt-3 bg-gradient-to-r from-[#003897] to-[#0151DA] text-white py-2 rounded-3xl font-semibold"
-                      onClick={() => setShowModal(true)}
-                    >
-                      Send Reminder
-                    </button>
+                    {paymentStatus === "Unpaid" && (
+                      <button
+                        className="w-full mt-3 bg-gradient-to-r from-[#003897] to-[#0151DA] text-white py-2 rounded-3xl font-semibold"
+                        disabled={remindLoading}
+                        onClick={handleReminder}
+                      >
+                        {remindLoading ? "Sending..." : "Send Reminder"}
+                      </button>
+                    )}
+
                     <button
                       className="w-full mt-2 bg-gray-100 text-black py-2 rounded-3xl font-semibold"
-                      onClick={() => navigate("/app/rent-history")}
+                      onClick={() =>
+                        navigate("/app/rent-history", {
+                          state: {
+                            lateFeeAmount,
+                            rentDueDate,
+                            rent,
+                            paymentStatus,
+                            contractId: contract,
+                          },
+                        })
+                      }
                     >
                       View History
                     </button>
@@ -343,7 +376,11 @@ const PropertyDetail = () => {
 
               <div
                 className="bg-white flex justify-between rounded-2xl p-3 items-center"
-                onClick={() => navigate("/app/deposit-tracker")}
+                onClick={() =>
+                  navigate("/app/deposit-tracker", {
+                    state: { depositId: depositTracker },
+                  })
+                }
               >
                 <button className="font-[500]">Deposit Tracker</button>
                 <BsChevronRight />

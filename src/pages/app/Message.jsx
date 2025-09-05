@@ -261,10 +261,18 @@ const Message = () => {
                 <div
                   key={idx}
                   className={`flex flex-col ${
-                    msg.senderId === userData?.uid ? "items-end" : "items-start"
+                    msg.senderId === userData?.uid
+                      ? "items-end "
+                      : "items-start"
                   }`}
                 >
-                  <div className="bg-blue-700 text-white px-4 py-2 rounded-xl max-w-xs">
+                  <div
+                    className={`${
+                      msg.senderId === userData?.uid
+                        ? "items-end  bg-blue-700 text-white"
+                        : "items-start  bg-gray-300 text-black"
+                    } px-4 py-2 rounded-xl max-w-xs`}
+                  >
                     {msg.text}
                   </div>
                   {/* {msg.type === "text" ? (

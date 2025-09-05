@@ -51,7 +51,7 @@ const Header = () => {
             Home
           </li>
           <li
-            className="hover:underline cursor-pointer"
+            className="hover:underline cursor-pointer relative"
             onClick={() => {
               navigate("/app/tenant-requests");
             }}
@@ -129,12 +129,12 @@ const Header = () => {
         </div>
 
         {/* User Avatar */}
-       <img
-  src={userData?.profilePicture || mainlogowhite}
-  className="h-10 w-10 rounded-full object-cover cursor-pointer"
-  alt="User Avatar"
-  onClick={toggleUserpopup}
-/>
+        <img
+          src={userData?.profilePicture || mainlogowhite}
+          className="h-10 w-10 rounded-full object-cover cursor-pointer"
+          alt="User Avatar"
+          onClick={toggleUserpopup}
+        />
 
         {userPopup && (
           <div className="z-10 absolute top-[6em] right-10 w-[9em] p-4 bg-white shadow-lg rounded-lg border border-slate-200">

@@ -31,6 +31,7 @@ const ELEMENT_OPTIONS = {
 
 const PaymentForm = ({ planData, setShowModal }) => {
   const navigate = useNavigate();
+  const { loginContext } = useContext(AppContext);
 
   console.log("🚀 ~  ~ planData:", planData);
 
@@ -72,6 +73,7 @@ const PaymentForm = ({ planData, setShowModal }) => {
           );
           console.log("🚀 ~ handleSubmit ~ response:", response);
           if (response.status === 200) {
+            loginContext(response?.data);
             setShowModal(true);
           }
         }

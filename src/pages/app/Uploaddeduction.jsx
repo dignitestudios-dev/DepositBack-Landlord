@@ -3,12 +3,22 @@ import Header from "../../components/global/Header";
 import Footer from "../../components/global/Footer";
 import { FaArrowLeft } from "react-icons/fa";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import axios from "../../axios";
+import { ErrorToast } from "../../components/global/Toaster";
 
 const Uploaddeduction = () => {
-  const [propertyMedia, setPropertyMedia] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate("");
+
+  const location = useLocation();
+  const depositId = location.state?.depositId || false;
+
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [propertyMedia, setPropertyMedia] = useState([]);
+  console.log("🚀 ~ Uploaddeduction ~ propertyMedia:", propertyMedia);
 
   const handleUploadPropertyimage = (e) => {
     const files = Array.from(e.target.files);
@@ -26,6 +36,36 @@ const Uploaddeduction = () => {
       setShowPopup(false);
       navigate("/app/deposit-tracker", { state: { uploaded: true } });
     }, 2000);
+  };
+
+  const handleDepositSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("amount", amount);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("date", new Date().toLocaleString());
+
+    propertyMedia.forEach((file) => {
+      formData.append("invoices", file); // multiple files with same key
+    });
+
+    try {
+      const response = await axios.post(`/deposits/${depositId}`, formData);
+      if (response.status === 200) {
+        console.log("✅ Success:", response.data);
+
+        setShowPopup(true);
+        setTimeout(() => {
+          setShowPopup(false);
+          navigate(-1);
+        }, 2000);
+      }
+    } catch (err) {
+      ErrorToast(err.response.data.message);
+      console.error("❌ Error:", err);
+    }
   };
 
   return (
@@ -54,21 +94,27 @@ const Uploaddeduction = () => {
                 type="text"
                 placeholder="Place holder goes here"
                 className="border px-4 py-2 rounded-full w-full"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block mb-1 text-sm font-medium">Date</label>
               <select className="border px-4 py-2 rounded-full w-full">
                 <option>Select Dropdown</option>
               </select>
-            </div>
+            </div> */}
             <div>
               <label className="block mb-1 text-sm font-medium">
                 Deduction Amount
               </label>
-              <select className="border px-4 py-2 rounded-full w-full">
-                <option>Select Dropdown</option>
-              </select>
+              <input
+                type="number"
+                placeholder="Place holder goes here"
+                className="border px-4 py-2 rounded-full w-full"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
             </div>
           </div>
 
@@ -81,6 +127,8 @@ const Uploaddeduction = () => {
               placeholder="Place holder goes here"
               rows={4}
               className="w-full border px-4 py-2 rounded-3xl resize-none"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             ></textarea>
           </div>
 
@@ -145,7 +193,7 @@ const Uploaddeduction = () => {
           {/* Upload Button */}
           <div className="pt-4 justify-center flex">
             <button
-              onClick={handleUploadClick}
+              onClick={handleDepositSubmit}
               className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white py-2 px-36 rounded-full"
             >
               Upload

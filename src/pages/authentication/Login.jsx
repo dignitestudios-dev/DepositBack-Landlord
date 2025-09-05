@@ -35,15 +35,7 @@ export default function LoginPage() {
           const response = await axios.post("/auth/emailSignIn", payload);
           if (response.status === 200) {
             let data = response?.data?.data;
-            console.log("user--->", data?.user);
             SuccessToast("Success");
-            // if (!data?.user?.isSessionComplete) {
-            //   navigate("/onboarding/personal-info");
-            // } else if (!data?.user?.isSubscriptionPaid) {
-            //   navigate("onboarding/subscription-plans");
-            // } else {
-            //   navigate("/app/Dashboard");
-            // }
             loginContext(data);
           }
         } catch (error) {

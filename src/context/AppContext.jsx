@@ -8,6 +8,7 @@ const AppContext = createContext();
 const AppProvider = ({ children }) => {
   const navigate = useNavigate();
   const [update, setUpdate] = useState();
+
   const [token, setToken] = useState(() => Cookies.get("token"));
 
   const [userData, setUserData] = useState(() => {

@@ -8,7 +8,6 @@ import axios from "../../axios";
 import { ErrorToast } from "../global/Toaster";
 
 const TenantRequestDetails = ({ request }) => {
-  console.log("🚀 ~ TenantRequestDetails ~ request:", request);
   const navigate = useNavigate("");
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [acceptRequestModal, setAcceptRequestModal] = useState(false);
@@ -54,15 +53,21 @@ const TenantRequestDetails = ({ request }) => {
     }
   };
 
-  const handleAcceptRequest = async () => {
+  const handleAcceptRequest = async (status) => {
+    console.log("🚀 ~ handleAcceptRequest ~ status:", status);
     try {
+      const today = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+
       const payload = {
-        status: "approved",
-        leaseStartDate:
-          new Date(leaseStart).toISOString().split("T")[0] + "T00:00:00.000Z",
-        leaseEndDate:
-          new Date(leaseEnd).toISOString().split("T")[0] + "T00:00:00.000Z",
+        status: status,
+        leaseStartDate: leaseStart
+          ? new Date(leaseStart).toISOString().split("T")[0] + "T00:00:00.000Z"
+          : today,
+        leaseEndDate: leaseEnd
+          ? new Date(leaseEnd).toISOString().split("T")[0] + "T00:00:00.000Z"
+          : today,
       };
+
       setLoading(true);
       const response = await axios.put(
         `/requests/properties/${request?._id}`,
@@ -70,12 +75,18 @@ const TenantRequestDetails = ({ request }) => {
       );
       if (response.status === 200) {
         // setTentantRequestapproved(true);
-        setLeaseStart("");
-        setLeaseEnd("");
-        setConfirmleasedate(false);
-        setTentantRequestapproved(true);
+        if (status === "approved") {
+          setLeaseStart("");
+          setLeaseEnd("");
+          setConfirmleasedate(false);
+          setTentantRequestapproved(true);
+        } else {
+          setShowRequestModal(false);
+          setRejectedRequestModal(true);
+        }
       }
     } catch (error) {
+      console.log("🚀 ~ handleAcceptRequest ~ error:", error);
       ErrorToast(error.response.data.message);
     } finally {
       setLoading(false);
@@ -152,16 +163,13 @@ const TenantRequestDetails = ({ request }) => {
                     Cancel
                   </button>
                   <button
+                    disabled={loading}
                     onClick={() => {
-                      setShowRequestModal(false);
-                      setRejectedRequestModal(true);
-                      setTimeout(() => {
-                        window.location.reload();
-                      }, 1000);
+                      handleAcceptRequest("rejected");
                     }}
                     className="px-[5em] py-2 text-sm bg-[#FF3B30] text-white rounded-full"
                   >
-                    Yes
+                    {loading ? "Processing" : "Yes"}
                   </button>
                 </div>
               </div>
@@ -230,7 +238,10 @@ const TenantRequestDetails = ({ request }) => {
 
           {rejectedRequestModal && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-              <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
+              <div
+                onClick={() => navigate("/app/dashboard")}
+                className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center"
+              >
                 <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-[#fff] p-6 w-fit mx-auto rounded-full mb-3">
                   <IoMdCheckmark size={40} />
                 </div>
@@ -338,7 +349,7 @@ const TenantRequestDetails = ({ request }) => {
                   </button>
                   <button
                     disabled={loading}
-                    onClick={handleAcceptRequest}
+                    onClick={() => handleAcceptRequest("approved")}
                     className="px-[5em] py-2 text-sm bg-[#FF3B30] text-white rounded-full"
                   >
                     {loading ? "Saving..." : "Yes"}

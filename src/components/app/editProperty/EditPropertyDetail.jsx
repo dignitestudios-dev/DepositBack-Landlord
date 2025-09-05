@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import AddContactPersonModal from "./../propertyDetail/AddContactPersonModal";
 import { ErrorToast } from "./../../global/Toaster";
 import axios from "../../../axios";
+import stateCityData from "../../global/CountryData";
 
 const initialState = {
   form: {
@@ -133,13 +134,6 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
   const [state, dispatch] = useReducer(formReducer, initialState);
 
   const { form, errors } = state;
-
-  // Example state list
-  const states = {
-    California: ["Los Angeles", "San Diego", "San Francisco"],
-    Texas: ["Houston", "Dallas", "Austin"],
-    Florida: ["Miami", "Orlando", "Tampa"],
-  };
 
   const handleUploadPropertyimage = (e) => {
     setMediaError(null);
@@ -401,7 +395,7 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
             className="w-full p-3 border rounded-full"
           >
             <option value="">Select State</option>
-            {Object.keys(states).map((st) => (
+            {Object.keys(stateCityData).map((st) => (
               <option key={st} value={st}>
                 {st}
               </option>
@@ -444,7 +438,7 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
             className="w-full p-3 border rounded-full"
           >
             <option value="">Select City</option>
-            {states[form.state]?.map((city) => (
+            {stateCityData[form.state]?.map((city) => (
               <option key={city} value={city}>
                 {city}
               </option>

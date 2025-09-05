@@ -1,5 +1,5 @@
 // import moment from "moment";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import moment from "moment";
 import axios from "../../axios";
@@ -45,6 +45,10 @@ const Notifications = () => {
       setUnReadLoadingId(null);
     }
   };
+
+  useEffect(() => {
+    setUpdate((prev) => !prev);
+  }, []);
 
   return (
     <Fragment>

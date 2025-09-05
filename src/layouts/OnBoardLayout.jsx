@@ -1,7 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 
 const OnBoardLayout = ({ token, userData }) => {
-  console.log("🚀 ~ OnBoardLayout ~ userData:", userData);
   const location = useLocation();
   const path = location.pathname;
   if (!token) {

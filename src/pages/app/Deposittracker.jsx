@@ -1,26 +1,61 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import invoice from "../../assets/invoice.png";
 import { useLocation } from "react-router";
 import { TiWarning } from "react-icons/ti";
 import { IoMdCheckmark } from "react-icons/io";
+import { ErrorToast } from "../../components/global/Toaster";
+import axios from "../../axios";
+import { useFetchData } from "../../hooks/api/Get";
 
 const Deposittracker = () => {
   const navigate = useNavigate("");
   const location = useLocation();
-  const uploaded = location.state?.uploaded || false;
+  const depositId = location.state?.depositId || false;
+  console.log("🚀 ~ Deposittracker ~ uploaded:", depositId);
+
   const [isReleasing, setIsReleasing] = React.useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [depostreleasedpopup, setDepostreleasedpopup] = useState(false);
+  const [releaseLoading, setReleaseLoading] = useState(false);
 
-  const deductionData = {
-    title: "Plumbing Repairs",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    date: "Sun, Jun 15, 2024",
-    amount: "$200",
-    files: [invoice, invoice, invoice],
+  const uploaded = false;
+
+  const { data, loading, pagination } = useFetchData(
+    `/deposits/${depositId}`,
+    { currentDate: new Date().toLocaleString() },
+    1,
+    ""
+  );
+  console.log("🚀 ~ Deposittracker ~ data:", data);
+
+  // const deductionData = {
+  //   title: "Plumbing Repairs",
+  //   description:
+  //     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  //   date: "Sun, Jun 15, 2024",
+  //   amount: "$200",
+  //   files: [invoice, invoice, invoice],
+  // };
+
+  const handleDepositRelease = async () => {
+    try {
+      setReleaseLoading(true);
+      const response = await axios.post(`deposits/release/${depositId}`);
+      if (response.status === 200) {
+        setShowRequestModal(false);
+        setDepostreleasedpopup(true);
+        setTimeout(() => {
+          navigate("/app/dashboard");
+        }, 2000);
+      }
+    } catch (error) {
+      console.log("🚀 ~ handleDepositRelease ~ error:", error);
+      ErrorToast(error?.response?.data?.message);
+    } finally {
+      setReleaseLoading(false);
+    }
   };
 
   return (
@@ -47,7 +82,9 @@ const Deposittracker = () => {
           <p className="text-sm font-medium text-gray-600 mb-1">
             Total Deposit Amount
           </p>
-          <p className="text-4xl font-[600] text-blue-700">$2,500.00</p>
+          <p className="text-4xl font-[600] text-blue-700">
+            ${data?.depositTracker?.totalDeposit}
+          </p>
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
           {!isReleasing ? (
@@ -60,7 +97,11 @@ const Deposittracker = () => {
               </button>
 
               <button
-                onClick={() => navigate("/app/upload-deduction")}
+                onClick={() =>
+                  navigate("/app/upload-deduction", {
+                    state: { depositId: depositId },
+                  })
+                }
                 className="px-4 py-2 text-sm rounded-full font-[500] bg-blue-700 text-white hover:bg-blue-800 transition"
               >
                 Upload Deduction
@@ -68,12 +109,11 @@ const Deposittracker = () => {
             </>
           ) : (
             <button
-              onClick={() => {
-                setShowRequestModal(true);
-              }}
+              disabled={releaseLoading}
+              onClick={() => setShowRequestModal(true)}
               className="px-4 py-2 text-sm rounded-full border bg-gradient-to-r from-[#003897] to-[#0151DA] text-white font-[500] border-gray-300 hover:bg-blue-900 transition"
             >
-              Release Deposit Amount
+              {releaseLoading ? "Releasing amount" : "Release Deposit Amount"}
             </button>
           )}
         </div>
@@ -88,7 +128,8 @@ const Deposittracker = () => {
                 Release Deposit Amount
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to release the refundable deposit of $2300
+                Are you sure you want to release the refundable deposit of $
+                {data?.depositTracker?.remainingBalance}
                 to [Tenant Name]? This action cannot be undone.
               </p>
               <div className="flex justify-center gap-3">
@@ -100,11 +141,7 @@ const Deposittracker = () => {
                 </button>
                 <button
                   onClick={() => {
-                    setShowRequestModal(false);
-                    setDepostreleasedpopup(true);
-                    setTimeout(() => {
-                      navigate("/app/property-detail");
-                    }, 2000);
+                    handleDepositRelease();
                   }}
                   className="px-8 py-2 text-sm bg-[#FF3B30] text-white rounded-full"
                 >
@@ -125,7 +162,8 @@ const Deposittracker = () => {
                 Deposit Released!
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to release the refundable deposit of $2300
+                Are you sure you want to release the refundable deposit of $
+                {data?.depositTracker?.totalDeposit}
                 to [Tenant Name]? This action cannot be undone.
               </p>
             </div>
@@ -138,7 +176,7 @@ const Deposittracker = () => {
         <h3 className="text-md text-black font-semibold mb-4">
           Receipts and Deductions
         </h3>
-        {!uploaded && (
+        {data?.deductions?.length === 0 && (
           <div className="text-center py-10 text-gray-500">
             <p className="font-[600] text-lg text-black">
               No Receipts Or Deductions Yet
@@ -150,40 +188,54 @@ const Deposittracker = () => {
           </div>
         )}
 
-        {uploaded && (
-          <div className="bg-[#F3F3F3] p-6 rounded-2xl items-start">
-            <h1 className="font-[500]">Plumbing Repairs</h1>
-            <p className="text-sm pt-1 pb-1">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </p>
-            <span className="text-[14px] font-[500] pt-1">
-              Date: Sun,15,2024
-            </span>
-            <br />
-            <span className="text-[14px] font-[500] pt-1">
-              Deduction: <span className="text-red-600">$200</span>
-            </span>
-            <div className="flex justify-end">
-              <button
-                onClick={() =>
-                  navigate("/app/receipts-and-deductions", {
-                    state: deductionData,
-                  })
-                }
-                className="font-[500] text-[14px] underline text-blue-600"
+        {data?.deductions?.length > 0 ? (
+          <Fragment>
+            {data.deductions.map((item, index) => (
+              <div
+                key={item._id || index}
+                className="bg-[#F3F3F3] p-6 rounded-2xl items-start"
               >
-                View Details
-              </button>
-            </div>
-          </div>
+                <h1 className="font-[500]">{item.title}</h1>
+                <p className="text-sm pt-1 pb-1">{item.description}</p>
+
+                <span className="text-[14px] font-[500] pt-1 block">
+                  Date:{" "}
+                  {new Date(item.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+
+                <span className="text-[14px] font-[500] pt-1 block">
+                  Deduction:{" "}
+                  <span className="text-red-600">${item.amount}</span>
+                </span>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={() =>
+                      navigate("/app/receipts-and-deductions", { state: item })
+                    }
+                    className="font-[500] text-[14px] underline text-blue-600"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))}
+          </Fragment>
+        ) : (
+          <div>No deductions found</div>
         )}
       </div>
 
       {/* Remaining Balance */}
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
         <h3 className="text-md text-black font-semibold">Remaining Balance</h3>
-        <p className="text-4xl font-[600] text-blue-700">$2,500.00</p>
+        <p className="text-4xl font-[600] text-blue-700">
+          ${data?.depositTracker?.remainingBalance}
+        </p>
       </div>
     </div>
   );

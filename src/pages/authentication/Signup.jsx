@@ -42,7 +42,7 @@ export default function Signup() {
           const newUser = await createUserWithEmailAndPassword(
             auth,
             values.email.toLocaleLowerCase(),
-            "Test@123"
+            values.email.toLocaleLowerCase()
           );
           const token = await getIdToken(newUser.user);
           if (token) {
@@ -56,7 +56,7 @@ export default function Signup() {
               const userCredential = await signInWithEmailAndPassword(
                 auth,
                 values.email.toLocaleLowerCase(),
-                "Test@123"
+                values.email.toLocaleLowerCase()
               );
               const user = userCredential?.user;
               //   // Get the ID token

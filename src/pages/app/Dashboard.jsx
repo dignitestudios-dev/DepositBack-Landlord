@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import SearchBar from "../../components/global/Searchbar";
 
@@ -10,13 +10,13 @@ import Addmorepropertymodal from "../../components/global/Addmorepropertymodal";
 import { useNavigate } from "react-router";
 import { useFetchData } from "../../hooks/api/Get";
 import DashboardSkeletonLoader from "../../components/app/dashboard/DashboardSkeletonLoader";
+import { AppContext } from "../../context/AppContext";
 
 const Dashboard = () => {
   const [modalOpen, setModalOpen] = useState(false); // Manage modal visibility
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
-
 
   const navigate = useNavigate("");
 
@@ -36,8 +36,8 @@ const Dashboard = () => {
   );
 
   const filteredProperties = data.filter((property) =>
-  property.name?.toLowerCase().includes(searchTerm.toLowerCase())
-);
+    property.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const PropertyFilterModal = ({ isOpen, onClose, onApply }) => {
     const [propertyType, setPropertyType] = useState("Apartment");
@@ -154,8 +154,8 @@ const Dashboard = () => {
           <SearchBar
             placeholder="Search"
             setSearchTerm={setSearchTerm}
-            searchTerm={searchTerm} 
-            />
+            searchTerm={searchTerm}
+          />
 
           {/* Settings Icon */}
           <div className="flex items-center justify-center bg-gradient-to-r w-[4em] h-10 from-[#003897] to-[#0151DA] rounded-full cursor-pointer">
@@ -178,113 +178,112 @@ const Dashboard = () => {
       </div>
 
       {/* Property Cards Grid */}
-     {loading ? (
-  <DashboardSkeletonLoader />
-) : (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
-    {filteredProperties.length > 0 ? (
-      filteredProperties.map((property, index) => (
-        <div
-          key={index}
-          className="bg-white p-3 rounded-2xl shadow-lg overflow-hidden"
-        >
-          {/* Property Image */}
-          <div className="relative">
-            <img
-              src={property.images?.[0] || "/default-property.jpg"}
-              alt="Property"
-              className="w-full h-[13em] object-cover rounded-2xl"
-            />
-            <span
-              className={`absolute top-2 right-2 px-3 py-1 text-sm text-white rounded-full ${
-                property.tenant ? "bg-green-500" : "bg-red-500"
-              }`}
-            >
-              {property.tenant ? "Active" : "Inactive"}
-            </span>
-          </div>
-
-          {/* Card Body */}
-          <div className="p-4">
-            <div className="flex justify-between items-center">
-              <span
-                className="text-[18px] font-[500] cursor-pointer"
-                onClick={() => {
-                  navigate(`/app/property-detail/${property._id}`, {
-                    state: { propertyDetail: property },
-                  });
-                }}
+      {loading ? (
+        <DashboardSkeletonLoader />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-10">
+          {filteredProperties.length > 0 ? (
+            filteredProperties.map((property, index) => (
+              <div
+                key={index}
+                className="bg-white p-3 rounded-2xl shadow-lg overflow-hidden"
               >
-                {property.name}
-              </span>
-              <p className="mt-2 text-lg font-semibold text-[#0151DA]">
-                ${property.rent}
-              </p>
-            </div>
-
-            <div className="flex gap-1 pt-2 items-center">
-              <LuMapPin size={16} />
-              <p className="text-gray-500 font-[500] text-sm">
-                {property.address}
-              </p>
-            </div>
-
-            <span className="text-sm text-black">
-              Unique Code: &nbsp;
-              <span className="text-blue-600 font-semibold">
-                {property.uniquePropertyCode}
-              </span>
-            </span>
-
-            {/* Tenant Info and Chat */}
-            <div className="flex gap-3 justify-between pt-3">
-              <div className="flex gap-3">
-                <img
-                  src={property.tenant?.profilePicture || user}
-                  className="h-10 w-10 rounded-full object-cover cursor-pointer"
-                  alt="Tenant Avatar"
-                />
-                <div>
-                  <span className="text-1xl">
-                    {property.tenant?.name || "No Tenant"}
+                {/* Property Image */}
+                <div className="relative">
+                  <img
+                    src={property.images?.[0] || "/default-property.jpg"}
+                    alt="Property"
+                    className="w-full h-[13em] object-cover rounded-2xl"
+                  />
+                  <span
+                    className={`absolute top-2 right-2 px-3 py-1 text-sm text-white rounded-full ${
+                      property.tenant ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  >
+                    {property.tenant ? "Active" : "Inactive"}
                   </span>
-                  <p className="text-sm text-gray-500">
-                    {property.tenant?.name ? "Tenant" : "--"}
-                  </p>
                 </div>
-              </div>
-              <div>
-                <div
-                  className="bg-[#0151DA] p-3 rounded-xl cursor-pointer"
-                  onClick={() => {
-                    navigate("/app/messages", {
-                      state: { tenantId: property?.tenant?.uid },
-                    });
-                  }}
-                >
-                  <IoChatbubbleEllipsesOutline size={20} color="white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="col-span-full text-center mt-10">
-        <p className="text-gray-500 text-lg mb-4">
-          No properties found for "{searchTerm}".
-        </p>
-        <button
-          onClick={() => setSearchTerm("")}
-          className="text-sm text-white bg-[#0151DA] px-5 py-2 rounded-full hover:bg-blue-700 transition"
-        >
-          Clear Search
-        </button>
-      </div>
-    )}
-  </div>
-)}
 
+                {/* Card Body */}
+                <div className="p-4">
+                  <div className="flex justify-between items-center">
+                    <span
+                      className="text-[18px] font-[500] cursor-pointer"
+                      onClick={() => {
+                        navigate(`/app/property-detail/${property._id}`, {
+                          state: { propertyDetail: property },
+                        });
+                      }}
+                    >
+                      {property.name}
+                    </span>
+                    <p className="mt-2 text-lg font-semibold text-[#0151DA]">
+                      ${property.rent}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-1 pt-2 items-center">
+                    <LuMapPin size={16} />
+                    <p className="text-gray-500 font-[500] text-sm">
+                      {property.address}
+                    </p>
+                  </div>
+
+                  <span className="text-sm text-black">
+                    Unique Code: &nbsp;
+                    <span className="text-blue-600 font-semibold">
+                      {property.uniquePropertyCode}
+                    </span>
+                  </span>
+
+                  {/* Tenant Info and Chat */}
+                  <div className="flex gap-3 justify-between pt-3">
+                    <div className="flex gap-3">
+                      <img
+                        src={property.tenant?.profilePicture || user}
+                        className="h-10 w-10 rounded-full object-cover cursor-pointer"
+                        alt="Tenant Avatar"
+                      />
+                      <div>
+                        <span className="text-1xl">
+                          {property.tenant?.name || "No Tenant"}
+                        </span>
+                        <p className="text-sm text-gray-500">
+                          {property.tenant?.name ? "Tenant" : "--"}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <div
+                        className="bg-[#0151DA] p-3 rounded-xl cursor-pointer"
+                        onClick={() => {
+                          navigate("/app/messages", {
+                            state: { tenantId: property?.tenant?.uid },
+                          });
+                        }}
+                      >
+                        <IoChatbubbleEllipsesOutline size={20} color="white" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center mt-10">
+              <p className="text-gray-500 text-lg mb-4">
+                No properties found for "{searchTerm}".
+              </p>
+              <button
+                onClick={() => setSearchTerm("")}
+                className="text-sm text-white bg-[#0151DA] px-5 py-2 rounded-full hover:bg-blue-700 transition"
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Add Property Modal */}
       <Addmorepropertymodal

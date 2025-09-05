@@ -27,7 +27,7 @@ export default function Addpersonalinfo() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
     const newErrors = {
       fullname: !Fullname.trim() ? "Full name is required" : "",
       ssn: !Ssnnumber.trim()
@@ -58,6 +58,8 @@ export default function Addpersonalinfo() {
     if (files.profileImage) {
       formData.append("profilePicture", files.profileImage);
     }
+
+    setLoading(true);
 
     try {
       const response = await axios.post("/users/complete", formData);
