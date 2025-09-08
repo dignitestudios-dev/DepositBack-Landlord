@@ -60,7 +60,7 @@ const RentHistory = () => {
           <div className="w-full">
             <div className="flex items-center justify-between">
               <p className="text-black font-[500] text-[16px]">Total Paid</p>
-              <p className="text-lg ">${data?.summary?.amountDue}</p>
+              <p className="text-lg ">${data?.summary?.totalPaid}</p>
             </div>
             <div className="flex items-center justify-between pt-2 pb-2">
               <p className="text-black font-[500] text-[16px]">

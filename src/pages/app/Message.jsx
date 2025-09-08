@@ -26,6 +26,9 @@ import {
 import { db } from "../../firebase/firebase";
 import { AppContext } from "../../context/AppContext";
 import { chatTime } from "../../lib/helpers";
+import { ErrorToast } from "../../components/global/Toaster";
+import axios from "../../axios";
+import { RiLoader3Fill } from "react-icons/ri";
 
 const Message = () => {
   const { userData } = useContext(AppContext);
@@ -40,8 +43,11 @@ const Message = () => {
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [chatList, setChatList] = useState([]);
-  console.log("🚀 ~ Message ~ chatList:", chatList);
+
   const [selectedMessages, setSelectedMessages] = useState([]);
+  console.log("🚀 ~ Message ~ selectedMessages:", selectedMessages);
+  const [uploadFileLoading, setUploadFileLoading] = useState("");
+  const [uploadedImages, setUploadedImages] = useState([]);
 
   const [chatId, setChatId] = useState("");
 
@@ -49,7 +55,11 @@ const Message = () => {
   const navigate = useNavigate("");
 
   const handleSendMessage = () => {
-    sendMessage(chatId, userData?.uid, input);
+    sendMessage(
+      chatId,
+      userData?.uid,
+      uploadedImages?.length > 0 ? uploadedImages : input
+    );
 
     const newMessages = [...(chats[selectedUser.uid] || [])];
 
@@ -81,15 +91,34 @@ const Message = () => {
     setChats((prev) => ({ ...prev, [selectedUser.uid]: newMessages }));
     setInput("");
     setAttachments([]);
+    setUploadedImages([]);
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
-    const previews = files.map((file) => ({
-      file,
-      type: file.type.startsWith("image/") ? "image" : "file",
-    }));
-    setAttachments((prev) => [...prev, ...previews]);
+    setUploadFileLoading(true);
+    try {
+      const formData = new FormData();
+      files.forEach((item) => formData.append("file", item));
+      const { data } = await axios.post("/chat/upload", formData);
+      console.log("🚀 ~ handleFileChange ~ data:", data);
+      if (data?.success) {
+        const previews = files.map((file) => ({
+          file,
+          type: file.type.startsWith("image/") ? "image" : "file",
+        }));
+        let upload = data?.data?.url;
+
+        const uploadArray = Array.isArray(upload) ? upload : [upload];
+
+        setAttachments((prev) => [...prev, ...previews]);
+        setUploadedImages(uploadArray);
+      }
+    } catch (error) {
+      ErrorToast(error.response.data.message || "Network error");
+    } finally {
+      setUploadFileLoading(false);
+    }
   };
 
   const removeAttachment = (index) => {
@@ -173,13 +202,13 @@ const Message = () => {
     return () => unsub();
   }, [chatId]);
 
-  const messagesRef = collection(db, "chats");
+  // const messagesRef = collection(db, "chats");
 
-  onSnapshot(messagesRef, (snapshot) => {
-    snapshot.docs.forEach((doc) => {
-      console.log("🚀 ~ Message ~ doc:", doc);
-    });
-  });
+  // onSnapshot(messagesRef, (snapshot) => {
+  //   snapshot.docs.forEach((doc) => {
+  //     console.log("🚀 ~ Message ~ doc:", doc);
+  //   });
+  // });
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 py-10">
@@ -255,45 +284,39 @@ const Message = () => {
             </div>
 
             <div className="py-6 space-y-6 overflow-y-auto text-sm text-gray-800 h-[500px] pr-2">
-              <div className="text-center text-xs text-gray-400">Today</div>
+              {/* <div className="text-center text-xs text-gray-400">Today</div> */}
 
               {selectedMessages.map((msg, idx) => (
                 <div
                   key={idx}
                   className={`flex flex-col ${
-                    msg.senderId === userData?.uid
-                      ? "items-end "
-                      : "items-start"
+                    msg.senderId === userData?.uid ? "items-end" : "items-start"
                   }`}
                 >
-                  <div
-                    className={`${
-                      msg.senderId === userData?.uid
-                        ? "items-end  bg-blue-700 text-white"
-                        : "items-start  bg-gray-300 text-black"
-                    } px-4 py-2 rounded-xl max-w-xs`}
-                  >
-                    {msg.text}
-                  </div>
-                  {/* {msg.type === "text" ? (
-                    <div className="bg-blue-700 text-white px-4 py-2 rounded-xl max-w-xs">
+                  {Array.isArray(msg.text) ? (
+                    <div className="flex gap-2 flex-wrap">
+                      {msg.text.map((item, index) => (
+                        <img
+                          key={index}
+                          src={item}
+                          alt="attachment"
+                          onClick={() => window.open(item, "_blank")}
+                          className="w-32 h-32 object-cover rounded-xl shadow"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div
+                      className={`${
+                        msg.senderId === userData?.uid
+                          ? "items-end bg-blue-700 text-white"
+                          : "items-start bg-gray-300 text-black"
+                      } px-4 py-2 rounded-xl max-w-xs`}
+                    >
                       {msg.text}
                     </div>
-                  ) : msg.type === "image" ? (
-                    <img
-                      src={msg.file}
-                      alt="attachment"
-                      className="w-10 rounded-xl shadow"
-                    />
-                  ) : (
-                    <a
-                      href={msg.file}
-                      download={msg.name}
-                      className="bg-gray-200 px-4 py-2 rounded-xl text-blue-700 underline"
-                    >
-                      {msg.name}
-                    </a>
-                  )} */}
+                  )}
+
                   <span className="text-xs text-gray-400 mt-1">
                     {msg?.timestamp ? chatTime(msg.timestamp) : ""}
                   </span>
@@ -330,20 +353,31 @@ const Message = () => {
 
             {/* Chat Input */}
             <div className="flex items-center gap-3 pt-4 border-t">
-              <button
-                className="bg-blue-600 text-white rounded-full p-2"
-                onClick={() => fileInputRef.current.click()}
-              >
-                <MdAttachFile size={16} />
-              </button>
+              {uploadFileLoading ? (
+                <div className="flex items-center justify-center">
+                  <RiLoader3Fill
+                    size={20}
+                    className="animate-spin text-blue-600"
+                  />
+                </div>
+              ) : (
+                <button
+                  className="bg-blue-600 text-white rounded-full p-2"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <MdAttachFile size={16} />
+                </button>
+              )}
               <input
                 type="file"
                 multiple
+                accept="image/*"
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 className="hidden"
               />
               <input
+                disabled={uploadedImages.length > 0}
                 type="text"
                 placeholder="Type Here..."
                 className="flex-1 px-4 py-2 rounded-full border text-sm"

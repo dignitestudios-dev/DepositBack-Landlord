@@ -9,7 +9,7 @@ import {
 import axios from "../../axios";
 import { useNavigate } from "react-router";
 import { AppContext } from "../../context/AppContext";
-import { ErrorToast } from "../../components/global/Toaster";
+import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 import { RiLoader5Line } from "react-icons/ri";
 
 const ELEMENT_OPTIONS = {
@@ -62,8 +62,6 @@ const PaymentForm = ({ planData, setShowModal }) => {
         const response = await axios.post("/finance/cards", {
           paymentMethodId: paymentMethod.id,
         });
-
-        console.log("🚀 ~ Stripe ~ response:", response);
         if (response.status === 200) {
           const response = await axios.post(
             "/subscription/stripeSubscription",
@@ -71,10 +69,17 @@ const PaymentForm = ({ planData, setShowModal }) => {
               sku: planData?.sku,
             }
           );
-          console.log("🚀 ~ handleSubmit ~ response:", response);
           if (response.status === 200) {
-            loginContext(response?.data);
-            setShowModal(true);
+            try {
+              const res = await axios.get(`/users/me`);
+              if (res.status === 200) {
+                SuccessToast("Subscribed Successfully ");
+                loginContext({ user: res?.data?.data });
+                setShowModal(true);
+              }
+            } catch (error) {
+              ErrorToast(error?.response?.data?.message);
+            }
           }
         }
       } catch (apiError) {

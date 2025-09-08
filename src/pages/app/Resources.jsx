@@ -8,13 +8,19 @@ import SearchBar from "../../components/global/Searchbar";
 import { useNavigate } from "react-router";
 import { useFetchData } from "../../hooks/api/Get";
 import ResourceTextModal from "../../components/app/resources/ResourceTextModal";
+import Pagination from "../../components/global/Pagination";
 
 const Resources = () => {
   const navigate = useNavigate("");
   const [searchTerm, setSearchTerm] = useState("");
   const [textModal, setTextModal] = useState(false);
+  const [page, setPage] = useState(1);
 
-  const { data, loading, pagination } = useFetchData(`/laws`, {}, 1, "");
+  const { data, loading, pagination } = useFetchData(`/laws`, {}, page, "");
+
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
 
   const filteredDocs = data.filter((doc) =>
     doc.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -97,6 +103,14 @@ const Resources = () => {
                 <p className="mt-4 font-medium text-sm">{doc.title}</p>
               </div>
             ))}
+      </div>
+      <div className="mt-6 flex justify-end">
+        <Pagination
+          currentPage={pagination?.currentPage}
+          totalPages={pagination?.totalPages}
+          onPageChange={handlePageChange}
+          setCurrentPage={page}
+        />
       </div>
       {textModal && (
         <ResourceTextModal textModal={textModal} setTextModal={setTextModal} />

@@ -86,6 +86,7 @@ const PropertyDetail = () => {
     depositTracker,
     contract,
   } = propertyDetail;
+  console.log("🚀 ~ PropertyDetail ~ tenant:", tenant);
 
   return (
     <div className="max-w-[1260px] mx-auto pt-10">
@@ -227,19 +228,22 @@ const PropertyDetail = () => {
                 <div className="flex gap-3 justify-between pt-3">
                   <div className="flex gap-3">
                     <img
-                      src={user}
+                      src={tenant?.profilePicture}
                       className="h-[3.3em] w-[3.3em] rounded-full object-cover cursor-pointer"
                       alt="User Avatar"
                     />
                     <div>
                       <span className="text-1xl font-[500]">
-                        {tenant?.fullName || "N/A"}
+                        {tenant?.name || "N/A"}
                       </span>
                       <p className="text-sm text-white">Tenant</p>
                     </div>
                   </div>
                   <div>
-                    <div className="bg-[#fff] p-3 rounded-xl">
+                    <div
+                      onClick={() => navigate("/app/messages")}
+                      className="bg-[#fff] p-3 rounded-xl cursor-pointer"
+                    >
                       <IoChatbubbleEllipsesOutline size={20} color="blue" />
                     </div>
                   </div>

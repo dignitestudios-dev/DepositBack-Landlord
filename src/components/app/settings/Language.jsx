@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { FaTimes, FaCheck } from 'react-icons/fa';
+import React, { useState } from "react";
+import { FaTimes, FaCheck } from "react-icons/fa";
+
+const languages = ["English"];
+// "Portuguese", "Russian", "French" "Spanish"
 
 const Language = () => {
   // State to control the popup visibility
@@ -33,23 +36,21 @@ const Language = () => {
 
       {/* Language List */}
       <div className="space-y-3 overflow-auto h-[16em]">
-        {["English", "Spanish", "Portuguese", "Russian", "French"].map(
-          (lang, index) => (
-            <label
-              key={index}
-              className="flex items-center justify-between bg-[#F9F9F9] px-4 py-3 rounded-xl cursor-pointer hover:bg-gray-100"
-            >
-              <span className="text-sm">{lang}</span>
-              <input
-                type="radio"
-                name="language"
-                value={lang}
-                className="accent-blue-600 w-4 h-4"
-                defaultChecked={lang === "English"}
-              />
-            </label>
-          )
-        )}
+        {languages.map((lang, index) => (
+          <label
+            key={index}
+            className="flex items-center justify-between bg-[#F9F9F9] px-4 py-3 rounded-xl cursor-pointer hover:bg-gray-100"
+          >
+            <span className="text-sm">{lang}</span>
+            <input
+              type="radio"
+              name="language"
+              value={lang}
+              className="accent-blue-600 w-4 h-4"
+              defaultChecked={lang === "English"}
+            />
+          </label>
+        ))}
       </div>
 
       {/* Update Button */}

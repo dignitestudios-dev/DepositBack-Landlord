@@ -46,6 +46,7 @@ instance.interceptors.request.use((request) => {
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.log("🚀 ~ error:", error);
     if (error.code === "ECONNABORTED") {
       // Slow internet or request timeout
       ErrorToast("Your internet connection is slow. Please try again.");

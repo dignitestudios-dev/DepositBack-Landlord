@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import {
-  FaArrowLeft,
-  FaChevronRight,
-} from "react-icons/fa";
+import { FaArrowLeft, FaChevronRight } from "react-icons/fa";
 import {
   IoNotificationsOutline,
   IoEarthOutline,
@@ -31,8 +28,8 @@ const settingsMenu = [
   },
   { key: "languages", label: "Languages", icon: <IoEarthOutline /> },
   { key: "change_password", label: "Change Password", icon: <MdLockOutline /> },
-  { key: "change_number", label: "Change Number", icon: <IoCallOutline /> },
-  { key: "payment", label: "Payment Method", icon: <CiCreditCard1 /> },
+  // { key: "change_number", label: "Change Number", icon: <IoCallOutline /> },
+  // { key: "payment", label: "Payment Method", icon: <CiCreditCard1 /> },
   { key: "terms", label: "Terms & Conditions", icon: <CgLoadbarDoc /> },
   { key: "privacy", label: "Privacy Policy", icon: <RiErrorWarningLine /> },
   {
@@ -46,39 +43,26 @@ const settingsMenu = [
 const Setting = () => {
   const navigate = useNavigate();
   const [selectedSetting, setSelectedSetting] = useState(null);
- 
-  
-const renderSettingContent = () => {
+
+  const renderSettingContent = () => {
     switch (selectedSetting) {
       case "notifications":
-        return (
-          <NotificationSettings />
-        );
+        return <NotificationSettings />;
       case "privacy":
       case "terms":
-        return (
-          <PrivacyPolicy/>
-        );
-      case "payment":
-        return (
-          <PaymentSetting/>
-        );
+        return <PrivacyPolicy />;
+      // case "payment":
+      //   return <PaymentSetting />;
       case "languages":
-        return (
-          <Language />
-        );
+        return <Language />;
       case "change_password":
-        return (
-         <ChangePassword/>
-        );
-      case "change_number":
-        return (
-          <ChangeNumber />
-        );
+        return <ChangePassword />;
+      // case "change_number":
+      //   return (
+      //     <ChangeNumber />
+      //   );
       case "delete":
-        return (
-          <DeleteAccount />
-        );
+        return <DeleteAccount />;
       default:
         return (
           <div className="flex items-center justify-center h-full text-gray-400">
@@ -132,7 +116,6 @@ const renderSettingContent = () => {
           {renderSettingContent()}
         </div>
       </div>
-
     </div>
   );
 };

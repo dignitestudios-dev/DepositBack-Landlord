@@ -16,10 +16,15 @@ import DetailStepThree from "../../components/app/propertyDetail/DetailStepThree
 import DetailStepFour from "../../components/app/propertyDetail/DetailStepFour";
 import { useNavigate } from "react-router";
 import { AppContext } from "../../context/AppContext";
+import { useFetchData } from "../../hooks/api/Get";
+import { ErrorToast } from "../../components/global/Toaster";
+import axios from "../../axios";
 
 const AddPropertyDetail = () => {
   const navigate = useNavigate();
   const { userData } = useContext(AppContext);
+  const [update, setUpdate] = useState(false);
+
   const [step, setStep] = useState(1);
 
   // const [accountholderName, setAccountholderName] = useState("");
@@ -52,9 +57,22 @@ const AddPropertyDetail = () => {
     // { img: Stripeaccount, label: "Stripe Account" },
   ];
 
+  const handleStripeAccount = async () => {
+    try {
+      const { data } = await axios.get("/users/linkForWeb");
+      console.log("🚀 ~ handleStripeAccount ~ response:", data);
+      if (data?.success) {
+        window.location.href = data?.data;
+        // userData?.stripeConnectLink;
+      }
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message);
+    }
+  };
+
   useEffect(() => {
     if (userData?.stripeProfileStatus === "pending") {
-      window.location.href = userData?.stripeConnectLink;
+      handleStripeAccount();
     }
   }, [userData]);
 
