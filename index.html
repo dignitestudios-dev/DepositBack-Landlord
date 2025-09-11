@@ -6,9 +6,25 @@
     <link href="https://api.fontshare.com/v2/css?f[]=general-sans@1&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Deposits Back - LandLord</title>
+
+    <!-- ✅ Google Translate Initialization Script -->
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: 'en,es', // only English and Spanish
+          autoDisplay: false
+        }, 'google_translate_element');
+      }
+    </script>
   </head>
-  <body style="background-color:  #F3F8FF;">
+  <body style="background-color: #F3F8FF;">
+    <!-- 🔒 Hidden translate element -->
+    <div id="google_translate_element" style="display: none;"></div>
+
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   </body>
 </html>
