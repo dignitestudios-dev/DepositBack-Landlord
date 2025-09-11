@@ -11,18 +11,17 @@ const ViewProfile = () => {
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [update, setUpdate] = useState(false);
 
   const handleCloseModal = (wasSuccessful) => {
     setShowEditModal(false);
-    if (wasSuccessful) {
-      setTimeout(() => {
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 2000);
-      }, 500); // wait for modal to close
+    if (wasSuccessful === true) {
+      setShowSuccess(true);
+      setUpdate((prev) => !prev);
     }
   };
 
-  const { data, loading } = useFetchData(`/users/me`, {}, 1, "");
+  const { data, loading } = useFetchData(`/users/me`, {}, 1, update);
 
   return (
     <div className="min-h-screen bg-[#F6FAFF] text-[#333]">
@@ -154,11 +153,16 @@ const ViewProfile = () => {
         </div>
       )}
 
-      {showEditModal && <EditProfileModal onClose={handleCloseModal} />}
+      {showEditModal && (
+        <EditProfileModal onClose={handleCloseModal} userData={data} />
+      )}
 
       {showSuccess && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
+          <div
+            onClick={() => setShowSuccess(false)}
+            className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center"
+          >
             <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white p-6 w-fit mx-auto rounded-full mb-3">
               <FaCheck size={30} />
             </div>

@@ -28,7 +28,6 @@ const initialState = {
 };
 
 function formReducer(state, action) {
-  console.log("🚀 ~ formReducer ~ action:", action);
   switch (action.type) {
     case "SET_FIELD":
       return {
@@ -40,13 +39,13 @@ function formReducer(state, action) {
     case "SET_FRONT":
       return {
         ...state,
-        idFront: action.file,
+        frontIDImage: action.file,
         idFrontPreview: action.preview,
       };
     case "SET_BACK":
       return {
         ...state,
-        idBack: action.file,
+        backIDImage: action.file,
         idBackPreview: action.preview,
       };
     case "SET_PROFILE":
@@ -64,10 +63,9 @@ function formReducer(state, action) {
   }
 }
 
-const EditProfileModal = ({ onClose }) => {
-  const { userData } = useContext(AppContext);
+const EditProfileModal = ({ onClose, userData }) => {
   const [state, dispatch] = useReducer(formReducer, initialState);
-  console.log("🚀 ~ EditProfileModal ~ state:", state);
+  console.log("🚀 ~ EditProfileModal ~ state?.phone -- :", state?.phone);
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -105,25 +103,60 @@ const EditProfileModal = ({ onClose }) => {
       formData?.append("lastFourSSN", state?.ssn);
       formData?.append("language", "english");
       formData?.append("name", state?.fullName);
-// Assuming formData is a FormData object
-if (state?.profileImage) {
-  // Check if profileImage is a File object (i.e., a file)
-  if (state?.profileImage instanceof File) {
-    // If it's a file, append it to formData
-    formData.append("profilePicture", state?.profileImage);
-    console.log("Profile image is a file, appending to formData.");
-  } else {
-    // Otherwise, it's a URL (string), so we skip appending it to formData
-    try {
-      new URL(state?.profileImage); // Tries to create a URL object
-      // If it's a valid URL, do not append to formData
-      console.log("Profile image is a URL, skipping append.");
-    } catch (e) {
-      // If it's neither a URL nor a file, handle accordingly
-      console.error("Invalid profile image format.");
-    }
-  }
-}
+      // Assuming formData is a FormData object
+      if (state?.profileImage) {
+        // Check if profileImage is a File object (i.e., a file)
+        if (state?.profileImage instanceof File) {
+          // If it's a file, append it to formData
+          formData.append("profilePicture", state?.profileImage);
+        } else {
+          // Otherwise, it's a URL (string), so we skip appending it to formData
+          try {
+            new URL(state?.profileImage); // Tries to create a URL object
+            // If it's a valid URL, do not append to formData
+            console.log("Profile image is a URL, skipping append.");
+          } catch (e) {
+            // If it's neither a URL nor a file, handle accordingly
+            console.error("Invalid profile image format.");
+          }
+        }
+      }
+      if (state?.backIDImage) {
+        // Check if profileImage is a File object (i.e., a file)
+        if (state?.backIDImage instanceof File) {
+          // If it's a file, append it to formData
+          formData.append("governmentIdBack", state?.backIDImage);
+          console.log("Profile image is a file, appending to formData.");
+        } else {
+          // Otherwise, it's a URL (string), so we skip appending it to formData
+          try {
+            new URL(state?.backIDImage); // Tries to create a URL object
+            // If it's a valid URL, do not append to formData
+            console.log("Profile image is a URL, skipping append.");
+          } catch (e) {
+            // If it's neither a URL nor a file, handle accordingly
+            console.error("Invalid profile image format.");
+          }
+        }
+      }
+      if (state?.frontIDImage) {
+        // Check if profileImage is a File object (i.e., a file)
+        if (state?.frontIDImage instanceof File) {
+          // If it's a file, append it to formData
+          formData.append("governmentIdFront", state?.frontIDImage);
+          console.log("Profile image is a file, appending to formData.");
+        } else {
+          // Otherwise, it's a URL (string), so we skip appending it to formData
+          try {
+            new URL(state?.frontIDImage); // Tries to create a URL object
+            // If it's a valid URL, do not append to formData
+            console.log("Profile image is a URL, skipping append.");
+          } catch (e) {
+            // If it's neither a URL nor a file, handle accordingly
+            console.error("Invalid profile image format.");
+          }
+        }
+      }
       const response = await axios.put("/users", formData);
       if (response.status === 201 || response.status === 200) {
         onClose(true);
@@ -287,7 +320,7 @@ if (state?.profileImage) {
               <p className="text-sm font-medium mb-2">Front ID Card</p>
               <div className="relative">
                 <img
-                  src={state?.frontIDImage || state?.idFrontPreview}
+                  src={state?.idFrontPreview || state?.frontIDImage}
                   alt="Front ID"
                   className="h-28 mx-auto rounded-md"
                 />
@@ -303,7 +336,7 @@ if (state?.profileImage) {
               <p className="text-sm font-medium mb-2">Back ID Card</p>
               <div className="relative">
                 <img
-                  src={state?.backIDImage || state?.idBackPreview}
+                  src={state?.idBackPreview || state?.backIDImage}
                   alt="Back ID"
                   className="h-28 mx-auto rounded-md"
                 />
