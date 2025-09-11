@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaTimes, FaCheck } from "react-icons/fa";
 
-// 👇 Now includes Spanish
 const languages = ["English", "Spanish"];
+// "Portuguese", "Russian", "French" "Spanish"
 
 const Language = () => {
-  const [selectedLang, setSelectedLang] = useState("English");
-  const [showPopup, setShowPopup] = useState(false);
+  // State to control the popup visibility
+  const [language, setLanguage] = useState(false);
 
-  // 👉 Language switch handler
-  const handleLanguageUpdate = () => {
-    if (selectedLang === "Spanish") {
-      setGoogleTranslateLang("Spanish");
-    } else {
-      setGoogleTranslateLang("English");
-    }
-    setShowPopup(true);
+  const { i18n } = useTranslation();
+
+  const handleLanguageChange = (e) => {
+    const selected = e.target.value;
+    const langCode = selected === "English" ? "en" : "es";
+    i18n.changeLanguage(langCode);
   };
 
   return (
@@ -59,6 +58,12 @@ const Language = () => {
               checked={selectedLang === lang}
               onChange={() => setSelectedLang(lang)}
               className="accent-blue-600 w-4 h-4"
+              defaultChecked={lang === "English"}
+              onChange={handleLanguageChange}
+              checked={
+                (lang === "English" && i18n.language === "en") ||
+                (lang === "Spanish" && i18n.language === "es")
+              }
             />
           </label>
         ))}

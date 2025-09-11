@@ -13,6 +13,8 @@ import DashboardSkeletonLoader from "../../components/app/dashboard/DashboardSke
 import { AppContext } from "../../context/AppContext";
 
 const Dashboard = () => {
+  const { userData } = useContext(AppContext);
+  console.log("🚀 ~ Dashboard ~ userData:", userData);
   const [modalOpen, setModalOpen] = useState(false); // Manage modal visibility
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({});
@@ -142,7 +144,7 @@ const Dashboard = () => {
       <div className="flex flex-wrap justify-between items-center gap-6 p-0">
         <div className="text-left">
           <h1 className="text-3xl font-[500]">
-            Hello, <span className="font-[600]">Justin!</span>
+            Hello, <span className="font-[600]">{userData?.name}!</span>
           </h1>
           <p className="mt-2 text-2xl font-medium text-black pt-2">
             My Properties

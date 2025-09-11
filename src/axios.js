@@ -19,7 +19,7 @@ const instance = axios.create({
     devicemodel: getDeviceFingerprint(),
     deviceuniqueid: getDeviceFingerprint(),
   },
-  timeout: 10000, // 10 seconds timeout
+  timeout: 60000, // 10 seconds timeout
 });
 
 instance.interceptors.request.use((request) => {
