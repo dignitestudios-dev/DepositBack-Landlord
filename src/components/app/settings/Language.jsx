@@ -55,6 +55,8 @@ const Language = () => {
               type="radio"
               name="language"
               value={lang}
+              checked={selectedLang === lang}
+              onChange={() => setSelectedLang(lang)}
               className="accent-blue-600 w-4 h-4"
               defaultChecked={lang === "English"}
               onChange={handleLanguageChange}
@@ -70,7 +72,7 @@ const Language = () => {
       {/* Update Button */}
       <div className="mt-[7em] flex justify-center">
         <button
-          onClick={() => setLanguage(true)} // Show the popup when "Update" is clicked
+          onClick={handleLanguageUpdate}
           className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white px-[10em] py-3 rounded-full font-medium shadow hover:from-blue-600 hover:to-blue-800 transition"
         >
           Update
@@ -78,17 +80,16 @@ const Language = () => {
       </div>
 
       {/* Success Popup */}
-      {language && (
+      {showPopup && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="relative bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
             <button
-              onClick={() => setLanguage(false)} // Close the popup when clicked
+              onClick={() => setShowPopup(false)} 
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
             >
               <FaTimes size={18} />
             </button>
 
-            {/* ✅ Success Icon */}
             <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white p-6 w-fit mx-auto rounded-full mb-3">
               <FaCheck size={24} />
             </div>
@@ -105,3 +106,66 @@ const Language = () => {
 };
 
 export default Language;
+
+const setGoogleTranslateLang = (lang) => {
+  const targetLangCode = lang.toLowerCase().startsWith("spanish") ? "es" : "en";
+
+  const gtDiv = document.querySelector("#google_translate_element");
+  if (gtDiv) {
+    gtDiv.click(); // Trigger iframe load if needed
+  }
+
+  // Function to check if the iframe is loaded
+  const checkIframeLoaded = () => {
+    const frame = document.querySelector("iframe.goog-te-menu-frame");
+
+    if (!frame) {
+      console.log("Iframe not found yet.");
+      return false; // Iframe isn't loaded yet, keep checking
+    }
+
+    console.log("Iframe found!");
+    const innerDoc = frame.contentDocument || frame.contentWindow.document;
+    if (!innerDoc) {
+      console.log("Iframe document not accessible.");
+      return false; // Document inside iframe isn't accessible yet
+    }
+
+    const langItems = innerDoc.querySelectorAll(".goog-te-menu2-item");
+    if (langItems.length > 0) {
+      console.log("Language items loaded:", langItems);
+      for (const item of langItems) {
+        const span = item.querySelector("span.text");
+        if (span && span.innerText.toLowerCase().includes(lang.toLowerCase())) {
+          item.click(); // Click the language option
+
+          // Update the select element (hidden) and fire change event
+          const select = document.querySelector("select.goog-te-combo");
+          if (select) {
+            select.value = targetLangCode;
+            select.dispatchEvent(new Event("change"));
+          }
+
+          return true; // Successfully set the language
+        }
+      }
+    }
+
+    return false; // No language items found, keep trying
+  };
+
+  // Retry checking the iframe every 300ms, with a max time of 5 seconds
+  const intervalId = setInterval(() => {
+    if (checkIframeLoaded()) {
+      clearInterval(intervalId); // Stop checking if successful
+    }
+  }, 300);
+
+  // Stop checking after 5 seconds (timeout)
+  setTimeout(() => clearInterval(intervalId), 5000);
+};
+
+
+
+
+
