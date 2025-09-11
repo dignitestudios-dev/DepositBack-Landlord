@@ -5,8 +5,10 @@ import { useNavigate } from "react-router";
 import { AppContext } from "../../context/AppContext";
 import { getDateFormat } from "../../lib/helpers";
 import mainlogowhite from "../../assets/mainlogowhite.png";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate("");
   const { logoutContext, notification, userData } = useContext(AppContext);
 
@@ -48,7 +50,7 @@ const Header = () => {
               navigate("/app/Dashboard");
             }}
           >
-            Home
+            {t("header.home")}
           </li>
           <li
             className="hover:underline cursor-pointer relative"
@@ -56,7 +58,7 @@ const Header = () => {
               navigate("/app/tenant-requests");
             }}
           >
-            Tenant Requests
+            {t("header.tenantRequests")}
           </li>
           <li
             className="hover:underline cursor-pointer"
@@ -64,7 +66,7 @@ const Header = () => {
               navigate("/app/resources");
             }}
           >
-            Resources
+            {t("header.resources")}
           </li>
           <li
             className="hover:underline cursor-pointer"
@@ -72,7 +74,7 @@ const Header = () => {
               navigate("/app/messages");
             }}
           >
-            Messages
+            {t("header.messages")}
           </li>
         </ul>
 
@@ -90,7 +92,9 @@ const Header = () => {
           {/* Notification Popup */}
           {isPopupOpen && (
             <div className="absolute top-12 z-10 right-0 w-[26em] p-4 bg-white shadow-lg rounded-lg border border-slate-200">
-              <h3 className="text-lg font-semibold">Notifications</h3>
+              <h3 className="text-lg font-semibold">
+                {t("header.notifications")}
+              </h3>
               <div className="mt-4 space-y-4">
                 {notification.slice(0, 3).map((notification, index) => (
                   <div key={index}>
@@ -120,7 +124,7 @@ const Header = () => {
                     onClick={() => navigate("/app/notifications")}
                     className="text-sm text-blue-600 font-medium px-4 py-1 rounded-lg hover:bg-blue-50 cursor-pointer transition"
                   >
-                    View All
+                    {t("header.viewAll")}
                   </button>
                 </div>
               </div>
@@ -145,7 +149,7 @@ const Header = () => {
                   navigate("/app/view-profile");
                 }}
               >
-                View Profile
+                {t("header.viewProfile")}
               </span>
               <span
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
@@ -153,7 +157,7 @@ const Header = () => {
                   navigate("/app/subscription-plans");
                 }}
               >
-                Subscription Plans
+                {t("header.subscriptionPlans")}
               </span>
               <span
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
@@ -161,7 +165,7 @@ const Header = () => {
                   navigate("/app/settings");
                 }}
               >
-                Settings
+                {t("header.settings")}
               </span>
               <span
                 onClick={() => {
@@ -169,7 +173,7 @@ const Header = () => {
                 }}
                 className="block text-[12px] font-[500] text-red-600 hover:text-red-700 cursor-pointer"
               >
-                Log Out
+                {t("header.logout")}
               </span>
             </div>
           </div>
@@ -182,17 +186,17 @@ const Header = () => {
                 <IoLogOut size={60} color="#FF3B30" />
               </div>
               <h2 className="font-semibold text-[#DC1D00] text-[20px] mb-2">
-                Logout
+                {t("header.logoutTitle")}
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to logout your account?
+                {t("header.logoutMessage")}
               </p>
               <div className="flex justify-center gap-3">
                 <button
                   className="px-16 py-2 text-sm bg-gray-200 rounded-full"
                   onClick={() => setLogoutpopup(false)}
                 >
-                  No
+                  {t("header.no")}
                 </button>
                 <button
                   onClick={() => {
@@ -200,7 +204,7 @@ const Header = () => {
                   }}
                   className="px-16 py-2 text-sm bg-[#DC1D00] text-white rounded-full"
                 >
-                  Yes
+                  {t("header.yes")}
                 </button>
               </div>
             </div>

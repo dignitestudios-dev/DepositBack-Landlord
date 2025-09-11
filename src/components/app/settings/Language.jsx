@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaTimes, FaCheck } from "react-icons/fa";
 
-const languages = ["English"];
+const languages = ["English", "Spanish"];
 // "Portuguese", "Russian", "French" "Spanish"
 
 const Language = () => {
   // State to control the popup visibility
   const [language, setLanguage] = useState(false);
+
+  const { i18n } = useTranslation();
+
+  const handleLanguageChange = (e) => {
+    const selected = e.target.value;
+    const langCode = selected === "English" ? "en" : "es";
+    i18n.changeLanguage(langCode);
+  };
 
   return (
     <div className="p-6">
@@ -48,6 +57,11 @@ const Language = () => {
               value={lang}
               className="accent-blue-600 w-4 h-4"
               defaultChecked={lang === "English"}
+              onChange={handleLanguageChange}
+              checked={
+                (lang === "English" && i18n.language === "en") ||
+                (lang === "Spanish" && i18n.language === "es")
+              }
             />
           </label>
         ))}
