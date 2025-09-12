@@ -4,12 +4,15 @@ import pdfIcon from "../../../assets/pdficon.png";
 import axios from "../../../axios";
 import { ErrorToast } from "../../global/Toaster";
 import { RiLoader5Line } from "react-icons/ri";
+import { useNavigate } from "react-router";
 
 const UploadPropertyDocs = ({
   setIsUploadFile,
   activeCategory,
   propertyId,
 }) => {
+  console.log("🚀 ~ UploadPropertyDocs ~ activeCategory:", activeCategory);
+  const navigate = useNavigate();
   const activeCategoryName = activeCategory.split(" ")[0].toLowerCase();
   const [mediaError, setMediaError] = useState(null);
 
@@ -88,7 +91,8 @@ const UploadPropertyDocs = ({
       );
 
       if (response.status === 200) {
-        // setIsUploadFile(false);
+        setIsUploadFile(false);
+        navigate(-1);
       }
     } catch (error) {
       ErrorToast(error?.response?.data?.message);
@@ -121,7 +125,11 @@ const UploadPropertyDocs = ({
             <input
               type="file"
               id="fileUpload"
-              accept="image/*,video/*,application/pdf"
+              accept={
+                activeCategoryName === "rules"
+                  ? "application/pdf"
+                  : "image/*,video/*,application/pdf"
+              }
               multiple
               onChange={handleFileChange}
               className="hidden"

@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router";
-import { useFetchData } from "../hooks/api/Get";
 import { ErrorToast } from "../components/global/Toaster";
 import axios from "../axios";
 
@@ -9,7 +8,7 @@ const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
   const navigate = useNavigate();
-  const [update, setUpdate] = useState();
+  const [update, setUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [notification, setNotification] = useState([]);
@@ -47,7 +46,6 @@ const AppProvider = ({ children }) => {
     try {
       setIsLoading(true);
       const { data } = await axios.get("/notification");
-      console.log("🚀 ~ handleNotifications ~ data:", data);
       if (data.success) {
         setNotification(data.data);
         setIsLoading(false);

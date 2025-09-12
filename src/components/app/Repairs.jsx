@@ -2,6 +2,7 @@ import { useState } from "react";
 import pdfIcon from "../../assets/pdficon.png";
 
 const Repairs = ({ rules }) => {
+  console.log("🚀 ~ Repairs ~ rules:", rules);
   const [activePopup, setActivePopup] = useState(null); // track which popup is open
 
   const handleTogglePopup = (docId) => {

@@ -18,7 +18,6 @@ const Uploaddeduction = () => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [propertyMedia, setPropertyMedia] = useState([]);
-  console.log("🚀 ~ Uploaddeduction ~ propertyMedia:", propertyMedia);
 
   const handleUploadPropertyimage = (e) => {
     const files = Array.from(e.target.files);

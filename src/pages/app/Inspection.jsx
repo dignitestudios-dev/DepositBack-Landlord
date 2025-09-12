@@ -20,6 +20,7 @@ const Inspection = () => {
     tenantMoveOutVideos = [],
   } = location.state || {};
 
+  console.log("🚀 ~ Inspection ~ allowedDocs:--> ", allowedDocs);
   const [viewMode, setViewMode] = useState("Move In");
   const [previewItem, setPreviewItem] = useState(null);
   const [unlockedIndexes, setUnlockedIndexes] = useState([]);
@@ -63,25 +64,20 @@ const Inspection = () => {
   };
 
   useEffect(() => {
-    const handleWatchedDoc = async () => {
-      console.log("--handleWatchedDoc--");
-      try {
-        const response = await axios.post(
-          `/requests/docs/watch/${propertyId}`,
-          {
-            documents: [allowedDocs[0]],
-          }
-        );
-      } catch (error) {
-        console.log("🚀 ~ handleSendRequest ~ error:", error);
-        ErrorToast(error);
-      }
-    };
-
     if (allowedDocs?.length > 0) {
       handleWatchedDoc();
     }
-  }, []);
+  }, [allowedDocs]);
+  const handleWatchedDoc = async () => {
+    try {
+      const response = await axios.post(`/requests/docs/watch/${propertyId}`, {
+        documents: [allowedDocs[0]],
+      });
+    } catch (error) {
+      console.log("🚀 ~ handleSendRequest ~ error:", error);
+      ErrorToast(error?.response?.data?.message);
+    }
+  };
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 pt-8 pb-20 min-h-screen bg-[#F6FAFF] text-[#333]">

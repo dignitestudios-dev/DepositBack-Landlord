@@ -82,6 +82,9 @@ const PropertyDetail = () => {
     tenantMoveInVideos,
     tenantMoveOutImages,
     tenantMoveOutVideos,
+    tenantRepairsVideos,
+    tenantRepairsImages,
+    tenantAgreements,
     uvLightImages,
     depositTracker,
     contract,
@@ -262,7 +265,8 @@ const PropertyDetail = () => {
                   </div>
                   <p className="flex gap-2 items-center mt-2">
                     <IoIosWarning />
-                    Emergency: {tenant?.emergencyContact || "+1 000 000 000"}
+                    Emergency:{" "}
+                    {tenant?.emergencyContact || "-- Not provided --"}
                   </p>
                 </div>
               </div>
@@ -348,6 +352,9 @@ const PropertyDetail = () => {
                       landlordPropertyConditionImages,
                       landlordPropertyConditionVideos,
                       uvLightImages,
+                      tenantRepairsVideos,
+                      tenantRepairsImages,
+                      tenantAgreements,
                     },
                   })
                 }

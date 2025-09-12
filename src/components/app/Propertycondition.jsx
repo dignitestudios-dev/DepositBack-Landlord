@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Propertycondition = ({ images, videos, uvLightImages }) => {
+const Propertycondition = ({ images, videos, uvLightImages, isLandLord }) => {
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showAllVideos, setShowAllVideos] = useState(false);
   const [showAllUvImages, setShowAllUvImages] = useState(false);
@@ -19,7 +19,7 @@ const Propertycondition = ({ images, videos, uvLightImages }) => {
   return (
     <div className="bg-[#F6FAFF] min-h-screen p-6">
       {/* Videos Section */}
-      {viewingOnly !== "videos" && (
+      {viewingOnly !== "videos" && viewingOnly !== "uv" && (
         <div className="mb-10">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">
@@ -62,7 +62,7 @@ const Propertycondition = ({ images, videos, uvLightImages }) => {
       )}
 
       {/* Photos Section */}
-      {viewingOnly !== "photos" && (
+      {viewingOnly !== "photos" && viewingOnly !== "uv" && (
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">
@@ -104,7 +104,7 @@ const Propertycondition = ({ images, videos, uvLightImages }) => {
         </div>
       )}
 
-      {viewingOnly !== "photos" && viewingOnly !== "videos" && (
+      {viewingOnly !== "photos" && viewingOnly !== "videos" && isLandLord && (
         <div className="mt-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">
@@ -112,13 +112,13 @@ const Propertycondition = ({ images, videos, uvLightImages }) => {
             </h2>
             <button
               onClick={() => {
-                setShowAllPhotos(!showAllUvImages);
-                setViewingOnly(showAllUvImages ? "" : "photos");
+                setShowAllUvImages(!showAllUvImages);
+                setViewingOnly(showAllUvImages ? "" : "uv");
                 if (!showAllUvImages) setShowAllVideos(false);
               }}
               className="text-blue-600 text-base font-medium underline"
             >
-              {showAllUvImages ? "Show less" : "View all photos"}
+              {showAllUvImages ? "Show less" : "View all UV images"}
             </button>
           </div>
           {visibleUvImages?.length > 0 ? (
@@ -133,7 +133,7 @@ const Propertycondition = ({ images, videos, uvLightImages }) => {
                   onClick={() => setPreviewItem({ type: "image", src })}
                 >
                   <img
-                    src={src.fileUrl}
+                    src={src}
                     alt={`Photo ${idx}`}
                     className={`w-full h-[150px] object-cover rounded-md `}
                   />
@@ -159,14 +159,14 @@ const Propertycondition = ({ images, videos, uvLightImages }) => {
             <p className="text-sm font-semibold mb-2">Photo</p>
             {previewItem.type === "image" ? (
               <img
-                src={previewItem.src?.fileUrl}
+                src={previewItem.src?.fileUrl || previewItem}
                 className="w-full h-auto rounded-md mb-4"
                 alt="Preview"
               />
             ) : (
               <video
                 controls
-                src={previewItem.src?.fileUrl}
+                src={previewItem.src?.fileUrl || previewItem}
                 className="w-full rounded-md mb-4"
               />
             )}

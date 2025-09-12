@@ -23,13 +23,12 @@ const Documents = () => {
     landlordPropertyConditionImages = [],
     landlordPropertyConditionVideos = [],
     uvLightImages = [],
+    tenantRepairsVideos = [],
+    tenantRepairsImages = [],
+    tenantAgreements = [],
   } = location.state || {};
-  console.log(
-    "🚀 ~ Documents ~ landlordPropertyConditionImages:",
-    landlordPropertyConditionImages
-  );
-  console.log("🚀 ~ Documents ~ uvLightImages:", uvLightImages);
 
+  console.log("🚀 ~ Documents ~ landlordAgreements:", landlordAgreements);
   const landlordTabs = ["Agreements", "Property Conditions", "Rules"];
   const tenantTabs = ["Agreements", "Repairs"];
   const [activePopup, setActivePopup] = useState(null); // track which popup is open
@@ -70,12 +69,9 @@ const Documents = () => {
     }
   }, [location.state]);
 
-  const landlordDocuments = [landlordAgreements[0]];
+  const landlordDocuments = landlordAgreements;
 
-  const tenantDocuments = [
-    { title: "Repair Request Form", file: "#", id: 3 },
-    { title: "Repair Confirmation", file: "#", id: 4 },
-  ];
+  const tenantDocuments = tenantAgreements;
 
   const currentTabs = viewMode === "landlord" ? landlordTabs : tenantTabs;
   const currentDocuments =
@@ -131,23 +127,25 @@ const Documents = () => {
                   </button>
                 </div>
               </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => {
-                    setActiveCategory("uv");
-                    setIsUploadFile(true);
-                  }}
-                  className="bg-gradient-to-r from-[#314ba1] to-[#0a55d6] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
-                >
-                  + Upload UV Images
-                </button>
-                <button
-                  onClick={() => setIsUploadFile(true)}
-                  className="bg-gradient-to-r from-[#003897] to-[#0151DA] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
-                >
-                  + Upload Files
-                </button>
-              </div>
+              {viewMode === "landlord" && (
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => {
+                      setActiveCategory("uv");
+                      setIsUploadFile(true);
+                    }}
+                    className="bg-gradient-to-r from-[#314ba1] to-[#0a55d6] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
+                  >
+                    + Upload UV Images
+                  </button>
+                  <button
+                    onClick={() => setIsUploadFile(true)}
+                    className="bg-gradient-to-r from-[#003897] to-[#0151DA] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
+                  >
+                    + Upload Files
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -174,9 +172,17 @@ const Documents = () => {
               videos={landlordPropertyConditionVideos}
               images={landlordPropertyConditionImages}
               uvLightImages={uvLightImages}
+              isLandLord={true}
             />
           ) : activeCategory === "Rules" ? (
             <Repairs rules={landlordRules} />
+          ) : activeCategory === "Repairs" ? (
+            <Propertycondition
+              videos={tenantRepairsVideos}
+              images={tenantRepairsImages}
+              uvLightImages={[]}
+              isLandLord={false}
+            />
           ) : (
             <>
               {currentDocuments?.length > 0 &&
