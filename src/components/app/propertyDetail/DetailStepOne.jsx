@@ -25,11 +25,20 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
   const { form, errors } = state;
 
   const handleUploadPropertyimage = (e) => {
-    setMediaError(null);
-    const files = Array.from(e.target.files);
-    const images = files.filter((file) => file.type.startsWith("image/"));
-    setPropertyMedia((prev) => [...prev, ...images]);
-  };
+  setMediaError(null);
+  const files = Array.from(e.target.files); // Get the selected files
+  const images = files.filter((file) => file.type.startsWith("image/")); // Filter only image files
+
+  // Ensure the total number of images does not exceed 5
+  if (images.length + propertyMedia.length > 5) {
+    setMediaError("You can upload up to 5 images only.");
+    return; // Exit early if the limit is exceeded
+  }
+
+  // Update the state with the selected images if the limit is not exceeded
+  setPropertyMedia((prev) => [...prev, ...images]);
+};
+
 
   const removeMedias = (index) => {
     setPropertyMedia((prev) => prev.filter((_, i) => i !== index));
@@ -495,13 +504,13 @@ const DetailStepOne = ({ nextStep, propertyDetail, stepOneData }) => {
         >
           Next
         </button>
-        <button
+        {/* <button
           type="button"
           onClick={() => navigate("/app/dashboard")}
           className="px-[10em] py-3 rounded-full bg-gray-200 text-gray-700 font-medium"
         >
           Skip
-        </button>
+        </button> */}
       </div>
       {contactPersons && (
         <AddContactPersonModal

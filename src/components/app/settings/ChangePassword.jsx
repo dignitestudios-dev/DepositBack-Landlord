@@ -63,7 +63,7 @@ const ChangePassword = () => {
           <form onSubmit={handleSubmit} className="ml-[6em] mr-[6em]">
             {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
 
-            <div className="relative">
+            <div className="relative mb-2">
               <Input
                 label="Current password"
                 value={currentpassword}
@@ -75,13 +75,13 @@ const ChangePassword = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-4 top-10 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-11 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
               </button>
             </div>
 
-            <div className="relative">
+            <div className="relative mb-2">
               <Input
                 label="New password"
                 value={password}
@@ -93,13 +93,13 @@ const ChangePassword = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-4 top-10 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-11 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
               </button>
             </div>
 
-            <div className="relative">
+            <div className="relative mb-2">
               <Input
                 label="Confirm password"
                 value={newpassword}
@@ -111,9 +111,9 @@ const ChangePassword = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-4 top-10 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-11 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {showPassword ? <FaEye /> : <FaEyeSlash />}
               </button>
             </div>
 

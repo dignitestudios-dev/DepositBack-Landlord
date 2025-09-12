@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 
-const PrivacyPolicy = () => {
+const TermsandConditions = () => {
 const [selectedSetting, setSelectedSetting] = useState(null);
     
   return (
     <div className="p-6">
             <h3 className="text-2xl font-[600] mb-6">
-              Privacy Policy
+              Terms & Conditions
             </h3>
             <div className="text-sm leading-relaxed space-y-4 max-h-[450px] overflow-y-auto pr-2 pl-3 pr-3">
               <p>
@@ -49,4 +49,4 @@ const [selectedSetting, setSelectedSetting] = useState(null);
   )
 }
 
-export default PrivacyPolicy
+export default TermsandConditions;

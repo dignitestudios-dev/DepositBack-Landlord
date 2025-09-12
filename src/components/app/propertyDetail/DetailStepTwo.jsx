@@ -3,6 +3,7 @@ import { PiIdentificationBadge } from "react-icons/pi";
 import { ErrorToast } from "../../global/Toaster";
 import axios from "../../../axios";
 import { RiLoader5Line } from "react-icons/ri";
+import pdfIcon from "../../../assets/pdficon.png";
 
 const DetailStepTwo = ({
   prevStep,
@@ -103,7 +104,7 @@ const DetailStepTwo = ({
           className=" rounded-lg p-10 text-center cursor-pointer"
         >
           <p className="text-black">Upload “Documents”</p>
-          <p className="text-sm text-gray-400">Upto 20mbps PDF, JPG, PNG</p>
+          <p className="text-sm text-gray-400">Upto 20MB PDF, JPG, PNG</p>
           <input
             type="file"
             id="fileUpload"
@@ -153,7 +154,7 @@ const DetailStepTwo = ({
             className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded"
           >
             <div className="flex items-center gap-2">
-              <img src={PiIdentificationBadge} alt="pdf" className="w-5 h-5" />
+              <img src={pdfIcon} alt="pdf" className="w-5 h-5" />
               <p className="text-sm">{file.name}</p>
             </div>
             <button
