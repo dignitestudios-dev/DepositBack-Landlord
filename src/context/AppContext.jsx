@@ -59,8 +59,10 @@ const AppProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    handleNotifications();
-  }, []);
+    if (token) {
+      handleNotifications();
+    }
+  }, [update]);
 
   return (
     <AppContext.Provider

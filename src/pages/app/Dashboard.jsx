@@ -13,8 +13,7 @@ import DashboardSkeletonLoader from "../../components/app/dashboard/DashboardSke
 import { AppContext } from "../../context/AppContext";
 
 const Dashboard = () => {
-  const { userData } = useContext(AppContext);
-  console.log("🚀 ~ Dashboard ~ userData:", userData);
+  const { userData, setUpdate } = useContext(AppContext);
   const [modalOpen, setModalOpen] = useState(false); // Manage modal visibility
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({});
@@ -138,6 +137,10 @@ const Dashboard = () => {
       </div>
     );
   };
+
+  useEffect(() => {
+    setUpdate((prev) => !prev);
+  }, []);
 
   return (
     <div className="max-w-[90em] mx-auto py-6 px-[4em]">

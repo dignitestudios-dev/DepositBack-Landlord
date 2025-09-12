@@ -8,6 +8,7 @@ const languages = ["English", "Spanish"];
 const Language = () => {
   // State to control the popup visibility
   const [language, setLanguage] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const { i18n } = useTranslation();
 
@@ -17,6 +18,7 @@ const Language = () => {
     i18n.changeLanguage(langCode);
   };
 
+  // const handleLanguageUpdate = () => {};
   return (
     <div className="p-6">
       <h3 className="text-2xl font-[600] mb-6">Language Settings</h3>
@@ -55,8 +57,6 @@ const Language = () => {
               type="radio"
               name="language"
               value={lang}
-              checked={selectedLang === lang}
-              onChange={() => setSelectedLang(lang)}
               className="accent-blue-600 w-4 h-4"
               defaultChecked={lang === "English"}
               onChange={handleLanguageChange}
@@ -71,12 +71,12 @@ const Language = () => {
 
       {/* Update Button */}
       <div className="mt-[7em] flex justify-center">
-        <button
+        {/* <button
           onClick={handleLanguageUpdate}
           className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white px-[10em] py-3 rounded-full font-medium shadow hover:from-blue-600 hover:to-blue-800 transition"
         >
           Update
-        </button>
+        </button> */}
       </div>
 
       {/* Success Popup */}
@@ -84,7 +84,7 @@ const Language = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="relative bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
             <button
-              onClick={() => setShowPopup(false)} 
+              onClick={() => setShowPopup(false)}
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
             >
               <FaTimes size={18} />
@@ -164,8 +164,3 @@ const setGoogleTranslateLang = (lang) => {
   // Stop checking after 5 seconds (timeout)
   setTimeout(() => clearInterval(intervalId), 5000);
 };
-
-
-
-
-
