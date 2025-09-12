@@ -19,6 +19,7 @@ import ChangeNumber from "../../components/app/settings/ChangeNumber";
 import Language from "../../components/app/settings/Language";
 import PaymentSetting from "../../components/app/settings/PaymentSetting";
 import PrivacyPolicy from "../../components/app/settings/PrivacyPolicy";
+import TermsandConditions from "../../components/app/settings/TermsandConditions";
 
 const settingsMenu = [
   {
@@ -49,8 +50,9 @@ const Setting = () => {
       case "notifications":
         return <NotificationSettings />;
       case "privacy":
+                return <PrivacyPolicy />;
       case "terms":
-        return <PrivacyPolicy />;
+        return <TermsandConditions />;
       // case "payment":
       //   return <PaymentSetting />;
       case "languages":

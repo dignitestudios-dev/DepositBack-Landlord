@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import logo from "../../assets/mainlogowhite.png";
 import { IoLogOut, IoNotificationsOutline } from "react-icons/io5";
 import { useNavigate } from "react-router";
@@ -17,6 +17,9 @@ const Header = () => {
   const [logoutpopup, setLogoutpopup] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const notificationRef = useRef(null);
+  const userPopupRef = useRef(null);
+
   const togglePopup = () => {
     if (userPopup) setUserPopup(false);
     setIsPopupOpen(!isPopupOpen);
@@ -28,10 +31,38 @@ const Header = () => {
     setUserPopup(!userPopup);
   };
 
+  const closePopup = () => {
+    setIsPopupOpen(false); // Close notification popup
+  };
+
   useEffect(() => {
     let count = notification.filter((item) => !item.isRead);
     setUnreadCount(count);
-  }, [notification]);
+
+    // Close the popups if clicked outside
+    const handleClickOutside = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target) &&
+        isPopupOpen
+      ) {
+        setIsPopupOpen(false); // Close notification popup if clicked outside
+      }
+
+      if (
+        userPopupRef.current &&
+        !userPopupRef.current.contains(event.target) &&
+        userPopup
+      ) {
+        setUserPopup(false); // Close user dropdown if clicked outside
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isPopupOpen, userPopup, notification]);
 
   return (
     <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] flex justify-between items-center rounded-3xl px-[6em] py-4 shadow-md ml-[1em] mr-[1em] mt-[1em]">
@@ -48,6 +79,7 @@ const Header = () => {
             className="hover:underline cursor-pointer"
             onClick={() => {
               navigate("/app/Dashboard");
+              closePopup(); 
             }}
           >
             {t("header.home")}
@@ -56,6 +88,7 @@ const Header = () => {
             className="hover:underline cursor-pointer relative"
             onClick={() => {
               navigate("/app/tenant-requests");
+              closePopup();
             }}
           >
             {t("header.tenantRequests")}
@@ -64,6 +97,7 @@ const Header = () => {
             className="hover:underline cursor-pointer"
             onClick={() => {
               navigate("/app/resources");
+              closePopup(); 
             }}
           >
             {t("header.resources")}
@@ -72,6 +106,7 @@ const Header = () => {
             className="hover:underline cursor-pointer"
             onClick={() => {
               navigate("/app/messages");
+              closePopup(); 
             }}
           >
             {t("header.messages")}
@@ -79,7 +114,7 @@ const Header = () => {
         </ul>
 
         {/* Notification Icon with Popup toggle */}
-        <div className="relative">
+        <div className="relative" ref={notificationRef}>
           {unreadCount?.length > 0 && (
             <span className="absolute -top-2 text-sm bg-red-600 h-5 w-5 items-center flex justify-center text-white rounded-full">
               {unreadCount?.length}
@@ -110,18 +145,16 @@ const Header = () => {
                       <p className="text-[13px] mr-[3em]">
                         {notification.description}
                       </p>
-                      {/* {notification.unreadCount > 0 && (
-                        <span className="text-sm bg-red-600 h-5 w-8 items-center flex justify-center text-white rounded-full">
-                          {notification.unreadCount}
-                        </span>
-                      )} */}
                     </div>
                     <hr />
                   </div>
                 ))}
                 <div className="flex justify-center items-center ">
                   <button
-                    onClick={() => navigate("/app/notifications")}
+                    onClick={() => {
+                      navigate("/app/notifications");
+                      closePopup(); 
+                    }}
                     className="text-sm text-blue-600 font-medium px-4 py-1 rounded-lg hover:bg-blue-50 cursor-pointer transition"
                   >
                     {t("header.viewAll")}
@@ -141,12 +174,16 @@ const Header = () => {
         />
 
         {userPopup && (
-          <div className="z-10 absolute top-[6em] right-10 w-[9em] p-4 bg-white shadow-lg rounded-lg border border-slate-200">
+          <div
+            className="z-10 absolute top-[6em] right-10 w-[9em] p-4 bg-white shadow-lg rounded-lg border border-slate-200"
+            ref={userPopupRef}
+          >
             <div className="space-y-3">
               <span
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
                 onClick={() => {
                   navigate("/app/view-profile");
+                  closePopup(); 
                 }}
               >
                 {t("header.viewProfile")}
@@ -155,6 +192,7 @@ const Header = () => {
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
                 onClick={() => {
                   navigate("/app/subscription-plans");
+                  closePopup(); 
                 }}
               >
                 {t("header.subscriptionPlans")}
@@ -163,6 +201,7 @@ const Header = () => {
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
                 onClick={() => {
                   navigate("/app/settings");
+                  closePopup(); 
                 }}
               >
                 {t("header.settings")}
@@ -170,6 +209,7 @@ const Header = () => {
               <span
                 onClick={() => {
                   setLogoutpopup(true);
+                  closePopup(); 
                 }}
                 className="block text-[12px] font-[500] text-red-600 hover:text-red-700 cursor-pointer"
               >

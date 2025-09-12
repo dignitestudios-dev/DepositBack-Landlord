@@ -277,14 +277,15 @@ const Dashboard = () => {
           ) : (
             <div className="col-span-full text-center mt-10">
               <p className="text-gray-500 text-lg mb-4">
-                No properties found for "{searchTerm}".
+                {/* No properties found for "{searchTerm}". */}
+                No properties found.
               </p>
-              <button
+              {/* <button
                 onClick={() => setSearchTerm("")}
                 className="text-sm text-white bg-[#0151DA] px-5 py-2 rounded-full hover:bg-blue-700 transition"
               >
                 Clear Search
-              </button>
+              </button> */}
             </div>
           )}
         </div>

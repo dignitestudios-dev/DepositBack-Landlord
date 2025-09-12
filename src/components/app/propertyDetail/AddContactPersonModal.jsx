@@ -70,7 +70,7 @@ const AddContactPersonModal = ({
               <label className="mb-1 text-sm font-medium text-gray-700 text-left">
                 Phone Number
               </label>
-              <div className="flex gap-[10px] items-center">
+              <div className="flex gap-[10px] items-center mb-4 mt-4">
                 <div className="bg-gray-100 rounded-full py-[9px] pl-[6px] pr-[10px] flex items-center gap-2">
                   <img src={usaflag} className="h-4 w-[1.8em]" alt="" />
                   <p>+ 1</p>

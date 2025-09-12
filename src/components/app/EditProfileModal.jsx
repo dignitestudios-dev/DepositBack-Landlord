@@ -69,6 +69,9 @@ const EditProfileModal = ({ onClose, userData }) => {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+const [Fullname, setFullname] = useState("");
+  const [Ssnnumber, setSsnnumber] = useState("");
+
 
   const [errors, setErrors] = useState({
     fullname: "",
@@ -76,7 +79,9 @@ const EditProfileModal = ({ onClose, userData }) => {
     frontIDImage: "",
     backIDImage: "",
     profileImage: "",
+    phone: "",
   });
+  console.log("🚀 ~ EditProfileModal ~ errors:", errors);
 
   const handleImageChange = (event, type) => {
     const file = event.target.files[0];
@@ -96,6 +101,23 @@ const EditProfileModal = ({ onClose, userData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     const newErrors = {
+      fullname: !state.fullName.trim() ? "Full name is required" : "",
+      ssn: !state.ssn.trim()
+        ? "SSN is required"
+        : state.ssn.trim().length !== 4
+        ? "SSN must be exactly 4 digits"
+        : "",
+        phone: !state.phone.trim() ? "Phone number is required" : state.phone.trim().length < 10 ? "Phone number must be at least 10 digits" : "",
+        
+      // idFront: !state.frontIDImage ? "Front ID is required" : "",
+      // idBack: !state.backIDImage ? "Back ID is required" : "",
+      // profileImage: !state.profileImage ? "Profile image is required" : "",
+    };
+
+    setErrors(newErrors);
+    const hasErrors = Object.values(newErrors).some((error) => error !== "");
+    if (hasErrors) return;
     setLoading(true);
     try {
       const formData = new FormData();
@@ -235,6 +257,9 @@ const EditProfileModal = ({ onClose, userData }) => {
               placeholder="Enter full name"
               className="bg-[#ECECEC] !w-[132%]"
             />
+             {errors.fullname && (
+              <p className="text-red-500 text-xs">{errors.fullname}</p>
+            )}
 
             <Input
               label="Email Address"
@@ -277,7 +302,11 @@ const EditProfileModal = ({ onClose, userData }) => {
                 placeholder="Add phone number"
                 className="!w-[37em] bg-[#ECECEC]"
               />
+               
             </div>
+            {errors.phone && (
+              <p className="text-red-500 text-xs">{errors.phone}</p>
+            )}
           </div>
           <div className="flex gap-[6em]">
             <div className="mt-3">
@@ -296,6 +325,10 @@ const EditProfileModal = ({ onClose, userData }) => {
                 placeholder="XXXX"
                 className="bg-[#ECECEC] !w-[132%]"
               />
+               {errors.ssn && (
+              <p className="text-red-500 text-xs">{errors.ssn}</p>
+            )}
+              
             </div>
             <div className="mt-3">
               {/* <Input

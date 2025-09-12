@@ -49,6 +49,8 @@ const AddPropertyDetail = () => {
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
+  const { data, loading } = useFetchData(`/users/me`, {}, 1, update);
+ console.log("🚀 ~ AddPropertyDetail ~ data:", data);
   const steps = [
     { img: Propertydetails, label: "Property Details" },
     { img: Inspectiondetails, label: "Inspection Details" },
@@ -71,10 +73,10 @@ const AddPropertyDetail = () => {
   };
 
   useEffect(() => {
-    if (userData?.stripeProfileStatus === "pending") {
+    if (data?.stripeProfileStatus === "pending") {
       handleStripeAccount();
     }
-  }, [userData]);
+  }, [data]);
 
   return (
     <div className="min-h-screen bg-[#ecf3fd] py-12 px-6">
