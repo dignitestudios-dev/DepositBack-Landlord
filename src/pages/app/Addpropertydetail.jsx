@@ -50,7 +50,7 @@ const AddPropertyDetail = () => {
   const prevStep = () => setStep((prev) => prev - 1);
 
   const { data, loading } = useFetchData(`/users/me`, {}, 1, update);
- console.log("🚀 ~ AddPropertyDetail ~ data:", data);
+  console.log("🚀 ~ AddPropertyDetail ~ data:", data);
   const steps = [
     { img: Propertydetails, label: "Property Details" },
     { img: Inspectiondetails, label: "Inspection Details" },
@@ -64,7 +64,7 @@ const AddPropertyDetail = () => {
       const { data } = await axios.get("/users/linkForWeb");
       console.log("🚀 ~ handleStripeAccount ~ response:", data);
       if (data?.success) {
-        window.location.href = data?.data;
+        // window.location.href = data?.data;
         // userData?.stripeConnectLink;
       }
     } catch (error) {
@@ -73,7 +73,7 @@ const AddPropertyDetail = () => {
   };
 
   useEffect(() => {
-    if (data?.stripeProfileStatus === "pending") {
+    if (data?.stripeProfileStatus && data?.stripeProfileStatus !== "approved") {
       handleStripeAccount();
     }
   }, [data]);
@@ -157,170 +157,6 @@ const AddPropertyDetail = () => {
             uniquePropertyCode={stepOneData?.propertyCode}
           />
         )}
-
-        {/* {step === 5 && (
-          <div className="bg-[#F9FAFA] mt-20 rounded-xl shadow-lg p-8">
-            {!showStripeForm ? (
-              // === Step 1: Connect your Stripe Account screen ===
-              <>
-                <p className="text-black pb-6 text-2xl font-[500]">
-                  Connect Your Stripe Account
-                </p>
-                <p>
-                  To securely manage deposit transactions, refunds, and
-                  deductions, you need to link your Stripe account. This ensures
-                  smooth handling of funds held in escrow.
-                </p>
-
-                <div
-                  className="bg-white rounded-2xl p-4 flex items-center justify-between w-[30em] mt-6 mb-6 cursor-pointer"
-                  onClick={() => setShowStripeForm(true)}
-                >
-                  <div className="flex items-center gap-2">
-                    <img src={Stripe} className="h-7 w-10" alt="Stripe Logo" />
-                    <p className="font-[500]">Stripe</p>
-                  </div>
-                  <FaChevronRight />
-                </div>
-
-                <div className="mt-8 flex items-center justify-center gap-3">
-                  <button
-                    onClick={nextStep}
-                    disabled
-                    className="px-[10em] py-3 rounded-full bg-[#E7E7E8] text-slate-400 font-medium"
-                  >
-                    Next
-                  </button>
-                </div>
-              </>
-            ) : !isStripeLinked ? (
-              // === Step 2: Stripe Form ===
-              <>
-                <p className="text-black pb-6 text-2xl font-[500]">
-                  Add Stripe Account
-                </p>
-                <p>
-                  You can update your Stripe account to manage deposit
-                  transactions.
-                  <br />
-                  Note: Without a linked account, you cannot process tenant
-                  deposits or deductions.
-                </p>
-
-                <div className="pt-10 w-[38em]">
-                  <div>
-                    <label
-                      htmlFor="accountholderName"
-                      className="block mb-2 text-sm font-medium text-gray-700"
-                    >
-                      Account Holder’s Name
-                    </label>
-                    <input
-                      id="accountholderName"
-                      type="text"
-                      placeholder="Enter Account Holder’s Name"
-                      value={accountholderName}
-                      onChange={(e) => setAccountholderName(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div className="pt-3 pb-3">
-                    <label
-                      htmlFor="accountNumber"
-                      className="block mb-2 text-sm font-medium text-gray-700"
-                    >
-                      Account Number
-                    </label>
-                    <input
-                      id="accountNumber"
-                      type="tel"
-                      placeholder="Enter Account Number"
-                      value={accountNumber}
-                      onChange={(e) => setAccountNumber(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="routingNumber"
-                      className="block mb-2 text-sm font-medium text-gray-700"
-                    >
-                      Routing Number
-                    </label>
-                    <input
-                      id="routingNumber"
-                      type="tel"
-                      placeholder="Enter Routing Number"
-                      value={routingNumber}
-                      onChange={(e) => setRoutingNumber(e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-8 flex items-center justify-center gap-3">
-                  <button
-                    onClick={() => setIsStripeLinked(true)}
-                    className="px-[10em] py-3 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-medium"
-                  >
-                    Save
-                  </button>
-                </div>
-              </>
-            ) : (
-              // === Step 3: Confirmation ===
-              <>
-                <p className="text-black pb-6 text-2xl font-[500]">
-                  Your Stripe account is now linked. You are ready to manage
-                  deposits, refunds, and<br></br> deduction securely.
-                </p>
-                <div className="bg-white rounded-2xl p-4 flex items-center justify-between w-[30em] mt-6 mb-6 cursor-pointer">
-                  <p className="font-[500]">**** **** **** *485</p>
-                  <img src={Stripe} className="h-7 w-10" alt="Stripe Logo" />
-                </div>
-
-                <div className="mt-8 flex items-center justify-center gap-3">
-                  <button
-                    disabled={loading}
-                    onClick={handlePropertySubmit}
-                    className="px-[10em] py-3 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-medium"
-                  >
-                    {loading ? "Loading..." : "Next"}
-                  </button>
-                </div>
-              </>
-            )}
-
-            <Modal
-              isOpen={showModal}
-              onClose={() => {
-                setShowModal(false);
-                setModalOpen(true);
-              }}
-              data={{
-                title: "Property Added!",
-                description: "Your property has been added successfully.",
-                iconBgColor: "bg-blue-600", // Optional
-              }}
-            />
-            <Addmorepropertymodal
-              isOpen={modalOpen}
-              onAction={() => {
-                setStep(1);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                setModalOpen(false);
-              }}
-              onSecondaryAction={() => {
-                console.log("Continue Clicked");
-                setModalOpen(false);
-                navigate("/app/dashboard");
-              }}
-              data={modalData}
-            />
-          </div>
-        )} */}
       </div>
     </div>
   );

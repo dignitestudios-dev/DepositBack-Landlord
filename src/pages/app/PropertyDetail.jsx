@@ -369,6 +369,7 @@ const PropertyDetail = () => {
                 onClick={() =>
                   navigate("/app/inspection", {
                     state: {
+                      tenant,
                       propertyId: id,
                       allowedDocs,
                       tenantMoveInImages,

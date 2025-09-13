@@ -4,9 +4,12 @@ import { ErrorToast } from "../../global/Toaster";
 import { PiIdentificationBadge } from "react-icons/pi";
 import { RiLoader5Line } from "react-icons/ri";
 import { useNavigate } from "react-router";
+import Modal from "../../global/Modal";
 
 const EditPropertyDocs = ({ stepTwoData, inspectionDetail }) => {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [mediaFiles, setMediaFiles] = useState([]);
   const [documentFiles, setDocumentFiles] = useState([]);
@@ -79,7 +82,7 @@ const EditPropertyDocs = ({ stepTwoData, inspectionDetail }) => {
 
         if (response.status === 200) {
           inspectionDetail({ documentFiles, mediaFiles });
-          navigate("/app/dashboard");
+          setShowModal(true);
         }
       } catch (error) {
         ErrorToast(error?.response?.data?.message);
@@ -132,7 +135,7 @@ const EditPropertyDocs = ({ stepTwoData, inspectionDetail }) => {
   }, [stepTwoData]);
 
   return (
-    <div className="bg-[#F9FAFA] mt-20 rounded-xl shadow-lg p-8">
+    <div className="bg-[#F9FAFA] mt-10 rounded-xl shadow-lg p-8">
       <p className="text-black pb-6">
         Document the condition of your rental property to ensure a smooth
         leasing experience. Upload photos or videos for each area of the
@@ -241,6 +244,17 @@ const EditPropertyDocs = ({ stepTwoData, inspectionDetail }) => {
           </div>
         </button>
       </div>
+      <Modal
+        isOpen={showModal}
+        onClose={() => {
+          navigate("/app/dashboard");
+        }}
+        data={{
+          title: "Property Updated!",
+          description: "Your property has been updated successfully.",
+          iconBgColor: "bg-blue-600", // Optional
+        }}
+      />
     </div>
   );
 };

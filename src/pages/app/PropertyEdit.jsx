@@ -17,7 +17,7 @@ const PropertyEdit = () => {
     <div className="min-h-screen bg-[#ecf3fd] py-12 px-6">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-semibold text-gray-900">
-          Add Property Details
+          {step === 1 ? "Edit Property Details" : "Edit Inspection Details"}
         </h2>
         {step === 1 && (
           <EditPropertyDetail

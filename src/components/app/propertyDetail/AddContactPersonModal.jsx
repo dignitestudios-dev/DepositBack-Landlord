@@ -70,7 +70,7 @@ const AddContactPersonModal = ({
               <label className="mb-1 text-sm font-medium text-gray-700 text-left">
                 Phone Number
               </label>
-              <div className="flex gap-[10px] items-center mb-4 mt-4">
+              <div className="flex gap-[10px] items-center mb-4 ">
                 <div className="bg-gray-100 rounded-full py-[9px] pl-[6px] pr-[10px] flex items-center gap-2">
                   <img src={usaflag} className="h-4 w-[1.8em]" alt="" />
                   <p>+ 1</p>
@@ -88,18 +88,18 @@ const AddContactPersonModal = ({
             </div>
 
             {/* Add button */}
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setAddNumber(false)}
-                className="px-4 py-2 bg-gray-200 rounded-lg text-sm"
-              >
-                Cancel
-              </button>
+            <div className="mt-6 flex flex-col gap-3">
               <button
                 onClick={handleAddPerson}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm"
+                className=" px-4 py-2 bg-blue-700 text-white rounded-3xl text-sm"
               >
                 Add
+              </button>
+              <button
+                onClick={() => setAddNumber(false)}
+                className="px-4 py-2 bg-gray-200 rounded-3xl text-sm"
+              >
+                Cancel
               </button>
             </div>
           </div>

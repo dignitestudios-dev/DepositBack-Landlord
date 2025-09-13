@@ -136,19 +136,19 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
   const { form, errors } = state;
 
   const handleUploadPropertyimage = (e) => {
-  setMediaError(null);
-  const files = Array.from(e.target.files); // Get the selected files
-  const images = files.filter((file) => file.type.startsWith("image/")); // Filter only image files
+    setMediaError(null);
+    const files = Array.from(e.target.files); // Get the selected files
+    const images = files.filter((file) => file.type.startsWith("image/")); // Filter only image files
 
-  // Ensure the total number of images does not exceed 5
-  if (images.length + propertyMedia.length > 5) {
-    setMediaError("You can upload up to 5 images only.");
-    return; // Exit early if the limit is exceeded
-  }
+    // Ensure the total number of images does not exceed 5
+    if (images.length + propertyMedia.length > 5) {
+      setMediaError("You can upload up to 5 images only.");
+      return; // Exit early if the limit is exceeded
+    }
 
-  // Update the state with the selected images if the limit is not exceeded
-  setPropertyMedia((prev) => [...prev, ...images]);
-};
+    // Update the state with the selected images if the limit is not exceeded
+    setPropertyMedia((prev) => [...prev, ...images]);
+  };
 
   const removeMedias = (index) => {
     setPropertyMedia((prev) => prev.filter((_, i) => i !== index));
@@ -247,7 +247,7 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
   }, [stepOneData]);
 
   return (
-    <div className="bg-[#F9FAFA] mt-20 rounded-xl shadow-lg p-8">
+    <div className="bg-[#F9FAFA] mt-10 rounded-xl shadow-lg p-8">
       <h3 className="text-lg font-semibold text-gray-700 mb-6">
         Upload Images
       </h3>

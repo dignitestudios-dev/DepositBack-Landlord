@@ -3,6 +3,7 @@ import axios from "../../axios";
 import { processError } from "../../lib/utils";
 
 const useFetchData = (url, filter = {}, currentPage = 1, update = false) => {
+  console.log("🚀 ~ useFetchData ~ url:", url);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({});
@@ -33,6 +34,7 @@ const useFetchData = (url, filter = {}, currentPage = 1, update = false) => {
   };
 
   useEffect(() => {
+    if (!url) return;
     getUsers();
   }, [JSON.stringify(filter), currentPage, update]);
 
@@ -59,6 +61,7 @@ const useFetchById = (url, update = false) => {
   };
 
   useEffect(() => {
+    if (!url) return;
     getDataById();
   }, [update]);
 
