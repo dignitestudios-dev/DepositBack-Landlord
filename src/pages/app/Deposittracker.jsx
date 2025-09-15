@@ -14,7 +14,6 @@ const Deposittracker = () => {
   const navigate = useNavigate("");
   const location = useLocation();
   const depositId = location.state?.depositId || false;
-  console.log("🚀 ~ Deposittracker ~ depositId:", depositId);
 
   const [isReleasing, setIsReleasing] = React.useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
@@ -148,8 +147,8 @@ const Deposittracker = () => {
                       </h2>
                       <p className="text-sm text-gray-600 mb-4">
                         Are you sure you want to release the refundable deposit
-                        of ${data?.depositTracker?.remainingBalance}
-                        to [Tenant Name]? This action cannot be undone.
+                        of ${data?.depositTracker?.remainingBalance}? This
+                        action cannot be undone.
                       </p>
                       <div className="flex justify-center gap-3">
                         <button
@@ -159,12 +158,13 @@ const Deposittracker = () => {
                           Cancel
                         </button>
                         <button
+                          disabled={releaseLoading}
                           onClick={() => {
                             handleDepositRelease();
                           }}
                           className="px-8 py-2 text-sm bg-[#FF3B30] text-white rounded-full"
                         >
-                          Confirm
+                          {releaseLoading ? "Releasing..." : "Confirm"}
                         </button>
                       </div>
                     </div>

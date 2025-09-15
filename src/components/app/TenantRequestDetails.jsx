@@ -283,6 +283,7 @@ const TenantRequestDetails = ({ request }) => {
                     <input
                       type="date"
                       value={leaseStart}
+                      min={new Date().toISOString().split("T")[0]}
                       onChange={handleLeaseStartChange}
                       className="text-slate-500 mt-1 w-full p-3 rounded-xl border text-sm"
                     />
@@ -368,7 +369,10 @@ const TenantRequestDetails = ({ request }) => {
           </div>
           <div className="flex gap-2 items-center text-sm">
             <TiWarning />{" "}
-            <span>Emergency Contact: {request?.tenant?.emergencyContact}</span>
+            <span>
+              Emergency Contact:{" "}
+              {request?.tenant?.emergencyContact || "--Not Provided--"}
+            </span>
           </div>
         </div>
       </div>

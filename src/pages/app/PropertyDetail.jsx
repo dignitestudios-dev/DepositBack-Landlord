@@ -4,16 +4,15 @@ import { LuMapPin } from "react-icons/lu";
 import { FaArrowLeft, FaEnvelope, FaPhoneAlt } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { RiDeleteBinFill, RiEdit2Fill } from "react-icons/ri";
-import user from "../../assets/user.png";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import backimage from "../../assets/propertydetail/back.png";
-import { IoIosWarning } from "react-icons/io";
+import { IoIosWarning, IoMdCheckmark } from "react-icons/io";
 import { BsChevronRight } from "react-icons/bs";
 import Modal from "../../components/global/Modal";
 import ImageGallery from "../../components/app/ImageGallery";
-import { useFetchById } from "../../hooks/api/Get";
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 import axios from "../../axios";
+import { TiWarning } from "react-icons/ti";
 
 const PropertyDetail = () => {
   const navigate = useNavigate("");
@@ -23,12 +22,50 @@ const PropertyDetail = () => {
   console.log("🚀 ~ PropertyDetail ~ propertyDetail:", propertyDetail);
 
   const [showModal, setShowModal] = useState(false);
-  const [update, setUpdate] = useState(false);
   const [remindLoading, setRemindLoading] = useState(false);
+  const [leaseDuration, setLeaseDuration] = useState(false);
+  const [confirmLeaseDate, setConfirmLeaseDate] = useState(false);
+  const [rejectedRequestModal, setRejectedRequestModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [isDelete, setIsDelete] = useState(false);
 
   //   const images = [imagetwo, imageone, imagefive, imagethree, imagefour];
+  const [leaseStart, setLeaseStart] = useState("");
+  const [leaseEnd, setLeaseEnd] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLeaseStartChange = (e) => {
+    const value = e.target.value;
+    setLeaseStart(value);
+    setError("");
+
+    // Reset end date if it becomes invalid
+    if (leaseEnd && new Date(value) >= new Date(leaseEnd)) {
+      setLeaseEnd("");
+    }
+  };
+
+  const handleLeaseEndChange = (e) => {
+    const value = e.target.value;
+    setLeaseEnd(value);
+
+    if (leaseStart && value) {
+      const start = new Date(leaseStart);
+      const end = new Date(value);
+
+      // Calculate month difference
+      const monthDiff =
+        (end.getFullYear() - start.getFullYear()) * 12 +
+        (end.getMonth() - start.getMonth());
+
+      if (monthDiff < 1) {
+        setError("Lease end date must be at least 1 month after start date.");
+      } else {
+        setError("");
+      }
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -56,6 +93,51 @@ const PropertyDetail = () => {
       ErrorToast(error.response.data.message);
     } finally {
       setRemindLoading(false);
+    }
+  };
+
+  const handleLeaseConfirm = () => {
+    if (!leaseStart || !leaseEnd) {
+      setError("Please select both lease start and lease end dates.");
+      return;
+    }
+
+    setError(""); // clear any old error
+    setLeaseDuration(false);
+    setConfirmLeaseDate(true);
+  };
+
+  const handleLeaseSubmit = async (status) => {
+    try {
+      const today = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
+
+      const payload = {
+        leaseStartDate: leaseStart
+          ? new Date(leaseStart).toISOString().split("T")[0] + "T00:00:00.000Z"
+          : today,
+        leaseEndDate: leaseEnd
+          ? new Date(leaseEnd).toISOString().split("T")[0] + "T00:00:00.000Z"
+          : today,
+      };
+      setLoading(true);
+      const response = await axios.post(
+        `properties/leaseUpdate/${id}`,
+        payload
+      );
+      if (response.status === 200) {
+        if (status === "approved") {
+          setLeaseStart("");
+          setLeaseEnd("");
+          setConfirmLeaseDate(false);
+          SuccessToast("Lease Date Updated");
+        } else {
+          setRejectedRequestModal(true);
+        }
+      }
+    } catch (error) {
+      ErrorToast(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,6 +170,8 @@ const PropertyDetail = () => {
     uvLightImages,
     depositTracker,
     contract,
+    isLeaseDateConfirmed,
+    isLeaseDateResolved,
   } = propertyDetail;
   console.log("🚀 ~ PropertyDetail ~ tenant:", tenant);
 
@@ -134,6 +218,16 @@ const PropertyDetail = () => {
                 Edit
               </button>
             </>
+          )}
+          {!isLeaseDateConfirmed && (
+            <button
+              type="button"
+              onClick={() => setLeaseDuration(true)}
+              className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white flex items-center gap-3 rounded-3xl px-4 py-2 font-medium"
+            >
+              {/* <RiEdit2Fill /> */}
+              Update Lease Date
+            </button>
           )}
         </div>
       </div>
@@ -415,6 +509,127 @@ const PropertyDetail = () => {
             actionText: "Delete",
           }}
         />
+      )}
+      {leaseDuration && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-[#F7FAFC] p-8 rounded-2xl max-w-md w-full relative shadow-lg">
+            <button
+              onClick={() => {
+                setLeaseDuration(false);
+              }}
+              className="absolute top-4 right-4 text-gray-500 text-xl"
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-semibold mb-2 text-black">
+              Set Lease Duration
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Confirm the lease period for this property to finalize the
+              tenant’s request.
+            </p>
+
+            <div className="space-y-4">
+              <div className="mb-4">
+                <label className="text-sm font-medium text-gray-700">
+                  Lease Start Date
+                </label>
+                <input
+                  type="date"
+                  value={leaseStart}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={handleLeaseStartChange}
+                  className="text-slate-500 mt-1 w-full p-3 rounded-xl border text-sm"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="text-sm font-medium text-gray-700">
+                  Lease End Date
+                </label>
+                <input
+                  type="date"
+                  value={leaseEnd}
+                  onChange={handleLeaseEndChange}
+                  min={leaseStart} // prevent selecting a date before start
+                  className="text-slate-500 mt-1 w-full p-3 rounded-xl border text-sm"
+                />
+              </div>
+
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+            </div>
+
+            <p className="text-sm text-gray-500 mb-6">
+              The lease duration helps track the agreement timeline and ensures
+              proper management of tenant-related tasks.
+            </p>
+
+            <p className="text-xs text-red-600 mb-6">
+              <strong>Note*</strong>
+              <p className="text-sm text-gray-500 mb-6">
+                After setting the lease duration, both you and the tenant will
+                receive confirmation, and deposit tracking features will become
+                active.
+              </p>
+            </p>
+
+            <button
+              onClick={handleLeaseConfirm}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-full text-sm font-medium"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+      {confirmLeaseDate && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
+            <div className="bg-[#FF3B30] text-[#fff] p-6 w-fit mx-auto rounded-full mb-3">
+              <TiWarning size={40} />
+            </div>
+            <h2 className="font-semibold text-[20px] mb-2 text-black">
+              Confirm Lease Date
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Do you wish to confirm these dates?
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                className="px-[4em] py-2 text-sm text-slate-600 bg-gray-200 rounded-full"
+                onClick={() => setConfirmLeaseDate(false)}
+              >
+                Cancel
+              </button>
+              <button
+                disabled={loading}
+                onClick={() => handleLeaseSubmit("approved")}
+                className="px-[5em] py-2 text-sm bg-[#FF3B30] text-white rounded-full"
+              >
+                {loading ? "Saving..." : "Yes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {rejectedRequestModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div
+            onClick={() => navigate("/app/dashboard")}
+            className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center"
+          >
+            <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-[#fff] p-6 w-fit mx-auto rounded-full mb-3">
+              <IoMdCheckmark size={40} />
+            </div>
+            <h2 className="font-semibold text-[20px] mb-2 text-black">
+              Tenant Request Rejected!
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              The tenant will be notified and will not have access to this
+              property.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
