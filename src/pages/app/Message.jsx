@@ -1,188 +1,55 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
-import Header from "../../components/global/Header";
-import Footer from "../../components/global/Footer";
+import { useState, useRef, useEffect, useContext } from "react";
 import { IoSend } from "react-icons/io5";
 import { MdAttachFile } from "react-icons/md";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
-import pdf from "../../assets/pdficon.png";
-import userone from "../../assets/userone.png";
-import usertwo from "../../assets/usertwo.png";
-import user from "../../assets/user.png";
-import { useLocation, useNavigate } from "react-router";
-import { useFetchData } from "../../hooks/api/Get";
-import {
-  getOrCreateChat,
-  getUserChatsWithDetails,
-  listenToMessages,
-  sendMessage,
-} from "../../firebase/messages";
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
+import { RiLoader3Fill } from "react-icons/ri";
+
+import { useNavigate } from "react-router";
+import { getUserChatsWithDetails, sendMessage } from "../../firebase/messages";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import { AppContext } from "../../context/AppContext";
 import { chatTime } from "../../lib/helpers";
 import { ErrorToast } from "../../components/global/Toaster";
 import axios from "../../axios";
-import { RiLoader3Fill } from "react-icons/ri";
 
 const Message = () => {
   const { userData } = useContext(AppContext);
+  const navigate = useNavigate();
 
-  const location = useLocation();
-  const tenantUid = location?.state?.tenantId;
+  const [chatList, setChatList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [selectedUser, setSelectedUser] = useState("");
-
-  const [chats, setChats] = useState({});
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [chatId, setChatId] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState([]);
-  const [chatList, setChatList] = useState([]);
-
-  const [selectedMessages, setSelectedMessages] = useState([]);
-  console.log("🚀 ~ Message ~ selectedMessages:", selectedMessages);
-  const [uploadFileLoading, setUploadFileLoading] = useState("");
   const [uploadedImages, setUploadedImages] = useState([]);
 
-  const [chatId, setChatId] = useState("");
+  const [uploadFileLoading, setUploadFileLoading] = useState(false);
+  const [sendingMessageLoading, setSendingMessageLoading] = useState(false);
 
   const fileInputRef = useRef();
-  const navigate = useNavigate("");
 
-  const handleSendMessage = () => {
-    sendMessage(
-      chatId,
-      userData?.uid,
-      uploadedImages?.length > 0 ? uploadedImages : input
-    );
-
-    const newMessages = [...(chats[selectedUser.uid] || [])];
-
-    if (input.trim()) {
-      newMessages.push({
-        sender: "me",
-        type: "text",
-        text: input,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      });
-    }
-
-    attachments.forEach((file) => {
-      newMessages.push({
-        file: URL.createObjectURL(file.file),
-        name: file.file.name,
-        type: file.type,
-        sender: "me",
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      });
-    });
-
-    setChats((prev) => ({ ...prev, [selectedUser.uid]: newMessages }));
-    setInput("");
-    setAttachments([]);
-    setUploadedImages([]);
-  };
-
-  const handleFileChange = async (e) => {
-    const files = Array.from(e.target.files);
-    setUploadFileLoading(true);
-    try {
-      const formData = new FormData();
-      files.forEach((item) => formData.append("file", item));
-      const { data } = await axios.post("/chat/upload", formData);
-      console.log("🚀 ~ handleFileChange ~ data:", data);
-      if (data?.success) {
-        const previews = files.map((file) => ({
-          file,
-          type: file.type.startsWith("image/") ? "image" : "file",
-        }));
-        let upload = data?.data?.url;
-
-        const uploadArray = Array.isArray(upload) ? upload : [upload];
-
-        setAttachments((prev) => [...prev, ...previews]);
-        setUploadedImages(uploadArray);
-      }
-    } catch (error) {
-      ErrorToast(error.response.data.message || "Network error");
-    } finally {
-      setUploadFileLoading(false);
-    }
-  };
-
-  const removeAttachment = (index) => {
-    const updated = [...attachments];
-    updated.splice(index, 1);
-    setAttachments(updated);
-  };
-
+  // 🔹 Fetch chats
   useEffect(() => {
     if (!userData?.uid) return;
+
     const unsubscribe = getUserChatsWithDetails(
       "landlord",
       userData?.uid,
       (chats) => {
         setChatList(chats);
+        setLoading(false);
       }
     );
 
-    // return () => unsubscribe();
+    return () => unsubscribe && unsubscribe();
   }, [userData]);
-  // useEffect(() => {
-  //   if (!selectedUser?.uid) return;
 
-  //   const unsubscribe = listenToMessages(selectedUser?.uid, (msgs) => {
-  //     console.log("Messages for chat:", msgs);
-  //     // setMessages(msgs);
-  //   });
-  //   console.log("🚀 ~ Message ~ unsubscribe:", unsubscribe);
-
-  //   return () => unsubscribe(); // cleanup when chatId changes
-  // }, [selectedUser]);
-
-  // useEffect(() => {
-  //   getOrCreateChat("0RZOn1pB1PdYqWiWSf5WuhrsbmR2", tenantUid);
-  //   getUserChatsWithDetails(
-  //     "landlord",
-  //     "0RZOn1pB1PdYqWiWSf5WuhrsbmR2",
-  //     setChatList
-  //   );
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!userData?.uid) return;
-
-  //   // listen for chats where current user is a participant
-  //   const q = query(
-  //     collection(db, "chats"),
-  //     where("participants." + "landlord", "==", userData?.uid) // OR tenant, adjust for your logic
-  //     // you may need to use OR queries if user can be landlord OR tenant
-  //   );
-
-  //   const unsub = onSnapshot(q, (snapshot) => {
-  //     const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  //     const sorted = data.sort(
-  //       (a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0)
-  //     );
-  //     console.log("🚀 ~ Message ~ sorted:", sorted);
-  //     setChatList(sorted);
-  //     // setLoadingChats(false);
-  //   });
-
-  //   return () => unsub();
-  // }, [userData]);
-
+  // 🔹 Listen to messages in selected chat
   useEffect(() => {
     if (!chatId) return;
 
@@ -193,31 +60,81 @@ const Message = () => {
 
     const unsub = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
-      setSelectedMessages(msgs);
-      // setMessages(msgs);
-      // setLoading(false);
+      setMessages(msgs);
     });
 
     return () => unsub();
   }, [chatId]);
 
-  // const messagesRef = collection(db, "chats");
+  // 🔹 File Upload
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-  // onSnapshot(messagesRef, (snapshot) => {
-  //   snapshot.docs.forEach((doc) => {
-  //     console.log("🚀 ~ Message ~ doc:", doc);
-  //   });
-  // });
+    setUploadFileLoading(true);
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("file", file));
+
+      const { data } = await axios.post("/chat/upload", formData);
+
+      if (data?.success) {
+        const previews = files.map((file) => ({
+          file,
+          type: file.type.startsWith("image/") ? "image" : "file",
+        }));
+
+        const upload = data?.data?.url;
+        const uploadArray = Array.isArray(upload) ? upload : [upload];
+
+        setAttachments((prev) => [...prev, ...previews]);
+        setUploadedImages(uploadArray);
+      }
+    } catch (error) {
+      ErrorToast(error.response?.data?.message || "Failed to upload file");
+    } finally {
+      setUploadFileLoading(false);
+    }
+  };
+
+  const removeAttachment = (index) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // 🔹 Send Message
+  const handleSendMessage = async () => {
+    if (!chatId || (!input.trim() && uploadedImages.length === 0)) return;
+
+    setSendingMessageLoading(true);
+    try {
+      await sendMessage(
+        chatId,
+        userData?.uid,
+        uploadedImages.length > 0 ? uploadedImages : input
+      );
+
+      // optimistic reset
+      setInput("");
+      setAttachments([]);
+      setUploadedImages([]);
+    } catch (error) {
+      console.log("🚀 ~ handleSendMessage ~ error:", error);
+      ErrorToast("Failed to send message");
+    } finally {
+      setSendingMessageLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-[1260px] mx-auto px-6 py-10">
+      {/* Header */}
       <div className="flex items-center gap-2 mb-6">
         <button type="button" onClick={() => navigate("/app/dashboard")}>
           <FaArrowLeft size={16} />
         </button>
         <h1 className="text-2xl font-semibold">Messages</h1>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Sidebar */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -226,97 +143,97 @@ const Message = () => {
             placeholder="Search"
             className="w-full px-4 py-2 mb-4 rounded-xl border text-sm"
           />
+
           <div className="space-y-3">
-            {chatList?.map((user) => (
-              <div
-                key={user?.user?.id}
-                onClick={() => {
-                  setSelectedUser(user?.user);
-                  setChatId(user?.chatId);
-                }}
-                className={`flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all ${
-                  selectedUser.uid === user?.user?.uid
-                    ? "bg-[#E8F0FE]"
-                    : "hover:bg-gray-100"
-                }`}
-              >
-                <div className={`w-10 h-10 rounded-full ${user.color}`}>
+            {loading ? (
+              <p className="text-sm text-gray-400 text-center py-6">
+                Loading chats...
+              </p>
+            ) : chatList?.length > 0 ? (
+              chatList.map((chat) => (
+                <div
+                  key={chat?.user?.uid}
+                  onClick={() => {
+                    setSelectedUser(chat?.user);
+                    setChatId(chat?.id); // use chat.id from Firestore, not chatId if undefined
+                  }}
+                  className={`flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all ${
+                    selectedUser?.uid === chat?.user?.uid
+                      ? "bg-[#E8F0FE]"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
                   <img
-                    src={user?.user?.profilePicture}
+                    src={chat?.user?.profilePicture}
                     alt=""
                     className="w-10 h-10 rounded-full"
                   />
+                  <div className="flex-1 pt-2.5">
+                    <h4 className="text-sm font-semibold">
+                      {chat?.user?.name}
+                    </h4>
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    {chat?.timestamp ? chatTime(chat.timestamp) : ""}
+                  </span>
                 </div>
-                <div className="flex-1 pt-2.5">
-                  <h4 className="text-sm font-semibold">{user?.user?.name}</h4>
-                  {/* <p className="text-xs text-gray-600">
-                    {chats[user.id]?.[chats[user.id].length - 1]?.text?.slice(
-                      0,
-                      25
-                    ) || "No messages yet"}
-                  </p> */}
-                </div>
-                <span className="text-xs text-gray-400">
-                  {user?.timestamp ? chatTime(user.timestamp) : ""}
-                </span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-gray-400 text-center py-6">
+                No chats found
+              </p>
+            )}
           </div>
         </div>
 
         {/* Chat Window */}
         {selectedUser ? (
           <div className="col-span-2 bg-white rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-            {/* Header */}
-
+            {/* Chat Header */}
             <div className="flex items-center gap-3 border-b pb-3">
-              <div className="w-10 h-10 rounded-full">
-                <img
-                  src={selectedUser?.profilePicture}
-                  alt=""
-                  className="w-10 h-10 rounded-full object-fill"
-                />
-              </div>
+              <img
+                src={selectedUser?.profilePicture}
+                alt=""
+                className="w-10 h-10 rounded-full object-fill"
+              />
               <div>
                 <h4 className="text-sm font-semibold">{selectedUser?.name}</h4>
                 <p className="text-xs text-gray-500">Tenant</p>
               </div>
             </div>
 
+            {/* Messages */}
             <div className="py-6 space-y-6 overflow-y-auto text-sm text-gray-800 h-[500px] pr-2">
-              {/* <div className="text-center text-xs text-gray-400">Today</div> */}
-
-              {selectedMessages.map((msg, idx) => (
+              {messages.map((msg) => (
                 <div
-                  key={idx}
+                  key={msg.id}
                   className={`flex flex-col ${
                     msg.senderId === userData?.uid ? "items-end" : "items-start"
                   }`}
                 >
                   {Array.isArray(msg.text) ? (
                     <div className="flex gap-2 flex-wrap">
-                      {msg.text.map((item, index) => (
+                      {msg.text.map((url, index) => (
                         <img
                           key={index}
-                          src={item}
+                          src={url}
                           alt="attachment"
-                          onClick={() => window.open(item, "_blank")}
+                          onClick={() => window.open(url, "_blank")}
                           className="w-32 h-32 object-cover rounded-xl shadow"
                         />
                       ))}
                     </div>
                   ) : (
                     <div
-                      className={`${
+                      className={`px-4 py-2 rounded-xl max-w-xs ${
                         msg.senderId === userData?.uid
-                          ? "items-end bg-blue-700 text-white"
-                          : "items-start bg-gray-300 text-black"
-                      } px-4 py-2 rounded-xl max-w-xs`}
+                          ? "bg-blue-700 text-white"
+                          : "bg-gray-300 text-black"
+                      }`}
                     >
                       {msg.text}
                     </div>
                   )}
-
                   <span className="text-xs text-gray-400 mt-1">
                     {msg?.timestamp ? chatTime(msg.timestamp) : ""}
                   </span>
@@ -342,7 +259,7 @@ const Message = () => {
                     )}
                     <button
                       onClick={() => removeAttachment(idx)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-[2px] text-xs"
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-[2px]"
                     >
                       <FaTimes size={10} />
                     </button>
@@ -354,16 +271,15 @@ const Message = () => {
             {/* Chat Input */}
             <div className="flex items-center gap-3 pt-4 border-t">
               {uploadFileLoading ? (
-                <div className="flex items-center justify-center">
-                  <RiLoader3Fill
-                    size={20}
-                    className="animate-spin text-blue-600"
-                  />
-                </div>
+                <RiLoader3Fill
+                  size={20}
+                  className="animate-spin text-blue-600"
+                />
               ) : (
                 <button
                   className="bg-blue-600 text-white rounded-full p-2"
                   onClick={() => fileInputRef.current.click()}
+                  disabled={sendingMessageLoading}
                 >
                   <MdAttachFile size={16} />
                 </button>
@@ -377,7 +293,7 @@ const Message = () => {
                 className="hidden"
               />
               <input
-                disabled={uploadedImages.length > 0}
+                disabled={uploadedImages.length > 0 || sendingMessageLoading}
                 type="text"
                 placeholder="Type Here..."
                 className="flex-1 px-4 py-2 rounded-full border text-sm"
@@ -385,14 +301,22 @@ const Message = () => {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
               />
-              <button className="text-blue-600" onClick={handleSendMessage}>
-                <IoSend size={24} />
+              <button
+                className="text-blue-600"
+                onClick={handleSendMessage}
+                disabled={sendingMessageLoading}
+              >
+                {sendingMessageLoading ? (
+                  <RiLoader3Fill size={20} className="animate-spin" />
+                ) : (
+                  <IoSend size={24} />
+                )}
               </button>
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-end w-full">
-            <div className=" ">No chat selected</div>
+          <div className="flex items-center justify-center col-span-2">
+            <p className="text-gray-500">Select a chat to start messaging</p>
           </div>
         )}
       </div>

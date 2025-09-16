@@ -18,10 +18,15 @@ const Uploaddeduction = () => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [propertyMedia, setPropertyMedia] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleUploadPropertyimage = (e) => {
     const files = Array.from(e.target.files);
     const images = files.filter((file) => file.type.startsWith("image/"));
+    if (images.length > 5) {
+      ErrorToast("You can upload up to 5 images only.");
+      return; // Exit early if the limit is exceeded
+    }
     setPropertyMedia((prev) => [...prev, ...images]);
   };
 
@@ -51,6 +56,7 @@ const Uploaddeduction = () => {
     });
 
     try {
+      setLoading(true);
       const response = await axios.post(`/deposits/${depositId}`, formData);
       if (response.status === 200) {
         console.log("✅ Success:", response.data);
@@ -64,6 +70,8 @@ const Uploaddeduction = () => {
     } catch (err) {
       ErrorToast(err.response.data.message);
       console.error("❌ Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -192,10 +200,11 @@ const Uploaddeduction = () => {
           {/* Upload Button */}
           <div className="pt-4 justify-center flex">
             <button
+              disabled={loading}
               onClick={handleDepositSubmit}
               className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white py-2 px-36 rounded-full"
             >
-              Upload
+              {loading ? "Uploading... " : "Upload"}
             </button>
           </div>
         </div>

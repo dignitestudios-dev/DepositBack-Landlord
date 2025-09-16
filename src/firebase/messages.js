@@ -1,5 +1,5 @@
 import { onMessage } from "firebase/messaging";
-import { auth, db, messaging } from "./firebase";
+import { db, messaging } from "./firebase";
 import {
   addDoc,
   collection,
@@ -20,28 +20,27 @@ export const onMessageListener = () =>
     });
   });
 
-export async function getUserChatsWithDetails(currentRole, userId, callback) {
+export function getUserChatsWithDetails(currentRole, userId, callback) {
   if (!userId) {
     callback([]);
-    return;
+    return () => {}; // safe unsubscribe fallback
   }
 
   const chatsRef = collection(db, "chats");
   const q = query(
     chatsRef,
     where(`participants.${currentRole}`, "==", userId)
-    // orderBy("timestamp", "asc")
+    // orderBy("timestamp", "asc"
   );
 
+  // Return unsubscribe function
   return onSnapshot(q, async (snapshot) => {
     const chatList = await Promise.all(
       snapshot.docs.map(async (chatDoc) => {
         let chatData = { id: chatDoc.id, ...chatDoc.data() };
         const participants = chatData.participants || {};
 
-        // Example: if currentRole is tenant, otherRole = landlord
         const otherRole = currentRole === "tenant" ? "landlord" : "tenant";
-
         const otherUserId = participants[otherRole];
 
         if (otherUserId) {
@@ -50,7 +49,6 @@ export async function getUserChatsWithDetails(currentRole, userId, callback) {
 
           if (otherUserSnap.exists()) {
             const userDoc = otherUserSnap.data();
-
             const roleData = (userDoc.roles || {})[otherRole];
 
             if (roleData) {

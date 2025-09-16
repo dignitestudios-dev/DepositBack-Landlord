@@ -1,7 +1,6 @@
 import React, { Fragment, useMemo, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router";
-import invoice from "../../assets/invoice.png";
 import { useLocation } from "react-router";
 import { TiWarning } from "react-icons/ti";
 import { IoMdCheckmark } from "react-icons/io";
@@ -14,20 +13,24 @@ const Deposittracker = () => {
   const navigate = useNavigate("");
   const location = useLocation();
   const depositId = location.state?.depositId || false;
+  const [deductionID, setDeductionID] = useState(false);
+  const [update, setUpdate] = useState(false);
 
   const [isReleasing, setIsReleasing] = React.useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const [depostreleasedpopup, setDepostreleasedpopup] = useState(false);
   const [releaseLoading, setReleaseLoading] = useState(false);
+  const [removeLoading, setRemoveLoading] = useState(false);
+
   const currentDate = useMemo(() => new Date().toISOString(), []);
 
-  const uploaded = false;
-
-  const { data, loading, pagination } = useFetchData(
+  const { data, loading } = useFetchData(
     depositId ? `/deposits/${depositId}` : null,
     { currentDate },
     1,
-    ""
+    update
   );
 
   // const deductionData = {
@@ -55,6 +58,21 @@ const Deposittracker = () => {
       ErrorToast(error?.response?.data?.message);
     } finally {
       setReleaseLoading(false);
+    }
+  };
+
+  const handleRemoveDeduction = async () => {
+    try {
+      setRemoveLoading(true);
+      const response = await axios.delete(`/deposits/${deductionID}`);
+      if (response.status === 200) {
+        setShowConfirm(false);
+        setUpdate((prev) => !prev);
+      }
+    } catch (error) {
+      ErrorToast(error.response.data.message);
+    } finally {
+      setRemoveLoading(false);
     }
   };
 
@@ -231,7 +249,16 @@ const Deposittracker = () => {
                           <span className="text-red-600">${item.amount}</span>
                         </span>
 
-                        <div className="flex justify-end">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setShowConfirm(true);
+                              setDeductionID(item?._id);
+                            }}
+                            className="font-[500] text-[14px] underline text-red-600"
+                          >
+                            Remove
+                          </button>
                           <button
                             onClick={() =>
                               navigate("/app/receipts-and-deductions", {
@@ -263,6 +290,38 @@ const Deposittracker = () => {
             </>
           )}
         </>
+      )}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
+            <div className="bg-[#FF3B30] text-[#fff] p-6 w-fit mx-auto rounded-full mb-3">
+              <TiWarning size={40} />
+            </div>
+            <h2 className="font-semibold text-[20px] mb-2 text-black">
+              Remove Deduction?
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to remove this deduction?
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                className="px-[4em] py-2 text-sm text-slate-600 bg-gray-200 rounded-full w-[160px]"
+                onClick={() => setShowConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                disabled={removeLoading}
+                onClick={() => {
+                  handleRemoveDeduction();
+                }}
+                className=" py-2 text-center  text-sm bg-[#FF3B30] text-white rounded-full w-[160px]"
+              >
+                {removeLoading ? "Processing" : "Yes"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
