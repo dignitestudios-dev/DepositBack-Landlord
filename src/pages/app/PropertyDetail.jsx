@@ -13,6 +13,7 @@ import ImageGallery from "../../components/app/ImageGallery";
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster";
 import axios from "../../axios";
 import { TiWarning } from "react-icons/ti";
+import DeleteModal from "../../components/app/propertyDetail/DeleteModal";
 
 const PropertyDetail = () => {
   const navigate = useNavigate("");
@@ -303,7 +304,7 @@ const PropertyDetail = () => {
                   <li key={i} className="pt-2 pb-2">
                     {person.name}{" "}
                     <div className="flex items-center gap-3">
-                      <FaPhoneAlt color="#003897" size={12} /> {person.phone}
+                      <FaPhoneAlt color="#003897" size={12} /> +1 {person.phone}
                     </div>
                   </li>
                 ))
@@ -496,15 +497,15 @@ const PropertyDetail = () => {
         </div>
       </div>
       {isDelete && (
-        <Modal
+        <DeleteModal
           isOpen={isDelete}
           onClose={() => setIsDelete(false)}
           onAction={() => {
             handleDelete();
           }}
           data={{
-            title: "Are You Sure",
-            description: "You won't able to revert changes.",
+            title: "Delete Property",
+            description: "Are you sure you want to delete this property?",
             iconBgColor: "bg-red-600",
             actionText: "Delete",
           }}

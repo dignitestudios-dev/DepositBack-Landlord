@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { FaArrowLeft, FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router";
 
@@ -6,8 +6,10 @@ import EditProfileModal from "../../components/app/EditProfileModal";
 import { useFetchData } from "../../hooks/api/Get";
 import ProfileSkeleton from "../../components/app/ProfileSkeleton";
 import logomain from "../../assets/logomain.webp";
+import { AppContext } from "../../context/AppContext";
 
 const ViewProfile = () => {
+  const { userData } = useContext(AppContext);
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -21,7 +23,10 @@ const ViewProfile = () => {
     }
   };
 
+
   const { data, loading } = useFetchData(`/users/me`, {}, 1, update);
+  const { data: reviews, loading: loadingReviews } = useFetchData(`/reviews`, { landlordId: userData?._id }, 1, update);
+  console.log("🚀 ~ ViewProfile ~ reviews:", reviews);
 
   return (
     <div className="min-h-screen bg-[#F6FAFF] text-[#333]">
@@ -130,21 +135,65 @@ const ViewProfile = () => {
             </div>
 
             {/* Reviews */}
-            <div className="bg-[#fff] p-0 rounded-xl border">
+            {/* Reviews */}
+            <div className="bg-[#fff] p-0 rounded-xl border overflow-auto">
               <h4 className="text-[24px] font-[600] mb-4 border-b-2 pl-6 pt-3 pb-3">
                 Reviews
               </h4>
-
-              {data?.ratingCount > 0 ? (
-                <div className="pl-6 pt-3 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-500 text-lg">★★★★★</span>
-                    <span className="text-sm font-semibold ml-2">
-                      {data?.avgRating || 0} ({data?.ratingCount} reviews)
-                    </span>
+              {reviews?.reviewSummary?.totalReviews > 0 ? (
+                <>
+                  <div className="pl-6 pb-3">
+                    <div className="flex-col items-center gap-2 border-b-[1px] pb-2 ">
+                      <p className="font-semibold">Customer Reviews</p>
+                      <span className="text-yellow-500 text-lg">
+                        {"★★★★★".slice(0, reviews?.reviewSummary.avgRating)}
+                      </span>
+                      <span className="text-sm font-semibold ml-2">
+                        {reviews?.reviewSummary.avgRating || 0} (
+                        {reviews?.reviewSummary.totalReviews} reviews)
+                      </span>
+                    </div>
+                    
                   </div>
-                  {/* you can map actual reviews list when backend sends */}
-                </div>
+
+                  
+                  {/* Display each review */}
+                  <div className="pl-6  pb-3">
+                    {reviews?.reviews?.map((review) => (
+                      <div
+                        key={review._id}
+                        className="flex gap-4 mb-4 border-b-[1px] pb-4"
+                      >
+                        <img
+                          src={review.tenantProfilePicture || logomain}
+                          alt={review.tenantName}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-gray-800">
+                              {review.tenantName || "Anonymous"}
+                            </p>
+                            {review.isAnonymous && (
+                              <span className="text-xs text-gray-400">(Anonymous)</span>
+                            )}
+                            <div className="flex items-center gap-1 ">
+                            <span className="text-yellow-500 text-lg">
+                              {"★★★★★".slice(0, review.rating)}
+                            </span>
+                            {/* <span className="text-xs text-gray-500">
+                              {review.rating} 
+                            </span> */}
+                          </div>
+                          </div>
+                                                                            <p className=" text-gray-700">{review.comment}</p>
+
+                        </div>
+
+                      </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <p className="text-gray-500 pl-6 py-4">No reviews yet</p>
               )}

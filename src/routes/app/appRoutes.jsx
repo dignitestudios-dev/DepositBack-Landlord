@@ -3,6 +3,7 @@ import Dashboard from "../../pages/app/Dashboard";
 import Deposittracker from "../../pages/app/Deposittracker";
 import Documents from "../../pages/app/Documents";
 import Inspection from "../../pages/app/Inspection";
+import LandlordProfile from "../../pages/app/LandlordProfile";
 import Message from "../../pages/app/Message";
 import Notifications from "../../pages/app/Notifications";
 import Paymentmethodplan from "../../pages/app/Paymentmethodplan";
@@ -142,6 +143,12 @@ export const appRoutes = [
     url: "view-profile",
     page: <Viewprofile />,
     name: "View profile",
+    isPublic: true,
+  },
+   {
+    url: "landlord-profile",
+    page: <LandlordProfile />,
+    name: "Landlord Profile",
     isPublic: true,
   },
   {
