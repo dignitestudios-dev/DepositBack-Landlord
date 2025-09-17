@@ -28,7 +28,6 @@ const Documents = () => {
     tenantAgreements = [],
   } = location.state || {};
 
-  console.log("🚀 ~ Documents ~ landlordAgreements:", landlordAgreements);
   const landlordTabs = ["Agreements", "Property Conditions", "Rules"];
   const tenantTabs = ["Agreements", "Repairs"];
   const [activePopup, setActivePopup] = useState(null); // track which popup is open

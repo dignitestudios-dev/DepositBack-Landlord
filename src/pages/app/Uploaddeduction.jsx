@@ -1,57 +1,121 @@
-import React, { useState } from "react";
-import Header from "../../components/global/Header";
-import Footer from "../../components/global/Footer";
+import { useReducer, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { createPortal } from "react-dom";
+
 import { useLocation, useNavigate } from "react-router";
 import axios from "../../axios";
 import { ErrorToast } from "../../components/global/Toaster";
 
-const Uploaddeduction = () => {
-  const [showPopup, setShowPopup] = useState(false);
-  const navigate = useNavigate("");
+const initialState = {
+  title: "",
+  amount: "",
+  description: "",
+  propertyMedia: [],
+  errors: {},
+};
 
+function reducer(state, action) {
+  switch (action.type) {
+    case "SET_FIELD":
+      return {
+        ...state,
+        [action.field]: action.value,
+        errors: { ...state.errors, [action.field]: "" }, // clear error on change
+      };
+
+    case "ADD_MEDIA":
+      return {
+        ...state,
+        propertyMedia: [...state.propertyMedia, ...action.files],
+      };
+
+    case "REMOVE_MEDIA":
+      return {
+        ...state,
+        propertyMedia: state.propertyMedia.filter(
+          (_, idx) => idx !== action.index
+        ),
+      };
+
+    case "SET_ERRORS":
+      return { ...state, errors: action.errors };
+
+    case "RESET":
+      return initialState;
+
+    default:
+      return state;
+  }
+}
+
+function validateForm(state) {
+  let errors = {};
+
+  if (!state.title.trim()) {
+    errors.title = "Title is required";
+  }
+
+  if (!state.amount || Number(state.amount) <= 0) {
+    errors.amount = "Amount must be a positive number";
+  }
+
+  if (!state.description.trim()) {
+    errors.description = "Description is required";
+  }
+
+  if (state.propertyMedia.length === 0) {
+    errors.propertyMedia = "At least one file is required";
+  }
+
+  return errors;
+}
+
+const Uploaddeduction = () => {
+  const navigate = useNavigate("");
   const location = useLocation();
   const depositId = location.state?.depositId || false;
 
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [propertyMedia, setPropertyMedia] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const handleUploadPropertyimage = (e) => {
-    const files = Array.from(e.target.files);
-    const images = files.filter((file) => file.type.startsWith("image/"));
-    if (images.length > 5) {
-      ErrorToast("You can upload up to 5 images only.");
-      return; // Exit early if the limit is exceeded
-    }
-    setPropertyMedia((prev) => [...prev, ...images]);
-  };
+  // const handleUploadPropertyimage = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   const images = files.filter((file) => file.type.startsWith("image/"));
+  //   if (images.length > 5) {
+  //     ErrorToast("You can upload up to 5 images only.");
+  //     return; // Exit early if the limit is exceeded
+  //   }
+  //   setPropertyMedia((prev) => [...prev, ...images]);
+  // };
 
-  const removeMedias = (index) => {
-    setPropertyMedia((prev) => prev.filter((_, i) => i !== index));
-  };
+  // const removeMedias = (index) => {
+  //   setPropertyMedia((prev) => prev.filter((_, i) => i !== index));
+  // };
 
-  const handleUploadClick = () => {
-    setShowPopup(true);
-    setTimeout(() => {
-      setShowPopup(false);
-      navigate("/app/deposit-tracker", { state: { uploaded: true } });
-    }, 2000);
-  };
+  // const handleUploadClick = () => {
+  //   setShowPopup(true);
+  //   setTimeout(() => {
+  //     setShowPopup(false);
+  //     navigate("/app/deposit-tracker", { state: { uploaded: true } });
+  //   }, 2000);
+  // };
 
   const handleDepositSubmit = async (e) => {
     e.preventDefault();
+    const errors = validateForm(state);
+
+    if (Object.keys(errors).length > 0) {
+      dispatch({ type: "SET_ERRORS", errors });
+      return;
+    }
 
     const formData = new FormData();
-    formData.append("amount", amount);
-    formData.append("title", title);
-    formData.append("description", description);
+    formData.append("amount", state.amount);
+    formData.append("title", state.title);
+    formData.append("description", state.description);
     formData.append("date", new Date().toLocaleString());
 
-    propertyMedia.forEach((file) => {
+    state.propertyMedia.forEach((file) => {
       formData.append("invoices", file); // multiple files with same key
     });
 
@@ -59,8 +123,6 @@ const Uploaddeduction = () => {
       setLoading(true);
       const response = await axios.post(`/deposits/${depositId}`, formData);
       if (response.status === 200) {
-        console.log("✅ Success:", response.data);
-
         setShowPopup(true);
         setTimeout(() => {
           setShowPopup(false);
@@ -69,7 +131,6 @@ const Uploaddeduction = () => {
       }
     } catch (err) {
       ErrorToast(err.response.data.message);
-      console.error("❌ Error:", err);
     } finally {
       setLoading(false);
     }
@@ -101,9 +162,20 @@ const Uploaddeduction = () => {
                 type="text"
                 placeholder="Place holder goes here"
                 className="border px-4 py-2 rounded-full w-full"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={state.title}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_FIELD",
+                    field: "title",
+                    value: e.target.value,
+                  })
+                }
               />
+              {state.errors.title && (
+                <p className="text-red-500 text-xs mt-1">
+                  {state.errors.title}
+                </p>
+              )}
             </div>
             {/* <div>
               <label className="block mb-1 text-sm font-medium">Date</label>
@@ -116,12 +188,28 @@ const Uploaddeduction = () => {
                 Deduction Amount
               </label>
               <input
-                type="number"
+                type="text"
                 placeholder="Place holder goes here"
                 className="border px-4 py-2 rounded-full w-full"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                value={state.amount}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const regex = /^[0-9]*\.?[0-9]*$/;
+
+                  if (value === "" || regex.test(value)) {
+                    dispatch({
+                      type: "SET_FIELD",
+                      field: "amount",
+                      value,
+                    });
+                  }
+                }}
               />
+              {state.errors.amount && (
+                <p className="text-red-500 text-xs mt-1">
+                  {state.errors.amount}
+                </p>
+              )}
             </div>
           </div>
 
@@ -134,9 +222,20 @@ const Uploaddeduction = () => {
               placeholder="Place holder goes here"
               rows={4}
               className="w-full border px-4 py-2 rounded-3xl resize-none"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={state.description}
+              onChange={(e) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  field: "description",
+                  value: e.target.value,
+                })
+              }
             ></textarea>
+            {state.errors.description && (
+              <p className="text-red-500 text-xs mt-1">
+                {state.errors.description}
+              </p>
+            )}
           </div>
 
           {/* Upload Image */}
@@ -149,7 +248,7 @@ const Uploaddeduction = () => {
               className="bg-white border border-dashed border-gray-400 rounded-xl p-10 text-center text-sm text-gray-600 cursor-pointer"
             >
               <p className="font-semibold">Upload “Property Images”</p>
-              <p className="text-xs text-gray-400 mt-1">Upto 20mbps JPG, PNG</p>
+              <p className="text-xs text-gray-400 mt-1">Upto 20mb JPG, PNG</p>
             </div>
 
             <input
@@ -157,14 +256,24 @@ const Uploaddeduction = () => {
               id="fileUpload"
               accept="image/*"
               multiple
-              onChange={handleUploadPropertyimage}
+              onChange={(e) =>
+                dispatch({
+                  type: "ADD_MEDIA",
+                  files: Array.from(e.target.files),
+                })
+              }
               className="hidden"
             />
 
-            {/* Preview */}
-            {propertyMedia.length > 0 && (
+            {state.errors.propertyMedia && (
+              <p className="text-red-500 text-xs mt-1">
+                {state.errors.propertyMedia}
+              </p>
+            )}
+
+            {state.propertyMedia.length > 0 && (
               <div className="flex flex-wrap gap-4 mt-4">
-                {propertyMedia.map((file, index) => (
+                {state.propertyMedia.map((file, index) => (
                   <div
                     key={index}
                     className="relative w-28 h-28 rounded overflow-hidden border"
@@ -177,7 +286,7 @@ const Uploaddeduction = () => {
                     <button
                       type="button"
                       className="absolute top-1 right-1 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center"
-                      onClick={() => removeMedias(index)}
+                      onClick={() => dispatch({ type: "REMOVE_MEDIA", index })}
                     >
                       ✕
                     </button>

@@ -21,13 +21,10 @@ const Inspection = () => {
     tenant,
   } = location.state || {};
 
-  console.log("🚀 ~ Inspection ~ allowedDocs:--> ", allowedDocs);
   const [viewMode, setViewMode] = useState("Move In");
   const [previewItem, setPreviewItem] = useState(null);
-  const [unlockedIndexes, setUnlockedIndexes] = useState([]);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showAcceptedModal, setShowAcceptedModal] = useState(false);
-  const [targetIndex, setTargetIndex] = useState(null);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showAllVideos, setShowAllVideos] = useState(false);
   const [viewingOnly, setViewingOnly] = useState(""); // '' | 'photos' | 'videos'
@@ -35,7 +32,6 @@ const Inspection = () => {
   const [reqLoading, setReqLoading] = useState(false);
 
   const handleRequestAccess = (index, src) => {
-    setTargetIndex(index);
     setDocType(src.fileKey);
     setShowRequestModal(true);
   };
@@ -69,11 +65,15 @@ const Inspection = () => {
       handleWatchedDoc();
     }
   }, [allowedDocs]);
+
   const handleWatchedDoc = async () => {
     try {
-      const response = await axios.post(`/requests/docs/watch/${propertyId}`, {
+      const response = await axios.put(`/requests/docs/watch/${propertyId}`, {
         documents: [allowedDocs[0]],
       });
+      if (response.status === 200) {
+        console.log(response.status);
+      }
     } catch (error) {
       console.log("🚀 ~ handleSendRequest ~ error:", error);
       ErrorToast(error?.response?.data?.message);
@@ -231,7 +231,7 @@ const Inspection = () => {
                         //   isUnlocked(idx) && setPreviewItem({ type: "video", src })
                         // }
                       >
-                        <img
+                        <video
                           src={src?.fileUrl}
                           alt={`Video ${idx}`}
                           className={`w-full h-[150px] object-cover ${
@@ -266,96 +266,19 @@ const Inspection = () => {
                   </div>
                 </div>
               )}
-
-              {/* Preview Modal */}
-              {previewItem && (
-                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-                  <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md p-4 relative">
-                    <button
-                      className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black"
-                      onClick={() => setPreviewItem(null)}
-                    >
-                      ✕
-                    </button>
-                    <p className="text-sm font-semibold mb-2">Preview</p>
-                    {previewItem.type === "image" ? (
-                      <img
-                        src={previewItem.src}
-                        className="w-full h-auto rounded-md mb-4"
-                        alt="Preview"
-                      />
-                    ) : (
-                      <video
-                        controls
-                        src={previewItem.src}
-                        className="w-full rounded-md mb-4"
-                      />
-                    )}
-                    <h3 className="font-semibold text-sm mb-2">
-                      Title Goes Here
-                    </h3>
-                    <p className="text-xs text-gray-600">
-                      This file has been unlocked and is now available for
-                      viewing.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Request Modal */}
-              {showRequestModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-                  <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
-                    <div className="bg-[#FF3B30] text-[#fff] p-6 w-fit mx-auto rounded-full mb-3">
-                      <TiWarning size={40} />
-                    </div>
-                    <h2 className="font-semibold text-[20px] mb-2">
-                      Request Tenant Files
-                    </h2>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Would you like to request photos, videos, or documents
-                      from the tenant for review?
-                    </p>
-                    <div className="flex justify-center gap-3">
-                      <button
-                        className="px-8 py-2 text-sm bg-gray-200 rounded-full"
-                        onClick={() => setShowRequestModal(false)}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        disabled={reqLoading}
-                        className="px-8 py-2 text-sm bg-[#FF3B30] text-white rounded-full"
-                        onClick={handleSendRequest}
-                      >
-                        {reqLoading ? "Requesting..." : "Send Request"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Accepted Modal */}
-              {showAcceptedModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-                  <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
-                    <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white p-6 w-fit mx-auto rounded-full mb-3">
-                      <FaCheck size={30} />
-                    </div>
-                    <h2 className="font-semibold text-lg mb-1">
-                      Request Accepted!
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                      The tenant has accepted your request and now you have
-                      access to view this file.
-                    </p>
-                  </div>
-                </div>
-              )}
             </>
           )}
 
-          {viewMode === "Move Out" && <Moveout />}
+          {viewMode === "Move Out" && (
+            <Moveout
+              tenantMoveOutImages={tenantMoveOutImages}
+              tenantMoveOutVideos={tenantMoveOutVideos}
+              allowedDocs={allowedDocs}
+              handleRequestAccess={handleRequestAccess}
+              handleSendRequest={handleSendRequest}
+              reqLoading={reqLoading}
+            />
+          )}
         </>
       ) : (
         <div className="w-full ">
@@ -372,6 +295,86 @@ const Inspection = () => {
             <p className="capitalize text-sm">
               Currently no documents available for this property because the
               property is currently inactive.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewItem && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md p-4 relative">
+            <button
+              className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black"
+              onClick={() => setPreviewItem(null)}
+            >
+              ✕
+            </button>
+            <p className="text-sm font-semibold mb-2">Preview</p>
+            {previewItem.type === "image" ? (
+              <img
+                src={previewItem.src}
+                className="w-full h-auto rounded-md mb-4"
+                alt="Preview"
+              />
+            ) : (
+              <video
+                controls
+                src={previewItem.src}
+                className="w-full rounded-md mb-4"
+              />
+            )}
+            <h3 className="font-semibold text-sm mb-2">Title Goes Here</h3>
+            <p className="text-xs text-gray-600">
+              This file has been unlocked and is now available for viewing.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Request Modal */}
+      {showRequestModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
+            <div className="bg-[#FF3B30] text-[#fff] p-6 w-fit mx-auto rounded-full mb-3">
+              <TiWarning size={40} />
+            </div>
+            <h2 className="font-semibold text-[20px] mb-2">
+              Request Tenant Files
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Would you like to request photos, videos, or documents from the
+              tenant for review?
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                className="px-8 py-2 text-sm bg-gray-200 rounded-full w-[160px]"
+                onClick={() => setShowRequestModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                disabled={reqLoading}
+                className="px-8 py-2 text-sm bg-[#FF3B30] text-white rounded-full w-[160px]"
+                onClick={handleSendRequest}
+              >
+                {reqLoading ? "Requesting..." : "Send Request"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Accepted Modal */}
+      {showAcceptedModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
+            <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white p-6 w-fit mx-auto rounded-full mb-3">
+              <FaCheck size={30} />
+            </div>
+            <h2 className="font-semibold text-lg mb-1">Request Send!</h2>
+            <p className="text-sm text-gray-600">
+              Your request has been sent to tenant
             </p>
           </div>
         </div>
