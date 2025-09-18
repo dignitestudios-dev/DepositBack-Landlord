@@ -7,7 +7,7 @@ const languages = ["English", "Spanish"];
 
 const Language = () => {
   // State to control the popup visibility
-  const [language, setLanguage] = useState(false);
+
   const [showPopup, setShowPopup] = useState(false);
 
   const { i18n } = useTranslation();

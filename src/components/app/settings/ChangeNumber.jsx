@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { FaTimes, FaCheck } from 'react-icons/fa';
+import React, { useState } from "react";
+import { FaTimes, FaCheck } from "react-icons/fa";
 
 const ChangeNumber = () => {
-  const [phone, setPhone] = useState(''); // State to hold the phone number
+  const [phone, setPhone] = useState(""); // State to hold the phone number
   const [changenumber, setChangenumber] = useState(false); // State to control the popup visibility
 
   return (
@@ -17,7 +17,11 @@ const ChangeNumber = () => {
         </span>
         <div className="flex gap-[10px] justify-center items-center">
           <div className="bg-[#ECECEC] rounded-full p-3 pl-[13px] pr-[13px] flex items-center justify-center gap-3">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg" className="h-5 w-[2.1em]" alt="USA Flag" />
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg"
+              className="h-5 w-[2.1em]"
+              alt="USA Flag"
+            />
             <p>+1</p>
           </div>
           <input

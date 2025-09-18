@@ -37,13 +37,10 @@ const PropertyDetail = () => {
 
   const { data: propertyDetail, loading: loader } = useFetchData(
     `/properties/${id}`,
-    {
-      currentDate,
-    },
+    { currentDate },
     1,
     update
   );
-  console.log("🚀 ~ PropertyDetail ~ propertyDetail:", propertyDetail);
 
   const handleLeaseStartChange = (e) => {
     const value = e.target.value;

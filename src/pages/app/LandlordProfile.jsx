@@ -29,51 +29,64 @@ const LandlordProfile = () => {
 
           {/* Profile Card with Personal Details */}
           <div className="bg-white p-8 rounded-2xl mb-6  mx-auto">
-  <div className="flex flex-col items-center gap-4 mb-6">
-    {/* Profile Image and Name */}
-    <div className="flex flex-col items-center gap-4">
-      <img
-        src={data?.profilePicture || logomain}
-        alt="Profile"
-        className="w-[8em] h-[8em] rounded-full object-cover shadow-md"
-      />
-      <div className="text-center">
-        <h3 className="text-2xl font-semibold text-gray-800">{data?.name || "N/A"}</h3>
-        <p className="text-sm text-gray-500">{data?.email || "N/A"}</p>
-      </div>
-    </div>
-  </div>
+            <div className="flex flex-col items-center gap-4 mb-6">
+              {/* Profile Image and Name */}
+              <div className="flex flex-col items-center gap-4">
+                <img
+                  src={data?.profilePicture || logomain}
+                  alt="Profile"
+                  className="w-[8em] h-[8em] rounded-full object-cover shadow-md"
+                />
+                <div className="text-center">
+                  <h3 className="text-2xl font-semibold text-gray-800">
+                    {data?.name || "N/A"}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {data?.email || "N/A"}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-  {/* Personal Details */}
-  <div className="mt-6">
-    <h4 className="text-[24px] font-semibold text-gray-800 mb-4">Personal Details</h4>
+            {/* Personal Details */}
+            <div className="mt-6">
+              <h4 className="text-[24px] font-semibold text-gray-800 mb-4">
+                Personal Details
+              </h4>
 
-    {/* Full Name */}
-    <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
-      <p className="text-sm text-gray-500">Full Name</p>
-      <p className="font-medium text-gray-800">{data?.name || "N/A"}</p>
-    </div>
+              {/* Full Name */}
+              <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
+                <p className="text-sm text-gray-500">Full Name</p>
+                <p className="font-medium text-gray-800">
+                  {data?.name || "N/A"}
+                </p>
+              </div>
 
-    {/* Email */}
-    <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
-      <p className="text-sm text-gray-500">Email Address</p>
-      <p className="font-medium text-gray-800">{data?.email || "N/A"}</p>
-    </div>
+              {/* Email */}
+              <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
+                <p className="text-sm text-gray-500">Email Address</p>
+                <p className="font-medium text-gray-800">
+                  {data?.email || "N/A"}
+                </p>
+              </div>
 
-    {/* Emergency Contact */}
-    <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
-      <p className="text-sm text-gray-500">Emergency Contact</p>
-      <p className="font-medium text-gray-800">{data?.phoneNo || "N/A"}</p>
-    </div>
+              {/* Emergency Contact */}
+              <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
+                <p className="text-sm text-gray-500">Emergency Contact</p>
+                <p className="font-medium text-gray-800">
+                  {data?.phoneNo || "N/A"}
+                </p>
+              </div>
 
-    {/* SSN */}
-    <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
-      <p className="text-sm text-gray-500">Last Four Digits of SSN</p>
-      <p className="font-medium text-gray-800">{data?.lastFourSSN || "XXXX"}</p>
-    </div>
-  </div>
-</div>
-
+              {/* SSN */}
+              <div className="mb-4 border-b-[1px] border-gray-200 pb-3">
+                <p className="text-sm text-gray-500">Last Four Digits of SSN</p>
+                <p className="font-medium text-gray-800">
+                  {data?.lastFourSSN || "XXXX"}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Reviews */}
           <div className="bg-[#fff] p-0 rounded-xl border mt-6">

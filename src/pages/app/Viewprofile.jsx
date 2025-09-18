@@ -1,4 +1,4 @@
-import React, { useState,useContext } from "react";
+import React, { useState, useContext } from "react";
 import { FaArrowLeft, FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router";
 
@@ -7,6 +7,7 @@ import { useFetchData } from "../../hooks/api/Get";
 import ProfileSkeleton from "../../components/app/ProfileSkeleton";
 import logomain from "../../assets/logomain.webp";
 import { AppContext } from "../../context/AppContext";
+import { phoneFormatter } from "../../lib/helpers";
 
 const ViewProfile = () => {
   const { userData } = useContext(AppContext);
@@ -23,9 +24,13 @@ const ViewProfile = () => {
     }
   };
 
-
   const { data, loading } = useFetchData(`/users/me`, {}, 1, update);
-  const { data: reviews, loading: loadingReviews } = useFetchData(`/reviews`, { landlordId: userData?._id }, 1, update);
+  const { data: reviews, loading: loadingReviews } = useFetchData(
+    `/reviews`,
+    { landlordId: userData?._id },
+    1,
+    update
+  );
   console.log("🚀 ~ ViewProfile ~ reviews:", reviews);
 
   return (
@@ -90,7 +95,9 @@ const ViewProfile = () => {
                 {/* Phone */}
                 <div className="mb-4 border-b-[1px] pl-6 pt-3 pb-3">
                   <p className="text-sm text-gray-500">Emergency Contact</p>
-                  <p className="font-medium">{data?.phoneNo || "N/A"}</p>
+                  <p className="font-medium">
+                    +1 {phoneFormatter(data?.emergencyContact) || "N/A"}
+                  </p>
                 </div>
 
                 {/* SSN */}
@@ -153,10 +160,8 @@ const ViewProfile = () => {
                         {reviews?.reviewSummary.totalReviews} reviews)
                       </span>
                     </div>
-                    
                   </div>
 
-                  
                   {/* Display each review */}
                   <div className="pl-6  pb-3">
                     {reviews?.reviews?.map((review) => (
@@ -175,21 +180,21 @@ const ViewProfile = () => {
                               {review.tenantName || "Anonymous"}
                             </p>
                             {review.isAnonymous && (
-                              <span className="text-xs text-gray-400">(Anonymous)</span>
+                              <span className="text-xs text-gray-400">
+                                (Anonymous)
+                              </span>
                             )}
                             <div className="flex items-center gap-1 ">
-                            <span className="text-yellow-500 text-lg">
-                              {"★★★★★".slice(0, review.rating)}
-                            </span>
-                            {/* <span className="text-xs text-gray-500">
+                              <span className="text-yellow-500 text-lg">
+                                {"★★★★★".slice(0, review.rating)}
+                              </span>
+                              {/* <span className="text-xs text-gray-500">
                               {review.rating} 
                             </span> */}
+                            </div>
                           </div>
-                          </div>
-                                                                            <p className=" text-gray-700">{review.comment}</p>
-
+                          <p className=" text-gray-700">{review.comment}</p>
                         </div>
-
                       </div>
                     ))}
                   </div>

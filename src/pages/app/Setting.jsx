@@ -20,37 +20,74 @@ import Language from "../../components/app/settings/Language";
 import PaymentSetting from "../../components/app/settings/PaymentSetting";
 import PrivacyPolicy from "../../components/app/settings/PrivacyPolicy";
 import TermsandConditions from "../../components/app/settings/TermsandConditions";
+import { useTranslation } from "react-i18next";
 
-const settingsMenu = [
-  {
-    key: "notifications",
-    label: "Notification Settings",
-    icon: <IoNotificationsOutline />,
-  },
-  { key: "languages", label: "Languages", icon: <IoEarthOutline /> },
-  { key: "change_password", label: "Change Password", icon: <MdLockOutline /> },
-  // { key: "change_number", label: "Change Number", icon: <IoCallOutline /> },
-  // { key: "payment", label: "Payment Method", icon: <CiCreditCard1 /> },
-  { key: "terms", label: "Terms & Conditions", icon: <CgLoadbarDoc /> },
-  { key: "privacy", label: "Privacy Policy", icon: <RiErrorWarningLine /> },
-  {
-    key: "delete",
-    label: "Delete Account",
-    icon: <RxCrossCircled />,
-    danger: true,
-  },
-];
+// const settingsMenu = [
+//   {
+//     key: "notifications",
+//     label: "Notification Settings",
+//     icon: <IoNotificationsOutline />,
+//   },
+//   { key: "languages", label: "Languages", icon: <IoEarthOutline /> },
+//   { key: "change_password", label: "Change Password", icon: <MdLockOutline /> },
+//   // { key: "change_number", label: "Change Number", icon: <IoCallOutline /> },
+//   // { key: "payment", label: "Payment Method", icon: <CiCreditCard1 /> },
+//   { key: "terms", label: "Terms & Conditions", icon: <CgLoadbarDoc /> },
+//   { key: "privacy", label: "Privacy Policy", icon: <RiErrorWarningLine /> },
+//   {
+//     key: "delete",
+//     label: "Delete Account",
+//     icon: <RxCrossCircled />,
+//     danger: true,
+//   },
+// ];
 
 const Setting = () => {
   const navigate = useNavigate();
   const [selectedSetting, setSelectedSetting] = useState(null);
+
+  const { t } = useTranslation();
+
+  const settingsMenu = [
+    {
+      key: "notifications",
+      label: t("settings.notifications"),
+      icon: <IoNotificationsOutline />,
+    },
+    {
+      key: "languages",
+      label: t("settings.languages"),
+      icon: <IoEarthOutline />,
+    },
+    {
+      key: "change_password",
+      label: t("settings.change_password"),
+      icon: <MdLockOutline />,
+    },
+    {
+      key: "terms",
+      label: t("settings.terms"),
+      icon: <CgLoadbarDoc />,
+    },
+    {
+      key: "privacy",
+      label: t("settings.privacy"),
+      icon: <RiErrorWarningLine />,
+    },
+    {
+      key: "delete",
+      label: t("settings.delete"),
+      icon: <RxCrossCircled />,
+      danger: true,
+    },
+  ];
 
   const renderSettingContent = () => {
     switch (selectedSetting) {
       case "notifications":
         return <NotificationSettings />;
       case "privacy":
-                return <PrivacyPolicy />;
+        return <PrivacyPolicy />;
       case "terms":
         return <TermsandConditions />;
       // case "payment":

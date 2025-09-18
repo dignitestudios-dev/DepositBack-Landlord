@@ -145,7 +145,7 @@ export const appRoutes = [
     name: "View profile",
     isPublic: true,
   },
-   {
+  {
     url: "landlord-profile",
     page: <LandlordProfile />,
     name: "Landlord Profile",

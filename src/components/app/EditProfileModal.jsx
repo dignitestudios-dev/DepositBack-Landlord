@@ -65,13 +65,11 @@ function formReducer(state, action) {
 
 const EditProfileModal = ({ onClose, userData }) => {
   const [state, dispatch] = useReducer(formReducer, initialState);
-  console.log("🚀 ~ EditProfileModal ~ state?.phone -- :", state?.phone);
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-const [Fullname, setFullname] = useState("");
+  const [Fullname, setFullname] = useState("");
   const [Ssnnumber, setSsnnumber] = useState("");
-
 
   const [errors, setErrors] = useState({
     fullname: "",
@@ -80,6 +78,7 @@ const [Fullname, setFullname] = useState("");
     backIDImage: "",
     profileImage: "",
     phone: "",
+    emergencyContact: "",
   });
   console.log("🚀 ~ EditProfileModal ~ errors:", errors);
 
@@ -101,15 +100,23 @@ const [Fullname, setFullname] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-     const newErrors = {
+    const newErrors = {
       fullname: !state.fullName.trim() ? "Full name is required" : "",
       ssn: !state.ssn.trim()
         ? "SSN is required"
         : state.ssn.trim().length !== 4
         ? "SSN must be exactly 4 digits"
         : "",
-        phone: !state.phone.trim() ? "Phone number is required" : state.phone.trim().length < 10 ? "Phone number must be at least 10 digits" : "",
-        
+      phone: !state.phone.trim()
+        ? "Phone number is required"
+        : state.phone.trim().length < 10
+        ? "Phone number must be at least 10 digits"
+        : "",
+      emergencyContact: !state.emergencyContact.trim()
+        ? "Emergency contact number is required"
+        : state.emergencyContact.trim().length < 10
+        ? "Emergency contact number must be at least 10 digits"
+        : "",
       // idFront: !state.frontIDImage ? "Front ID is required" : "",
       // idBack: !state.backIDImage ? "Back ID is required" : "",
       // profileImage: !state.profileImage ? "Profile image is required" : "",
@@ -125,6 +132,8 @@ const [Fullname, setFullname] = useState("");
       formData?.append("lastFourSSN", state?.ssn);
       formData?.append("language", "english");
       formData?.append("name", state?.fullName);
+      formData?.append("emergencyContact", state?.emergencyContact);
+
       // Assuming formData is a FormData object
       if (state?.profileImage) {
         // Check if profileImage is a File object (i.e., a file)
@@ -198,6 +207,7 @@ const [Fullname, setFullname] = useState("");
           fullName: userData.name,
           email: userData.email,
           phone: userData.phoneNo,
+          emergencyContact: userData.emergencyContact,
           ssn: userData.lastFourSSN,
           profileImage: userData.profilePicture,
           frontIDImage: userData.governmentIdFront,
@@ -257,7 +267,7 @@ const [Fullname, setFullname] = useState("");
               placeholder="Enter full name"
               className="bg-[#ECECEC] !w-[132%]"
             />
-             {errors.fullname && (
+            {errors.fullname && (
               <p className="text-red-500 text-xs">{errors.fullname}</p>
             )}
 
@@ -302,7 +312,6 @@ const [Fullname, setFullname] = useState("");
                 placeholder="Add phone number"
                 className="!w-[37em] bg-[#ECECEC]"
               />
-               
             </div>
             {errors.phone && (
               <p className="text-red-500 text-xs">{errors.phone}</p>
@@ -325,26 +334,36 @@ const [Fullname, setFullname] = useState("");
                 placeholder="XXXX"
                 className="bg-[#ECECEC] !w-[132%]"
               />
-               {errors.ssn && (
-              <p className="text-red-500 text-xs">{errors.ssn}</p>
-            )}
-              
+              {errors.ssn && (
+                <p className="text-red-500 text-xs">{errors.ssn}</p>
+              )}
             </div>
             <div className="mt-3">
-              {/* <Input
-                label="Emergency Contact"
-                type="text"
-                value={state.emergencyContact}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_FIELD",
-                    field: "emergencyContact",
-                    value: e.target.value,
-                  })
-                }
-                placeholder="XXXX-XXXX-XXXX"
-                className="bg-[#ECECEC] !w-[132%]"
-              /> */}
+              <div className="relative">
+                <div className="absolute top-[43px] z-20">
+                  <p className="text-sm pl-[1px]">+1</p>
+                </div>
+                <Input
+                  label="Emergency Contact"
+                  type="text"
+                  maxLength={14}
+                  value={phoneFormatter(state.emergencyContact)}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "SET_FIELD",
+                      field: "emergencyContact",
+                      value: e.target.value.replace(/\D/g, ""),
+                    })
+                  }
+                  placeholder="XXXX-XXXX-XXXX"
+                  className="bg-[#ECECEC] !w-[132%]"
+                />
+              </div>
+              {errors.emergencyContact && (
+                <p className="text-red-500 text-xs">
+                  {errors.emergencyContact}
+                </p>
+              )}
             </div>
           </div>
 
