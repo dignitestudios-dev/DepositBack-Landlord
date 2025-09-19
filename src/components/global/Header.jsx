@@ -79,7 +79,7 @@ const Header = () => {
             className="hover:underline cursor-pointer"
             onClick={() => {
               navigate("/app/Dashboard");
-              closePopup(); 
+              closePopup();
             }}
           >
             {t("header.home")}
@@ -97,7 +97,7 @@ const Header = () => {
             className="hover:underline cursor-pointer"
             onClick={() => {
               navigate("/app/resources");
-              closePopup(); 
+              closePopup();
             }}
           >
             {t("header.resources")}
@@ -106,7 +106,7 @@ const Header = () => {
             className="hover:underline cursor-pointer"
             onClick={() => {
               navigate("/app/messages");
-              closePopup(); 
+              closePopup();
             }}
           >
             {t("header.messages")}
@@ -115,11 +115,11 @@ const Header = () => {
 
         {/* Notification Icon with Popup toggle */}
         <div className="relative" ref={notificationRef}>
-          {unreadCount?.length > 0 && (
+          {/* {unreadCount?.length > 0 && (
             <span className="absolute -top-2 text-sm bg-red-600 h-5 w-5 items-center flex justify-center text-white rounded-full">
               {unreadCount?.length}
             </span>
-          )}
+          )} */}
           <IoNotificationsOutline
             className="text-white text-2xl cursor-pointer"
             onClick={togglePopup}
@@ -153,7 +153,7 @@ const Header = () => {
                   <button
                     onClick={() => {
                       navigate("/app/notifications");
-                      closePopup(); 
+                      closePopup();
                     }}
                     className="text-sm text-blue-600 font-medium px-4 py-1 rounded-lg hover:bg-blue-50 cursor-pointer transition"
                   >
@@ -183,7 +183,7 @@ const Header = () => {
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
                 onClick={() => {
                   navigate("/app/view-profile");
-                  closePopup(); 
+                  closePopup();
                 }}
               >
                 {t("header.viewProfile")}
@@ -192,7 +192,7 @@ const Header = () => {
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
                 onClick={() => {
                   navigate("/app/subscription-plans");
-                  closePopup(); 
+                  closePopup();
                 }}
               >
                 {t("header.subscriptionPlans")}
@@ -201,7 +201,7 @@ const Header = () => {
                 className="block text-[12px] font-[500] hover:text-blue-500 cursor-pointer"
                 onClick={() => {
                   navigate("/app/settings");
-                  closePopup(); 
+                  closePopup();
                 }}
               >
                 {t("header.settings")}
@@ -209,7 +209,7 @@ const Header = () => {
               <span
                 onClick={() => {
                   setLogoutpopup(true);
-                  closePopup(); 
+                  closePopup();
                 }}
                 className="block text-[12px] font-[500] text-red-600 hover:text-red-700 cursor-pointer"
               >
