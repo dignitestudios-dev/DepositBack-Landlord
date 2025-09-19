@@ -160,7 +160,7 @@ const Uploaddeduction = () => {
               <label className="block mb-1 text-sm font-medium">Title</label>
               <input
                 type="text"
-                placeholder="Place holder goes here"
+                placeholder="Title"
                 className="border px-4 py-2 rounded-full w-full"
                 value={state.title}
                 onChange={(e) =>
@@ -189,7 +189,7 @@ const Uploaddeduction = () => {
               </label>
               <input
                 type="text"
-                placeholder="Place holder goes here"
+                placeholder="Deduction Amount"
                 className="border px-4 py-2 rounded-full w-full"
                 value={state.amount}
                 onChange={(e) => {
@@ -219,7 +219,7 @@ const Uploaddeduction = () => {
               Reason For Deduction
             </label>
             <textarea
-              placeholder="Place holder goes here"
+              placeholder="Reason For Deduction"
               rows={4}
               className="w-full border px-4 py-2 rounded-3xl resize-none"
               value={state.description}
@@ -248,7 +248,7 @@ const Uploaddeduction = () => {
               className="bg-white border border-dashed border-gray-400 rounded-xl p-10 text-center text-sm text-gray-600 cursor-pointer"
             >
               <p className="font-semibold">Upload “Property Images”</p>
-              <p className="text-xs text-gray-400 mt-1">Upto 20mb JPG, PNG</p>
+              <p className="text-xs text-gray-400 mt-1">Upto 20MB JPG, PNG</p>
             </div>
 
             <input

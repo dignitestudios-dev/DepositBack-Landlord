@@ -269,7 +269,7 @@ const PropertyDetail = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center text-gray-600 mb-2 font-[500]">
+              <div className="flex items-start text-gray-600 mb-2 font-[500]">
                 <LuMapPin className="mr-1" /> {address}
               </div>
               <p className="text-1xl font-[500] text-gray-600 mb-2">

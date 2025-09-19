@@ -16,6 +16,7 @@ export default function Input({
   name,
   maxLength,
   disabled,
+  required = false,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -34,7 +35,7 @@ export default function Input({
           placeholder={placeholder}
           onBlur={onBlur}
           maxLength={maxLength}
-          required
+          required={required}
           className={`w-full px-4 py-3 text-sm rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-12 ${
             className || ""
           }`}

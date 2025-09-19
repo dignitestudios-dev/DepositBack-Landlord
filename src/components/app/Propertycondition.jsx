@@ -6,6 +6,7 @@ const Propertycondition = ({ images, videos, uvLightImages, isLandLord }) => {
   const [showAllUvImages, setShowAllUvImages] = useState(false);
 
   const [previewItem, setPreviewItem] = useState(null); // modal image/video
+  console.log("🚀 ~ Propertycondition ~ previewItem:", previewItem);
   const [viewingOnly, setViewingOnly] = useState("");
 
   const visiblePhotos = showAllPhotos ? images : images.slice(0, 8);
@@ -159,23 +160,22 @@ const Propertycondition = ({ images, videos, uvLightImages, isLandLord }) => {
             <p className="text-sm font-semibold mb-2">Photo</p>
             {previewItem.type === "image" ? (
               <img
-                src={previewItem.src?.fileUrl || previewItem}
+                src={previewItem.src?.fileUrl || previewItem?.src}
                 className="w-full h-auto rounded-md mb-4"
                 alt="Preview"
               />
             ) : (
               <video
                 controls
-                src={previewItem.src?.fileUrl || previewItem}
+                src={previewItem.src?.fileUrl || previewItem?.src}
                 className="w-full rounded-md mb-4"
               />
             )}
-            <h3 className="font-semibold text-sm mb-2">Title Goes Here</h3>
+            <h3 className="font-semibold text-sm mb-2">
+              {previewItem.src?.fileKey || "--"}
+            </h3>
             <p className="text-xs text-gray-600">
-              Figma ipsum component variant main layer. Device undo
-              strikethrough pen rectangle flows background. Invite overflow
-              scrolling object select image italic. Layout arrange underline
-              distribute bold prototype italic.
+              This file is uploaded uv image
             </p>
           </div>
         </div>

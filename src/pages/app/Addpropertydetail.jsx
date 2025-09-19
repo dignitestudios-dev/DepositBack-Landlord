@@ -1,30 +1,21 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Propertydetails from "../../assets/addproperty/Propertydetails.png";
-import Stripeaccount from "../../assets/addproperty/Stripeaccount.png";
 import Uniquepropertycode from "../../assets/addproperty/Uniquepropertycode.png";
 import Inspectiondetails from "../../assets/addproperty/Inspectiondetails.png";
 import UvImage from "../../assets/addproperty/UvImage.png";
 
 import line from "../../assets/addproperty/Line.png";
-import Stripe from "../../assets/addproperty/Stripe.png";
-import { FaArrowLeft, FaChevronRight } from "react-icons/fa";
-import Modal from "../../components/global/Modal";
-import Addmorepropertymodal from "../../components/global/Addmorepropertymodal";
+import lineBlue from "../../assets/addproperty/LineBlue.png";
+import { FaArrowLeft } from "react-icons/fa";
 import DetailStepOne from "../../components/app/propertyDetail/DetailStepOne";
 import DetailStepTwo from "../../components/app/propertyDetail/DetailStepTwo";
 import DetailStepThree from "../../components/app/propertyDetail/DetailStepThree";
 import DetailStepFour from "../../components/app/propertyDetail/DetailStepFour";
-import { useNavigate } from "react-router";
-import { AppContext } from "../../context/AppContext";
 import { useFetchData } from "../../hooks/api/Get";
 import { ErrorToast } from "../../components/global/Toaster";
 import axios from "../../axios";
 
 const AddPropertyDetail = () => {
-  const navigate = useNavigate();
-  const { userData } = useContext(AppContext);
-  const [update, setUpdate] = useState(false);
-
   const [step, setStep] = useState(1);
 
   // const [accountholderName, setAccountholderName] = useState("");
@@ -49,7 +40,7 @@ const AddPropertyDetail = () => {
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
-  const { data, loading } = useFetchData(`/users/me`, {}, 1, update);
+  const { data } = useFetchData(`/users/me`, {}, 1, "");
   console.log("🚀 ~ AddPropertyDetail ~ data:", data);
   const steps = [
     { img: Propertydetails, label: "Property Details" },

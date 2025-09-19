@@ -121,7 +121,7 @@ const UploadPropertyDocs = ({
             className=" rounded-lg p-10 text-center cursor-pointer"
           >
             <p className="text-black">Upload “Documents”</p>
-            <p className="text-sm text-gray-400">Upto 20mb PDF, JPG, PNG</p>
+            <p className="text-sm text-gray-400">Upto 20MB PDF, JPG, PNG</p>
             <input
               type="file"
               id="fileUpload"

@@ -112,11 +112,11 @@ const EditProfileModal = ({ onClose, userData }) => {
         : state.phone.trim().length < 10
         ? "Phone number must be at least 10 digits"
         : "",
-      emergencyContact: !state.emergencyContact.trim()
-        ? "Emergency contact number is required"
-        : state.emergencyContact.trim().length < 10
-        ? "Emergency contact number must be at least 10 digits"
-        : "",
+      // emergencyContact: !state.emergencyContact.trim()
+      //   ? "Emergency contact number is required"
+      //   : state.emergencyContact.trim().length < 10
+      //   ? "Emergency contact number must be at least 10 digits"
+      //   : "",
       // idFront: !state.frontIDImage ? "Front ID is required" : "",
       // idBack: !state.backIDImage ? "Back ID is required" : "",
       // profileImage: !state.profileImage ? "Profile image is required" : "",
@@ -132,7 +132,9 @@ const EditProfileModal = ({ onClose, userData }) => {
       formData?.append("lastFourSSN", state?.ssn);
       formData?.append("language", "english");
       formData?.append("name", state?.fullName);
-      formData?.append("emergencyContact", state?.emergencyContact);
+      if (state?.emergencyContact?.trim()) {
+        formData.append("emergencyContact", state.emergencyContact.trim());
+      }
 
       // Assuming formData is a FormData object
       if (state?.profileImage) {
@@ -344,6 +346,7 @@ const EditProfileModal = ({ onClose, userData }) => {
                   <p className="text-sm pl-[1px]">+1</p>
                 </div>
                 <Input
+                  required={false}
                   label="Emergency Contact"
                   type="text"
                   maxLength={14}

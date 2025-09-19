@@ -271,7 +271,7 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
       {mediaError && <p className="text-red-500 text-xs">{mediaError}</p>}
 
       <div className="mt-6 flex flex-wrap gap-3">
-        {propertyMedia.map((file, index) => (
+        {propertyMedia?.map((file, index) => (
           <div
             key={index}
             className="relative w-28 h-28 rounded overflow-hidden"

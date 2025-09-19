@@ -23,6 +23,7 @@ const Inspection = () => {
 
   const [viewMode, setViewMode] = useState("Move In");
   const [previewItem, setPreviewItem] = useState(null);
+  console.log("🚀 ~ Inspection ~ previewItem:", previewItem);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showAcceptedModal, setShowAcceptedModal] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
@@ -168,9 +169,7 @@ const Inspection = () => {
                       <div
                         key={idx}
                         className="relative group border-2 border-transparent hover:border-blue-500 rounded-md overflow-hidden cursor-pointer"
-                        // onClick={() =>
-                        //   isUnlocked(idx) && setPreviewItem({ type: "image", src })
-                        // }
+                        onClick={() => setPreviewItem({ type: "image", src })}
                       >
                         <img
                           src={src?.fileUrl}
@@ -227,9 +226,7 @@ const Inspection = () => {
                       <div
                         key={idx}
                         className="relative group rounded-md overflow-hidden cursor-pointer"
-                        // onClick={() =>
-                        //   isUnlocked(idx) && setPreviewItem({ type: "video", src })
-                        // }
+                        onClick={() => setPreviewItem({ type: "video", src })}
                       >
                         <video
                           src={src?.fileUrl}
@@ -313,18 +310,20 @@ const Inspection = () => {
             <p className="text-sm font-semibold mb-2">Preview</p>
             {previewItem.type === "image" ? (
               <img
-                src={previewItem.src}
+                src={previewItem.src?.fileUrl || previewItem}
                 className="w-full h-auto rounded-md mb-4"
                 alt="Preview"
               />
             ) : (
               <video
                 controls
-                src={previewItem.src}
+                src={previewItem.src?.fileUrl || previewItem}
                 className="w-full rounded-md mb-4"
               />
             )}
-            <h3 className="font-semibold text-sm mb-2">Title Goes Here</h3>
+            <h3 className="font-semibold text-sm mb-2">
+              {previewItem.src?.fileKey}
+            </h3>
             <p className="text-xs text-gray-600">
               This file has been unlocked and is now available for viewing.
             </p>

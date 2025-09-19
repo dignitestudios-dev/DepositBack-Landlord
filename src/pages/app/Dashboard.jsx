@@ -227,8 +227,8 @@ const Dashboard = () => {
                     </p>
                   </div>
 
-                  <div className="flex gap-1 pt-2 items-center">
-                    <LuMapPin size={16} />
+                  <div className="flex gap-1 pt-2 items-start">
+                    <LuMapPin size={16} className="mt-0.5" />
                     <p className="text-gray-500 font-[500] text-sm">
                       {property.address}
                     </p>

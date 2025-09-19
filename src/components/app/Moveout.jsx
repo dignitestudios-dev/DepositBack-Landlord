@@ -11,6 +11,7 @@ const Moveout = ({
 }) => {
   console.log("🚀 ~ Moveout ~ tenantMoveOutVideos:", tenantMoveOutVideos);
   const [previewItem, setPreviewItem] = useState(null);
+  console.log("🚀 ~ Moveout ~ previewItem:", previewItem);
 
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showAllVideos, setShowAllVideos] = useState(false);
@@ -45,15 +46,13 @@ const Moveout = ({
                   <div
                     key={idx}
                     className="relative group border-2 border-transparent hover:border-blue-500 rounded-md overflow-hidden cursor-pointer"
-                    // onClick={() =>
-                    //   isUnlocked(idx) && setPreviewItem({ type: "image", src })
-                    // }
+                    onClick={() => setPreviewItem({ type: "image", src })}
                   >
                     <img
                       src={src?.fileUrl}
                       alt={`Photo ${idx}`}
                       className={`w-full h-[150px] object-cover rounded-md ${
-                        allowedDocs.includes("tenantMoveInImages")
+                        allowedDocs.includes("tenantMoveOutImages")
                           ? ""
                           : "blur-sm"
                       }`}
@@ -104,15 +103,13 @@ const Moveout = ({
                   <div
                     key={idx}
                     className="relative group rounded-md overflow-hidden cursor-pointer"
-                    // onClick={() =>
-                    //   isUnlocked(idx) && setPreviewItem({ type: "video", src })
-                    // }
+                    onClick={() => setPreviewItem({ type: "video", src })}
                   >
                     <video
                       src={src?.fileUrl}
                       alt={`Video ${idx}`}
                       className={`w-full h-[150px] object-cover ${
-                        allowedDocs.includes("tenantMoveInImages")
+                        allowedDocs.includes("tenantMoveOutVideos")
                           ? ""
                           : "blur-sm"
                       }`}
@@ -157,18 +154,20 @@ const Moveout = ({
                 <p className="text-sm font-semibold mb-2">Preview</p>
                 {previewItem.type === "image" ? (
                   <img
-                    src={previewItem.src}
+                    src={previewItem.src?.fileUrl || previewItem}
                     className="w-full h-auto rounded-md mb-4"
                     alt="Preview"
                   />
                 ) : (
                   <video
                     controls
-                    src={previewItem.src}
+                    src={previewItem.src?.fileUrl || previewItem}
                     className="w-full rounded-md mb-4"
                   />
                 )}
-                <h3 className="font-semibold text-sm mb-2">Title Goes Here</h3>
+                <h3 className="font-semibold text-sm mb-2">
+                  {previewItem.src?.fileKey}
+                </h3>
                 <p className="text-xs text-gray-600">
                   This file has been unlocked and is now available for viewing.
                 </p>
