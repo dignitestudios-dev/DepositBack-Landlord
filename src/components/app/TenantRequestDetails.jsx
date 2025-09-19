@@ -370,7 +370,7 @@ const TenantRequestDetails = ({ request }) => {
           <div className="flex gap-2 items-center text-sm">
             <TiWarning />{" "}
             <span>
-              Emergency Contact:{" "}
+              Emergency Contact: +1{" "}
               {request?.tenant?.emergencyContact || "--Not Provided--"}
             </span>
           </div>
