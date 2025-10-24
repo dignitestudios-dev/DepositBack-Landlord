@@ -25,6 +25,11 @@ const Documents = () => {
     uvLightImages = [],
     tenantRepairsVideos = [],
     tenantRepairsImages = [],
+    tenantMoveInImages = [],
+    tenantMoveOutImages = [],
+    tenantMoveInVideos = [],
+    tenantMoveOutVideos = [],
+    uvLightImagesTenant = [],
     tenantAgreements = [],
   } = location.state || {};
 
@@ -171,7 +176,8 @@ const Documents = () => {
               videos={landlordPropertyConditionVideos}
               images={landlordPropertyConditionImages}
               uvLightImages={uvLightImages}
-              isLandLord={true}
+              property={location.state}
+              isLandlord={viewMode === "landlord"}
             />
           ) : activeCategory === "Rules" ? (
             <Repairs rules={landlordRules} />
@@ -181,6 +187,7 @@ const Documents = () => {
               images={tenantRepairsImages}
               uvLightImages={[]}
               isLandLord={false}
+              property={location.state}
             />
           ) : (
             <>

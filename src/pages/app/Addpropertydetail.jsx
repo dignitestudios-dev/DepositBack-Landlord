@@ -41,7 +41,7 @@ const AddPropertyDetail = () => {
   const prevStep = () => setStep((prev) => prev - 1);
 
   const { data } = useFetchData(`/users/me`, {}, 1, "");
-  console.log("🚀 ~ AddPropertyDetail ~ data:", data);
+  
   const steps = [
     { img: Propertydetails, label: "Property Details" },
     { img: Inspectiondetails, label: "Inspection Details" },
