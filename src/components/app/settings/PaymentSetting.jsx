@@ -1,156 +1,138 @@
-import React, { useState } from 'react';
-import { FaChevronRight, FaPen, FaTimes, FaCheck, FaArrowLeft } from 'react-icons/fa';
-import Googlepay from '../../../assets/GooglePay.png';
-import Applepay from '../../../assets/ApplePay.png';
-import Stripe from '../../../assets/addproperty/Stripe.png';    
+import React, { useEffect, useState } from "react";
+import { FaChevronRight } from "react-icons/fa";
+import axios from "../../../axios";
+import {
+  CardElement,
+  useStripe,
+  useElements,
+  Elements,
+} from "@stripe/react-stripe-js";
+import { ErrorToast, SuccessToast } from "../../global/Toaster";
+import { loadStripe } from "@stripe/stripe-js";
+import { GoTrash } from "react-icons/go";
 
+const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_KEY);
 
-const PaymentSetting = () => {
-  // State to control editing and popup visibility
-  const [isEditing, setIsEditing] = useState(false);
-  const [accountName, setAccountName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [routingNumber, setRoutingNumber] = useState('');
-  const [stripeaccountupdate, setStripeaccountupdate] = useState(false);
+const PaymentSettingContent = () => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [cardsLoading, setCardsLoading] = useState(false);
 
-  // Handle form submission
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    // Handle Stripe account update logic here
-    setStripeaccountupdate(true); // Show success popup after update
+  const handleAddCard = async () => {
+    if (!stripe || !elements) return ErrorToast("Stripe not loaded yet bro 😅");
+
+    setLoading(true);
+    const cardElement = elements.getElement(CardElement);
+
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+      type: "card",
+      card: cardElement,
+    });
+
+    if (error) {
+      ErrorToast(error.message);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await axios.post("/finance/cards", {
+        paymentMethodId: paymentMethod.id,
+      });
+      SuccessToast(res?.data?.message || "Card Added Successfully");
+      cardElement.clear();
+
+      getCards();
+    } catch (err) {
+      ErrorToast(err?.response?.data?.message || "Error adding card");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCards = async () => {
+    setCardsLoading(true);
+    try {
+      const response = await axios.get("/finance/cards");
+      if (response?.status === 200) {
+        const cardData = response?.data?.data;
+
+        setCards(cardData);
+      }
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message || "Error fetching cards");
+    } finally {
+      setCardsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getCards();
+  }, []);
+
+  const handleDeleteCard = async (id) => {
+    try {
+      const res = await axios.delete(`/finance/cards/${id}`);
+      SuccessToast(res?.data?.message || "Card deleted");
+      getCards();
+    } catch (error) {
+      ErrorToast(error?.response?.data?.message || "Error deleting card");
+    }
   };
 
   return (
     <div className="p-6">
-      {!isEditing && ( // Only show this section when not editing
-        <>
-          <h3 className="text-2xl font-[600] mb-0">Payment Method</h3>
-          <p className="mt-1 mb-10">Select the Payment Method.</p>
+      <h3 className="text-2xl font-[600] mb-0">Payment Method</h3>
+      <p className="mt-1 mb-10">Select or Add a Payment Method.</p>
 
-          {/* Payment Methods */}
-          <div className="space-y-4 ml-[7em] mr-[7em]">
-            <button className="w-full p-3 bg-[#F0F4FF] border rounded-2xl flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <img src={Googlepay} alt="GPay" className="h-6" />
-                <span className="font-[500]">Google Pay</span>
-              </div>
-              <FaChevronRight />
-            </button>
-
-            <button className="w-full p-3 bg-[#F0F4FF] border rounded-2xl flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <img src={Applepay} alt="ApplePay" className="h-6" />
-                <span className="font-[500]">Apple Pay</span>
-              </div>
-              <FaChevronRight />
-            </button>
-
-            <div className="w-full">
-              <div className="flex justify-between items-center">
-                <h1 className="text-sm font-[500]">Attached Stripe Account</h1>
-                <FaPen
-                  size={14}
-                  onClick={() => setIsEditing(true)}
-                  className="cursor-pointer"
-                /> {/* Edit Icon */}
-              </div>
-
-              {/* Show Stripe Account Details */}
-              <div className="p-3 mt-2 border rounded-2xl font-[500] bg-[#F0F4FF] flex justify-between items-center">
-                <div className="text-sm">**** **** **** 485</div>
-                <div className="flex items-center gap-2">
-                  <img src={Stripe} alt="Stripe" className="h-6" />
-                </div>
-              </div>
+      {/* ✅ Saved Cards Section */}
+      <div className="space-y-4 ml-[7em] mr-[7em]">
+        {cardsLoading ? (
+          <p>Loading cards...</p>
+        ) : !cards ? (
+          <p className="text-gray-500 italic">No saved cards found</p>
+        ) : (
+          <div
+            key={cards?.id}
+            className="w-full p-3 bg-[#F0F4FF] border rounded-2xl flex justify-between items-center"
+          >
+            <div className="flex items-center gap-3">
+              <span className="font-[500] capitalize">
+                {cards?.brand} •••• {cards?.last4}
+              </span>
             </div>
-          </div>
-        </>
-      )}
-
-      {/* Edit Stripe Account Form */}
-      {isEditing && (
-        <div className="p-0">
-          <div className="flex gap-3">
-            <button type="button" onClick={() => setIsEditing(false)}>
-              <FaArrowLeft size={20} />
+            <button onClick={() => handleDeleteCard(cards?.id)}>
+              <GoTrash color="red" className="text-lg" />
             </button>
-            <h3 className="text-2xl font-semibold mb-0">Edit Stripe Account</h3>
           </div>
-          <p className="text-sm mt-1 mb-10">
-            You can update your Stripe account to manage deposit transactions.
-          </p>
+        )}
+      </div>
 
-          <div className="ml-[7em] mr-[7em]">
-            <form onSubmit={handleUpdate}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium">Account Holder's Name</label>
-                  <input
-                    type="text"
-                    placeholder="Text goes here"
-                    value={accountName}
-                    onChange={(e) => setAccountName(e.target.value)}
-                    className="w-full p-3 mt-2 rounded-xl border bg-[#F5F5F5] text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium">Account Number</label>
-                  <input
-                    type="text"
-                    placeholder="Text goes here"
-                    value={accountNumber}
-                    onChange={(e) => setAccountNumber(e.target.value)}
-                    className="w-full p-3 mt-2 rounded-xl border bg-[#F5F5F5] text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium">Routing Number</label>
-                  <input
-                    type="text"
-                    placeholder="Text goes here"
-                    value={routingNumber}
-                    onChange={(e) => setRoutingNumber(e.target.value)}
-                    className="w-full p-3 mt-2 rounded-xl border bg-[#F5F5F5] text-sm"
-                  />
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="w-full mt-[7em] bg-gradient-to-r from-[#003897] to-[#0151DA] text-white px-6 py-3 rounded-full font-semibold hover:opacity-90 transition"
-              >
-                Update
-              </button>
-            </form>
-          </div>
+      {/* ✅ Add New Card */}
+      <div className="mt-10 ml-[7em] mr-[7em]">
+        <h4 className="text-xl font-semibold mb-3">Add a new card</h4>
+        <div className="border p-3 rounded-xl mb-4">
+          <CardElement />
         </div>
-      )}
-
-      {/* Success Popup */}
-      {stripeaccountupdate && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="relative bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
-            <button
-              onClick={() => setStripeaccountupdate(false)} // Close the popup
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-            >
-              <FaTimes size={18} />
-            </button>
-
-            {/* ✅ Success Icon */}
-            <div className="bg-gradient-to-r from-[#003897] to-[#0151DA] text-white p-6 w-fit mx-auto rounded-full mb-3">
-              <FaCheck size={24} />
-            </div>
-
-            <h2 className="font-semibold text-2xl mb-1">Stripe Account Updated</h2>
-            <p className="text-sm text-gray-600">
-              Your stripe account has been successfully updated.
-            </p>
-          </div>
-        </div>
-      )}
+        <button
+          onClick={handleAddCard}
+          disabled={!stripe || loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded-xl"
+        >
+          {loading ? "Adding..." : "Add Card"}
+        </button>
+      </div>
     </div>
+  );
+};
+
+const PaymentSetting = () => {
+  return (
+    <Elements stripe={stripePromise}>
+      <PaymentSettingContent />
+    </Elements>
   );
 };
 

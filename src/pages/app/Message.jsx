@@ -224,15 +224,17 @@ const Message = () => {
                       ))}
                     </div>
                   ) : (
-                    <div
-                      className={`px-4 py-2 rounded-xl max-w-xs ${
-                        msg.senderId === userData?.uid
-                          ? "bg-blue-700 text-white"
-                          : "bg-gray-300 text-black"
-                      }`}
-                    >
-                      {msg.text}
-                    </div>
+                     <div
+                        className={`${
+                          msg?.emergency
+                            ? "bg-red-600 text-white" // 🔴 emergency message
+                            : msg.senderId === userData?.uid
+                            ? "bg-blue-700 text-white"
+                            : "bg-gray-300 text-black"
+                        } px-4 py-2 rounded-xl max-w-xs`}
+                      >
+                        {msg.text}
+                      </div>
                   )}
                   <span className="text-xs text-gray-400 mt-1">
                     {msg?.timestamp ? chatTime(msg.timestamp) : ""}

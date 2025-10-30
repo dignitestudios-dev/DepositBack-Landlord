@@ -9,11 +9,13 @@ import { useNavigate } from "react-router";
 import { useFetchData } from "../../hooks/api/Get";
 import ResourceTextModal from "../../components/app/resources/ResourceTextModal";
 import Pagination from "../../components/global/Pagination";
+import DisclaimerModal from "../../components/app/resources/DisclaimerModal";
 
 const Resources = () => {
   const navigate = useNavigate("");
   const [searchTerm, setSearchTerm] = useState("");
   const [textModal, setTextModal] = useState(false);
+  const [disclaimerModal, setDisclaimerModal] = useState(true);
   const [page, setPage] = useState(1);
 
   const { data, loading, pagination } = useFetchData(`/laws`, {}, page, "");
@@ -95,7 +97,7 @@ const Resources = () => {
               >
                 <img
                   src={
-                    doc?.formLink ? pdfIcon : doc?.lawLink ? linkIcon : textIcon
+                    doc?.icon || "https://placehold.co/400"
                   }
                   alt="PDF Icon"
                   className="h-[70px] mx-auto"
@@ -115,6 +117,11 @@ const Resources = () => {
       {textModal && (
         <ResourceTextModal textModal={textModal} setTextModal={setTextModal} />
       )}
+
+      <DisclaimerModal
+        isOpen={disclaimerModal}
+        onClose={() => setDisclaimerModal(false)}
+      />
     </div>
   );
 };

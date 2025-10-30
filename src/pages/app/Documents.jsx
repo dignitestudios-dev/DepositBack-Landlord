@@ -25,6 +25,11 @@ const Documents = () => {
     uvLightImages = [],
     tenantRepairsVideos = [],
     tenantRepairsImages = [],
+    tenantMoveInImages = [],
+    tenantMoveOutImages = [],
+    tenantMoveInVideos = [],
+    tenantMoveOutVideos = [],
+    uvLightImagesTenant = [],
     tenantAgreements = [],
   } = location.state || {};
 
@@ -135,7 +140,7 @@ const Documents = () => {
                     }}
                     className="bg-gradient-to-r from-[#314ba1] to-[#0a55d6] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
                   >
-                    + Upload UV Images
+                    + Upload DB Forensics Light Images
                   </button>
                   <button
                     onClick={() => setIsUploadFile(true)}
@@ -171,7 +176,8 @@ const Documents = () => {
               videos={landlordPropertyConditionVideos}
               images={landlordPropertyConditionImages}
               uvLightImages={uvLightImages}
-              isLandLord={true}
+              property={location.state}
+              isLandlord={viewMode === "landlord"}
             />
           ) : activeCategory === "Rules" ? (
             <Repairs rules={landlordRules} />
@@ -181,6 +187,7 @@ const Documents = () => {
               images={tenantRepairsImages}
               uvLightImages={[]}
               isLandLord={false}
+              property={location.state}
             />
           ) : (
             <>

@@ -9,6 +9,7 @@ import { useFetchData } from "../../hooks/api/Get";
 
 const Tenantrequests = () => {
   const navigate = useNavigate();
+  const [update, setUpdate] = useState(false);
   // const { tenantRequest, setTenantUpdate, tenantLoading } =
   //   useContext(AppContext);
 
@@ -19,7 +20,7 @@ const Tenantrequests = () => {
     {},
     // { status: "" },
     1,
-    ""
+    update
   );
 
   // useEffect(() => {
@@ -110,7 +111,7 @@ const Tenantrequests = () => {
           )}
         </>
       ) : (
-        <TenantRequestDetails request={selectedRequest} />
+        <TenantRequestDetails setUpdate={setUpdate} request={selectedRequest} />
       )}
     </div>
   );

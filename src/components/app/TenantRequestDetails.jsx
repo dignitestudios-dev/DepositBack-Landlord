@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaEnvelope, FaPhoneAlt } from "react-icons/fa";
 import { TiWarning } from "react-icons/ti";
 import { CiLocationOn } from "react-icons/ci";
 import { useNavigate } from "react-router";
 import { IoMdCheckmark } from "react-icons/io";
 import axios from "../../axios";
-import { ErrorToast } from "../global/Toaster";
+import { ErrorToast, SuccessToast } from "../global/Toaster";
+import CreditConfirmModal from "./CreditConfirmModal";
 
-const TenantRequestDetails = ({ request }) => {
+const TenantRequestDetails = ({ request, setUpdate }) => {
   const navigate = useNavigate("");
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [acceptRequestModal, setAcceptRequestModal] = useState(false);
@@ -16,10 +17,13 @@ const TenantRequestDetails = ({ request }) => {
   const [confirmleasedate, setConfirmleasedate] = useState(false);
   const [rejectedRequestModal, setRejectedRequestModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [creditloading, setcreditloading] = useState(false);
 
   const [leaseStart, setLeaseStart] = useState("");
   const [leaseEnd, setLeaseEnd] = useState("");
   const [error, setError] = useState("");
+  const [creditScore, setCreditScore] = useState("");
+  const [creditConfirmModal, setCreditConfirmModal] = useState(false); // ✅ new state
 
   const handleLeaseStartChange = (e) => {
     const value = e.target.value;
@@ -52,9 +56,7 @@ const TenantRequestDetails = ({ request }) => {
       }
     }
   };
-
   const handleAcceptRequest = async (status) => {
-    console.log("🚀 ~ handleAcceptRequest ~ status:", status);
     try {
       const today = new Date().toISOString().split("T")[0] + "T00:00:00.000Z";
 
@@ -103,7 +105,43 @@ const TenantRequestDetails = ({ request }) => {
     setSetleaseduration(false);
     setConfirmleasedate(true);
   };
+  const getCreditScore = async () => {
+    try {
+      const response = await axios.get(
+        `/users/verifyCredit/${request?.tenant?._id}`
+      );
+      if (response?.status === 200) {
+        const creditScores = response?.data?.data?.tierResult;
+        setCreditScore(creditScores);
+      }
+    } catch (error) {
+      console.log(error?.response?.data?.message);
+    }
+  };
+  const handleCreditScore = async () => {
+    setcreditloading(true);
+    try {
+      const response = await axios.post(`/users/verifyCredit`, {
+        tenantId: request?.tenant?._id,
+      });
+      if (response?.status === 200) {
+        const creditScore = response?.data?.data?.result;
+        SuccessToast(`Tenant's Credit Score is: ${creditScore}`);
+        setCreditConfirmModal(false);
+        setUpdate((prev) => !prev);
+        getCreditScore();
+      }
+    } catch (error) {
+      console.log("🚀 ~ handleCreditScore ~ error:", error);
+      ErrorToast(error.response.data.message);
+    } finally {
+      setcreditloading(false);
+    }
+  };
 
+  useEffect(() => {
+    getCreditScore();
+  }, []);
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
       {/* Top Profile Section */}
@@ -374,6 +412,32 @@ const TenantRequestDetails = ({ request }) => {
               {request?.tenant?.emergencyContact || "--Not Provided--"}
             </span>
           </div>
+          <div className="ms-auto">
+            <div className="ms-auto">
+              <button
+                onClick={() => {
+                  const score = creditScore;
+                  if (score) {
+                    SuccessToast(`Tenant's Credit Score is: ${score}`);
+                  } else {
+                    setCreditConfirmModal(true);
+                  }
+                }}
+                disabled={creditloading}
+                className={`bg-white text-[#003897] px-[4em] py-2 rounded-full font-medium text-sm transition-all ${
+                  creditloading
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-[#f0f0f0]"
+                }`}
+              >
+                {creditloading
+                  ? "Loading..."
+                  : creditScore || request?.tenant?.creditScore
+                  ? "View Score"
+                  : "Credit Score"}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -457,6 +521,13 @@ const TenantRequestDetails = ({ request }) => {
           </div>
         </div>
       </div>
+      {creditConfirmModal && (
+        <CreditConfirmModal
+          handleCreditScore={handleCreditScore}
+          creditloading={creditloading}
+          handleClose={() => setCreditConfirmModal(false)}
+        />
+      )}
     </div>
   );
 };
