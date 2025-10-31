@@ -102,12 +102,12 @@ export async function getOrCreateChat(currentUserId, tenantId) {
   return docRef.id;
 }
 
-export async function sendMessage(chatId, senderId, text) {
+export async function sendMessage(chatId, senderId, content) {
   const messagesRef = collection(db, "chats", chatId, "messages");
-
+ 
   await addDoc(messagesRef, {
     senderId,
-    text,
+    content,
     timestamp: serverTimestamp(),
   });
 }
