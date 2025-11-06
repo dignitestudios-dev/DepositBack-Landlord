@@ -25,6 +25,8 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
   const [creditScore, setCreditScore] = useState("");
   const [creditConfirmModal, setCreditConfirmModal] = useState(false); // ✅ new state
 
+  const [scoreModal, setScoreModal] = useState(false);
+
   const handleLeaseStartChange = (e) => {
     const value = e.target.value;
     setLeaseStart(value);
@@ -126,7 +128,9 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
       });
       if (response?.status === 200) {
         const creditScore = response?.data?.data?.result;
-        SuccessToast(`Tenant's Credit Score is: ${creditScore}`);
+        setCreditScore(creditScore);
+        setScoreModal(true);
+        // SuccessToast(`Tenant's Credit Score is: ${creditScore}`);
         setCreditConfirmModal(false);
         setUpdate((prev) => !prev);
         getCreditScore();
@@ -142,6 +146,7 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
   useEffect(() => {
     getCreditScore();
   }, []);
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
       {/* Top Profile Section */}
@@ -418,7 +423,8 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
                 onClick={() => {
                   const score = creditScore;
                   if (score) {
-                    SuccessToast(`Tenant's Credit Score is: ${score}`);
+                    setScoreModal(true);
+                    // SuccessToast(`Tenant's Credit Score is: ${score}`);
                   } else {
                     setCreditConfirmModal(true);
                   }
@@ -521,6 +527,31 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
           </div>
         </div>
       </div>
+
+      {scoreModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center">
+            <h2 className="font-semibold text-[20px] mb-2 text-black">
+              Credit Score
+            </h2>
+            {creditScore ? (
+              <p className="text-sm text-gray-600 mb-4">
+                Tenant&apos;s Credit Score is: {creditScore}
+              </p>
+            ) : (
+              <p>No Credit Score Found</p>
+            )}
+            <div className="flex justify-center gap-3">
+              <button
+                className="px-[4em] py-2 text-sm text-white bg-red-600 rounded-full"
+                onClick={() => setScoreModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {creditConfirmModal && (
         <CreditConfirmModal
           handleCreditScore={handleCreditScore}
