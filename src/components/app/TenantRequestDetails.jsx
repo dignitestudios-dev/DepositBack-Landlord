@@ -113,21 +113,22 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
         `/users/verifyCredit/${request?.tenant?._id}`
       );
       if (response?.status === 200) {
-        const creditScores = response?.data?.data?.tierResult;
+        const creditScores = response?.data?.data?.scoreData?.intelligence?.name;
         setCreditScore(creditScores);
       }
     } catch (error) {
       console.log(error?.response?.data?.message);
     }
   };
-  const handleCreditScore = async () => {
+  
+   const handleCreditScore = async () => {
     setcreditloading(true);
     try {
       const response = await axios.post(`/users/verifyCredit`, {
         tenantId: request?.tenant?._id,
       });
       if (response?.status === 200) {
-        const creditScore = response?.data?.data?.result;
+        const creditScore = response?.data?.data?.name;
         setCreditScore(creditScore);
         setScoreModal(true);
         // SuccessToast(`Tenant's Credit Score is: ${creditScore}`);
