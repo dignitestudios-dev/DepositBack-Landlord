@@ -104,7 +104,7 @@ export async function getOrCreateChat(currentUserId, tenantId) {
 
 export async function sendMessage(chatId, senderId, content) {
   const messagesRef = collection(db, "chats", chatId, "messages");
-
+ 
   await addDoc(messagesRef, {
     senderId,
     content,
