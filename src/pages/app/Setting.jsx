@@ -65,6 +65,11 @@ const Setting = () => {
       icon: <MdLockOutline />,
     },
     {
+      key: "payment_method",
+      label: t("settings.payment"),
+      icon: <MdLockOutline />,
+    },
+    {
       key: "terms",
       label: t("settings.terms"),
       icon: <CgLoadbarDoc />,
@@ -90,8 +95,8 @@ const Setting = () => {
         return <PrivacyPolicy />;
       case "terms":
         return <TermsandConditions />;
-      // case "payment":
-      //   return <PaymentSetting />;
+      case "payment_method":
+        return <PaymentSetting />;
       case "languages":
         return <Language />;
       case "change_password":

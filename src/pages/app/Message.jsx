@@ -211,9 +211,9 @@ const Message = () => {
                     msg.senderId === userData?.uid ? "items-end" : "items-start"
                   }`}
                 >
-                  {Array.isArray(msg.text) ? (
+                  {Array.isArray(msg.content) ? (
                     <div className="flex gap-2 flex-wrap">
-                      {msg.text.map((url, index) => (
+                      {msg.content.map((url, index) => (
                         <img
                           key={index}
                           src={url}
@@ -224,15 +224,17 @@ const Message = () => {
                       ))}
                     </div>
                   ) : (
-                    <div
-                      className={`px-4 py-2 rounded-xl max-w-xs ${
-                        msg.senderId === userData?.uid
-                          ? "bg-blue-700 text-white"
-                          : "bg-gray-300 text-black"
-                      }`}
-                    >
-                      {msg.text}
-                    </div>
+                     <div
+                        className={`${
+                          msg?.emergency
+                            ? "bg-red-600 text-white" // 🔴 emergency message
+                            : msg.senderId === userData?.uid
+                            ? "bg-blue-700 text-white"
+                            : "bg-gray-300 text-black"
+                        } px-4 py-2 rounded-xl max-w-xs`}
+                      >
+                        {msg.content}
+                      </div>
                   )}
                   <span className="text-xs text-gray-400 mt-1">
                     {msg?.timestamp ? chatTime(msg.timestamp) : ""}
@@ -255,7 +257,7 @@ const Message = () => {
                     ) : (
                       <div className="bg-gray-200 px-3 py-2 rounded-lg text-xs max-w-[150px]">
                         {att.file.name}
-                      </div>
+                      </div>  
                     )}
                     <button
                       onClick={() => removeAttachment(idx)}

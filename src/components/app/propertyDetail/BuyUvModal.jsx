@@ -25,7 +25,7 @@ export default function BuyUvModal({
     ),
     title = "Title Here",
     description = "Description here...",
-    actionText = "Buy UV Light",
+    actionText = "Buy DB Forensics Light",
     actionTextTwo = "Skip",
   } = data || {};
 

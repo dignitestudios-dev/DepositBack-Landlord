@@ -53,7 +53,7 @@ const DetailStepThree = ({ nextStep, propertyId }) => {
           UV (Ultraviolet) light is a form of electromagnetic radiation that is
           invisible to the human eye. It is commonly used in verification and
           tracking processes because certain materials react to UV exposure by
-          glowing or becoming visible. This makes UV light highly effective for
+          glowing or becoming visible. This makes DB Forensics Light highly effective for
           detecting marks, validating authenticity and enhancing security in
           various applications without affecting the visible appearance of an
           item.
@@ -130,7 +130,7 @@ const DetailStepThree = ({ nextStep, propertyId }) => {
             onClick={() => setShowModal(true)}
             className="px-[10em] py-3 rounded-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-medium"
           >
-            Verify UV Light
+            Verify DB Forensics Light
           </button>
         </div>
       )}
@@ -146,8 +146,8 @@ const DetailStepThree = ({ nextStep, propertyId }) => {
           setModalOpen(true);
         }}
         data={{
-          title: "Do you have a UV light?",
-          description: "Confirm that you have the UV light or not.",
+          title: "Do you have a DB Forensics Light?",
+          description: "Confirm that you have the DB Forensics Light or not.",
           iconBgColor: "bg-blue-600", // Optional
         }}
       />
@@ -164,8 +164,8 @@ const DetailStepThree = ({ nextStep, propertyId }) => {
           nextStep();
         }}
         data={{
-          title: "Do you have a UV light?",
-          description: "Confirm that you have the UV light or not.",
+          title: "Do you have a DB Forensics Light?",
+          description: "Confirm that you have the DB Forensics Light or not.",
           iconBgColor: "bg-blue-600",
         }}
       />

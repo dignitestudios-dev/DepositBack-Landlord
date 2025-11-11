@@ -179,6 +179,7 @@ const PropertyDetail = () => {
     depositTracker,
     contract,
     isLeaseDateResolved,
+    propertyCheckList,
   } = propertyDetail?.property || {};
 
   return (
@@ -467,9 +468,13 @@ const PropertyDetail = () => {
                           landlordPropertyConditionImages,
                           landlordPropertyConditionVideos,
                           uvLightImages,
+                          tenantAgreements,
                           tenantRepairsVideos,
                           tenantRepairsImages,
-                          tenantAgreements,
+                          tenantMoveInImages,
+                          tenantMoveInVideos,
+                          tenantMoveOutImages,
+                          tenantMoveOutVideos,
                         },
                       })
                     }
@@ -491,6 +496,7 @@ const PropertyDetail = () => {
                           tenantMoveInVideos,
                           tenantMoveOutImages,
                           tenantMoveOutVideos,
+                          propertyCheckList,
                         },
                       })
                     }
