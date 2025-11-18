@@ -120,7 +120,8 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
       console.log(error?.response?.data?.message);
     }
   };
-  const handleCreditScore = async () => {
+  
+   const handleCreditScore = async () => {
     setcreditloading(true);
     try {
       const response = await axios.post(`/users/verifyCredit`, {
