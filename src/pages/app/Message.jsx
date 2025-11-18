@@ -3,7 +3,7 @@ import { IoSend } from "react-icons/io5";
 import { MdAttachFile } from "react-icons/md";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import { RiLoader3Fill } from "react-icons/ri";
- 
+
 import { useNavigate } from "react-router";
 import { getUserChatsWithDetails, sendMessage } from "../../firebase/messages";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
@@ -12,31 +12,32 @@ import { AppContext } from "../../context/AppContext";
 import { chatTime } from "../../lib/helpers";
 import { ErrorToast } from "../../components/global/Toaster";
 import axios from "../../axios";
- 
+
 const Message = () => {
   const { userData } = useContext(AppContext);
   const navigate = useNavigate();
- 
+  const [activeTab, setActiveTab] = useState("normal"); // "normal" or "emergency"
+
   const [chatList, setChatList] = useState([]);
   const [loading, setLoading] = useState(true);
- 
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [chatId, setChatId] = useState("");
   const [messages, setMessages] = useState([]);
- 
+
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [uploadedImages, setUploadedImages] = useState([]);
- 
+
   const [uploadFileLoading, setUploadFileLoading] = useState(false);
   const [sendingMessageLoading, setSendingMessageLoading] = useState(false);
- 
+
   const fileInputRef = useRef();
- 
+
   // 🔹 Fetch chats
   useEffect(() => {
     if (!userData?.uid) return;
- 
+
     const unsubscribe = getUserChatsWithDetails(
       "landlord",
       userData?.uid,
@@ -45,48 +46,48 @@ const Message = () => {
         setLoading(false);
       }
     );
- 
+
     return () => unsubscribe && unsubscribe();
   }, [userData]);
- 
+
   // 🔹 Listen to messages in selected chat
   useEffect(() => {
     if (!chatId) return;
- 
+
     const q = query(
       collection(db, "chats", chatId, "messages"),
       orderBy("timestamp", "asc")
     );
- 
+
     const unsub = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setMessages(msgs);
     });
- 
+
     return () => unsub();
   }, [chatId]);
- 
+
   // 🔹 File Upload
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
- 
+
     setUploadFileLoading(true);
     try {
       const formData = new FormData();
       files.forEach((file) => formData.append("file", file));
- 
+
       const { data } = await axios.post("/chat/upload", formData);
- 
+
       if (data?.success) {
         const previews = files.map((file) => ({
           file,
           type: file.type.startsWith("image/") ? "image" : "file",
         }));
- 
+
         const upload = data?.data?.url;
         const uploadArray = Array.isArray(upload) ? upload : [upload];
- 
+
         setAttachments((prev) => [...prev, ...previews]);
         setUploadedImages(uploadArray);
       }
@@ -96,15 +97,15 @@ const Message = () => {
       setUploadFileLoading(false);
     }
   };
- 
+
   const removeAttachment = (index) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
- 
+
   // 🔹 Send Message
   const handleSendMessage = async () => {
     if (!chatId || (!input.trim() && uploadedImages.length === 0)) return;
- 
+
     setSendingMessageLoading(true);
     try {
       await sendMessage(
@@ -112,7 +113,7 @@ const Message = () => {
         userData?.uid,
         uploadedImages.length > 0 ? uploadedImages : input
       );
- 
+
       // optimistic reset
       setInput("");
       setAttachments([]);
@@ -124,7 +125,7 @@ const Message = () => {
       setSendingMessageLoading(false);
     }
   };
- 
+
   return (
     <div className="max-w-[1260px] mx-auto px-6 py-10">
       {/* Header */}
@@ -134,7 +135,7 @@ const Message = () => {
         </button>
         <h1 className="text-2xl font-semibold">Messages</h1>
       </div>
- 
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Sidebar */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -143,7 +144,7 @@ const Message = () => {
             placeholder="Search"
             className="w-full px-4 py-2 mb-4 rounded-xl border text-sm"
           />
- 
+
           <div className="space-y-3">
             {loading ? (
               <p className="text-sm text-gray-400 text-center py-6">
@@ -185,7 +186,7 @@ const Message = () => {
             )}
           </div>
         </div>
- 
+
         {/* Chat Window */}
         {selectedUser ? (
           <div className="col-span-2 bg-white rounded-2xl p-4 shadow-sm flex flex-col justify-between">
@@ -201,10 +202,42 @@ const Message = () => {
                 <p className="text-xs text-gray-500">Tenant</p>
               </div>
             </div>
- 
+            <div className="flex gap-2 mt-2">
+              <button
+                className={`px-4 py-1 rounded-full font-semibold ${
+                  activeTab === "normal"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200"
+                }`}
+                onClick={() => setActiveTab("normal")}
+              >
+                Messages
+              </button>
+              <button
+                className={`px-4 py-1 rounded-full font-semibold ${
+                  activeTab === "emergency"
+                    ? "bg-red-600 text-white"
+                    : "bg-gray-200"
+                }`}
+                onClick={() => setActiveTab("emergency")}
+              >
+                Emergency
+              </button>
+            </div>
             {/* Messages */}
             <div className="py-6 space-y-6 overflow-y-auto text-sm text-gray-800 h-[500px] pr-2">
-              {messages.map((msg) => (
+              {false ? (
+                <p className="text-center text-gray-400">Loading messages...</p>
+              ) : messages.length === 0 ? (
+                <p className="text-center text-gray-400">
+                  No messages in this chat yet.
+                </p>
+              ) : (
+                messages
+                  .filter((msg) =>
+                    activeTab === "emergency" ? msg.emergency : !msg.emergency
+                  )
+                  .map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex flex-col ${
@@ -224,27 +257,28 @@ const Message = () => {
                       ))}
                     </div>
                   ) : (
-                     <div
-                        className={`${
-                          msg?.emergency
-                            ? "bg-red-600 text-white" // 🔴 emergency message
-                            : msg.senderId === userData?.uid
-                            ? "bg-blue-700 text-white"
-                            : "bg-gray-300 text-black"
-                        } px-4 py-2 rounded-xl max-w-xs`}
-                      >
-                        {msg.content}
-                      </div>
+                    <div
+                      className={`${
+                        msg?.emergency
+                          ? "bg-red-600 text-white" // 🔴 emergency message
+                          : msg.senderId === userData?.uid
+                          ? "bg-blue-700 text-white"
+                          : "bg-gray-300 text-black"
+                      } px-4 py-2 rounded-xl max-w-xs`}
+                    >
+                      {msg.content}
+                    </div>
                   )}
                   <span className="text-xs text-gray-400 mt-1">
                     {msg?.timestamp ? chatTime(msg.timestamp) : ""}
                   </span>
                 </div>
-              ))}
+              )))}
             </div>
- 
-            {/* Preview Attachments */}
-            {attachments.length > 0 && (
+{activeTab === 'normal' && (
+<>
+
+    {attachments.length > 0 && (
               <div className="flex flex-wrap gap-4 border-t pt-4 pb-2">
                 {attachments.map((att, idx) => (
                   <div key={idx} className="relative">
@@ -257,7 +291,7 @@ const Message = () => {
                     ) : (
                       <div className="bg-gray-200 px-3 py-2 rounded-lg text-xs max-w-[150px]">
                         {att.file.name}
-                      </div>  
+                      </div>
                     )}
                     <button
                       onClick={() => removeAttachment(idx)}
@@ -269,7 +303,7 @@ const Message = () => {
                 ))}
               </div>
             )}
- 
+
             {/* Chat Input */}
             <div className="flex items-center gap-3 pt-4 border-t">
               {uploadFileLoading ? (
@@ -314,7 +348,10 @@ const Message = () => {
                   <IoSend size={24} />
                 )}
               </button>
-            </div>
+            </div></>
+) }
+            {/* Preview Attachments */}
+        
           </div>
         ) : (
           <div className="flex items-center justify-center col-span-2">
@@ -325,5 +362,5 @@ const Message = () => {
     </div>
   );
 };
- 
+
 export default Message;
