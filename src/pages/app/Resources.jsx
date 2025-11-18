@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 
 import pdfIcon from "../../assets/pdficon.png";
@@ -17,9 +17,15 @@ const Resources = () => {
   const [textModal, setTextModal] = useState(false);
   const [disclaimerModal, setDisclaimerModal] = useState(true);
   const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("ALL");
 
   const { data, loading, pagination } = useFetchData(`/laws`, {}, page, "");
-
+  const { data: categoryData, loading: categoryLoading } = useFetchData(
+    `/laws/category`,
+    {},
+    1,
+    ""
+  );
   const handlePageChange = (page) => {
     setPage(page);
   };
@@ -27,6 +33,16 @@ const Resources = () => {
   const filteredDocs = data.filter((doc) =>
     doc.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const filteredLaws = useMemo(() => {
+    let list =
+      activeTab === "ALL"
+        ? data
+        : data.filter((item) => item.type === activeTab);
+
+    return list.filter((doc) =>
+      doc.title?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [activeTab, data, searchTerm]);
 
   const handleDocClick = (type, value) => {
     console.log("🚀 ~ handleDocClick 33 ~ value:", value);
@@ -63,9 +79,50 @@ const Resources = () => {
           />
         </div>
       </div>
+      <div className="w-full overflow-x-auto">
+        <div className="flex gap-3 py-2">
+          {/* ALL TAB */}
+          <div
+            onClick={() => setActiveTab("ALL")}
+            className={`px-4 cursor-pointer py-2 rounded-full text-sm whitespace-nowrap transition-all duration-200
+      ${
+        activeTab === "ALL"
+          ? "bg-[#003897] text-white"
+          : "bg-gray-200 text-black"
+      }`}
+          >
+            All
+          </div>
+
+          {/* OTHER CATEGORY TABS */}
+          {categoryData?.map((item, index) => {
+            const formattedItem = item
+              .replace(/_/g, " ")
+              .toLowerCase()
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
+
+            return (
+              <div
+                key={index}
+                onClick={() => setActiveTab(item)}
+                className={`px-4 cursor-pointer py-2 rounded-full text-sm whitespace-nowrap transition-all duration-200
+        ${
+          activeTab === item
+            ? "bg-[#003897] text-white"
+            : "bg-gray-200 text-black"
+        }`}
+              >
+                {formattedItem} {/* <-- CHANGE MADE HERE */}
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Documents Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mt-10">
         {loading
           ? // Skeleton Loader (show 6 items as placeholder)
             Array.from({ length: 6 }).map((_, i) => (
@@ -80,7 +137,7 @@ const Resources = () => {
                 <div className="mt-4 h-4 w-3/4 mx-auto rounded bg-gray-200 animate-pulse" />
               </div>
             ))
-          : filteredDocs.map((doc) => (
+          : filteredLaws?.map((doc) => (
               <div
                 onClick={() =>
                   handleDocClick(
@@ -96,9 +153,7 @@ const Resources = () => {
                 className="bg-white rounded-xl p-6 text-center shadow cursor-pointer hover:shadow-md transition"
               >
                 <img
-                  src={
-                    doc?.icon || "https://placehold.co/400"
-                  }
+                  src={doc?.icon || "https://placehold.co/400"}
                   alt="PDF Icon"
                   className="h-[70px] mx-auto"
                 />
