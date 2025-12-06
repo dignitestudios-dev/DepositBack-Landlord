@@ -16,9 +16,9 @@ const CreditConfirmModal = ({
           Credit Score Verification
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          $15 will be deducted from your account to verify tenant’s credit
-          score. <br />
-          Do you want to continue?
+          A fee of $15 will be deducted from your account to conduct the
+          tenant’s creditworthiness due-diligence check. Would you like to
+          proceed?
         </p>
         <div className="flex justify-center gap-3">
           <button
