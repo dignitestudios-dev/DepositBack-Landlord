@@ -422,13 +422,13 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
             </span>
           </div>
           <div className="ms-auto">
-            <div className="ms-auto">
+            {/* <div className="ms-auto">
               <button
                 onClick={() => {
                   const score = creditScore;
                   if (score) {
                     setScoreModal(true);
-                    // SuccessToast(`Tenant's Credit Score is: ${score}`);
+                  
                   } else {
                     setCreditConfirmModal(true);
                   }
@@ -446,7 +446,7 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
                   ? "View Score"
                   : "Credit Score"}
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
