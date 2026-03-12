@@ -17,6 +17,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export const onMessageListener = () =>
   new Promise((resolve) => {
     onMessage(messaging, (payload) => {
+      console.log("Message received. ", payload);
       resolve(payload);
     });
   });

@@ -6,6 +6,8 @@ import { AppContext } from "../../context/AppContext";
 import { getDateFormat } from "../../lib/helpers";
 import mainlogowhite from "../../assets/mainlogowhite.png";
 import { useTranslation } from "react-i18next";
+import ChatIcon from "../../assets/chat-icon.png";
+
 
 const Header = () => {
   const { t, i18n } = useTranslation();
@@ -105,13 +107,22 @@ const Header = () => {
           <li
             className="hover:underline cursor-pointer"
             onClick={() => {
-              navigate("/app/messages");
+              navigate("#");
               closePopup();
             }}
           >
-            {t("header.messages")}
+            {t("Buy DB Forensics Light")}
           </li>
         </ul>
+
+        <button
+                  onClick={() => {
+                    navigate("/app/messages");
+                    closePopup();
+                  }}
+                >
+                  <img src={ChatIcon} className="w-[24px] h-[24px]" />
+                </button>
 
         {/* Notification Icon with Popup toggle */}
         <div className="relative" ref={notificationRef}>

@@ -22,11 +22,19 @@ function reducer(state, action) {
         errors: { ...state.errors, [action.field]: "" }, // clear error on change
       };
 
+    // case "ADD_MEDIA":
+    //   return {
+    //     ...state,
+    //     propertyMedia: [...state.propertyMedia, ...action.files],
+    //   };
+
     case "ADD_MEDIA":
-      return {
-        ...state,
-        propertyMedia: [...state.propertyMedia, ...action.files],
-      };
+  // This ensures that even if logic elsewhere fails, the state won't exceed 3
+  const combinedMedia = [...state.propertyMedia, ...action.files];
+  return {
+    ...state,
+    propertyMedia: combinedMedia.slice(0, 3), 
+  };
 
     case "REMOVE_MEDIA":
       return {
@@ -248,10 +256,10 @@ const Uploaddeduction = () => {
               className="bg-white border border-dashed border-gray-400 rounded-xl p-10 text-center text-sm text-gray-600 cursor-pointer"
             >
               <p className="font-semibold">Upload “Property Images”</p>
-              <p className="text-xs text-gray-400 mt-1">Upto 20MB JPG, PNG</p>
+              <p className="text-xs text-gray-400 mt-1">Upto 20MB JPG, PNG - Limit 3 Images</p>
             </div>
 
-            <input
+            {/* <input
               type="file"
               id="fileUpload"
               accept="image/*"
@@ -263,8 +271,30 @@ const Uploaddeduction = () => {
                 })
               }
               className="hidden"
-            />
+            /> */}
+<input
+  type="file"
+  id="fileUpload"
+  accept="image/*"
+  multiple
+  onChange={(e) => {
+    const selectedFiles = Array.from(e.target.files);
+    const currentFilesCount = state.propertyMedia.length;
+    const limit = 3;
 
+    // Check if adding new files exceeds the limit
+    if (currentFilesCount + selectedFiles.length > limit) {
+      ErrorToast(`You can only upload a total of ${limit} images.`);
+      return; 
+    }
+
+    dispatch({
+      type: "ADD_MEDIA",
+      files: selectedFiles,
+    });
+  }}
+  className="hidden"
+/>
             {state.errors.propertyMedia && (
               <p className="text-red-500 text-xs mt-1">
                 {state.errors.propertyMedia}

@@ -244,7 +244,7 @@ const Inspection = () => {
               {checklist.map((item, index) => (
                 <li
                   key={index}
-                  className="flex items-center gap-3 border p-3 rounded-lg hover:bg-blue-50"
+                  className="flex text-black items-center gap-3 border p-3 rounded-lg hover:bg-blue-50"
                 >
                   <input
                     type="checkbox"
@@ -252,7 +252,7 @@ const Inspection = () => {
                     checked
                     className="accent-blue-600 w-4 h-4"
                   />
-                  <span className="text-sm text-gray-700">{item.name}</span>
+                  <span className="text-sm text-black">{item}</span>
                 </li>
               ))}
             </ul>

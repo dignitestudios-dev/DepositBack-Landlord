@@ -93,10 +93,17 @@ const ViewProfile = () => {
                 </div>
 
                 {/* Phone */}
-                <div className="mb-4 border-b-[1px] pl-6 pt-3 pb-3">
+                {/* <div className="mb-4 border-b-[1px] pl-6 pt-3 pb-3">
                   <p className="text-sm text-gray-500">Emergency Contact</p>
                   <p className="font-medium">
                     +1 {phoneFormatter(data?.emergencyContact) || "N/A"}
+                  </p>
+                </div> */}
+
+                  <div className="mb-4 border-b-[1px] pl-6 pt-3 pb-3">
+                  <p className="text-sm text-gray-500">Phone Number</p>
+                  <p className="font-medium">
+                    +1 {phoneFormatter(data?.phoneNo) || "N/A"}
                   </p>
                 </div>
 

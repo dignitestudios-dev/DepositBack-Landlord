@@ -78,12 +78,18 @@ const formatInput = (value) =>
 
 const formReducer = (state, action) => {
   switch (action.type) {
+    case "SET_FORM_DATA":
+      return {
+        ...state,
+        form: { ...state.form, ...action.payload },
+        errors: {}, // Clears errors so the form doesn't show "Required" on load
+      };
+
     case "UPDATE_FIELD": {
       const { field, value } = action;
+      // Fixed: changed 'propertyName' to 'name' to match your state
       const formattedValue =
-        field === "propertyName" || field === "address"
-          ? formatInput(value)
-          : value;
+        field === "name" || field === "address" ? formatInput(value) : value;
 
       const error = validateField(field, formattedValue, state);
       const updatedErrors = { ...state.errors };
@@ -98,7 +104,7 @@ const formReducer = (state, action) => {
         form: {
           ...state.form,
           [field]: formattedValue,
-          ...(field === "state" ? { city: "" } : {}), // Reset city if state changes
+          ...(field === "state" ? { city: "" } : {}),
         },
         errors: updatedErrors,
       };
@@ -198,19 +204,26 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
         formData.append(`contactPersons[${index}][phone]`, person.phone);
       });
 
-      propertyMedia.forEach((file) => {
+  propertyMedia.forEach((file) => {
         if (typeof file !== "string") {
+          // This is a new file (Blob/File object)
           formData.append("images", file);
-        }
-      });
-      propertyMedia.forEach((file) => {
-        if (typeof file === "string") {
-          formData.append("existingImages", file);
+        } else {
+          // This is an existing URL string
+          // We add brackets [] to the key to force the backend to see it as an array
+          formData.append("existingImages[]", file); 
         }
       });
 
+
+      // If there are no existing images, send an empty string or handle accordingly
+      const existingImages = propertyMedia.filter(item => typeof item === "string");
+      if (existingImages.length === 0) {
+        formData.append("existingImages", ""); 
+      }
+
       const response = await axios.put(
-        `/properties/${stepOneData?._id}`,
+        `/properties/${stepOneData?.property?._id || stepOneData?._id}`,
         formData
       );
       if (response.status === 200) {
@@ -232,17 +245,35 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
     }
   };
 
-  useEffect(() => {
-    if (stepOneData && Object.keys(stepOneData).length > 0) {
-      Object.entries(stepOneData).forEach(([field, value]) => {
-        dispatch({
-          type: "UPDATE_FIELD",
-          field,
-          value,
-        });
+useEffect(() => {
+    // Digs into the object to find the property data
+    const dataToLoad = stepOneData?.property || stepOneData;
+
+    if (dataToLoad && Object.keys(dataToLoad).length > 0) {
+      dispatch({
+        type: "SET_FORM_DATA",
+        payload: {
+          name: dataToLoad.name || "",
+          address: dataToLoad.address || "",
+          city: dataToLoad.city || "",
+          state: dataToLoad.state || "",
+          zipcode: dataToLoad.zipcode || "",
+          rent: dataToLoad.rent || "",
+          rentDueDate: dataToLoad.rentDueDate || "",
+          type: dataToLoad.type || "",
+          description: dataToLoad.description || "",
+          deposit: dataToLoad.deposit || "",
+          lateFeeAmount: dataToLoad.lateFeeAmount || "",
+        },
       });
-      let images = stepOneData?.images;
-      setPropertyMedia(images);
+
+      // Update the images and contact persons separately
+      if (dataToLoad.images) {
+        setPropertyMedia(dataToLoad.images);
+      }
+      if (dataToLoad.contactPersons) {
+        setPersonsData(dataToLoad.contactPersons);
+      }
     }
   }, [stepOneData]);
 
@@ -297,19 +328,13 @@ const EditPropertyDetail = ({ nextStep, propertyDetail, stepOneData }) => {
           <label className="block mb-1 text-sm font-medium text-gray-700">
             Property Name
           </label>
-          <input
-            type="text"
-            placeholder="Property Name"
-            value={form.name}
-            onChange={(e) =>
-              dispatch({
-                type: "UPDATE_FIELD",
-                field: "name",
-                value: e.target.value,
-              })
-            }
-            className="w-full p-3 border rounded-full"
-          />
+         <input
+  type="text"
+  placeholder="Property Name"
+  value={form.name} // Ensure this is form.name, not form.propertyName
+  onChange={(e) => dispatch({ type: "UPDATE_FIELD", field: "name", value: e.target.value })}
+  className="w-full p-3 border rounded-full"
+/>
           {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
         <div className="w-full">

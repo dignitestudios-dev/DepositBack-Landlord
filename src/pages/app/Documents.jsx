@@ -81,6 +81,27 @@ const Documents = () => {
   const currentDocuments =
     viewMode === "landlord" ? landlordDocuments : tenantDocuments;
 
+
+const canUploadMore = () => {
+  // Determine which list to check based on activeCategory
+  let currentCount = 0;
+  
+  if (activeCategory === "Agreements") {
+    currentCount = viewMode === "landlord" ? landlordAgreements.length : tenantAgreements.length;
+  } else if (activeCategory === "Rules") {
+    currentCount = landlordRules.length;
+  } else if (activeCategory === "uv") {
+    currentCount = uvLightImages.length;
+  }
+  // Add other categories as needed...
+
+  if (currentCount >= 5) {
+    alert("You have reached the maximum limit of 5 files for this category.");
+    return false;
+  }
+  return true;
+};
+
   return (
     <div className="max-w-[1260px] mx-auto pt-8 pb-[10em] p-6 text-[#333]">
       {isUploadFile ? (
@@ -88,6 +109,7 @@ const Documents = () => {
           setIsUploadFile={setIsUploadFile}
           activeCategory={activeCategory}
           propertyId={propertyId}
+          maxAllowed={5 - (currentDocuments?.length || 0)}
         />
       ) : (
         <Fragment>
@@ -134,17 +156,23 @@ const Documents = () => {
               {viewMode === "landlord" && (
                 <div className="flex justify-end gap-2">
                   <button
-                    onClick={() => {
-                      setActiveCategory("uv");
-                      setIsUploadFile(true);
-                    }}
+                   // Find this button in your JSX and update the onClick:
+onClick={() => {
+  if (canUploadMore()) { // Check limit first
+    setActiveCategory("uv");
+    setIsUploadFile(true);
+  }
+}}
                     className="bg-gradient-to-r from-[#314ba1] to-[#0a55d6] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
                   >
                     + Upload DB Forensics Light Images
                   </button>
                   <button
-                    onClick={() => setIsUploadFile(true)}
-                    className="bg-gradient-to-r from-[#003897] to-[#0151DA] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
+onClick={() => {
+  if (canUploadMore()) { // Check limit first
+    setIsUploadFile(true);
+  }
+}}                    className="bg-gradient-to-r from-[#003897] to-[#0151DA] hover:bg-[#0151DA] text-white text-sm px-4 py-3 rounded-full font-medium"
                   >
                     + Upload Files
                   </button>

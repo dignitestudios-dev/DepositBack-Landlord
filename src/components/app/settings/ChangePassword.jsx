@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaCheck, FaTimes, FaEye, FaEyeSlash } from "react-icons/fa";
 import Input from "../../global/Input";
 import axios from "../../../axios";
+import { useNavigate } from "react-router";
 
 const ChangePassword = () => {
   const [currentpassword, setCurrentpassword] = useState("");
@@ -11,6 +12,7 @@ const ChangePassword = () => {
   const [changepassword, setChangepassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,6 +43,11 @@ const ChangePassword = () => {
         setCurrentpassword("");
         setPassword("");
         setnewPassword("");
+
+        // redirect to login
+      setTimeout(() => {
+        navigate("/auth/login");
+      }, 1500);
       }
     } catch (err) {
       setError(

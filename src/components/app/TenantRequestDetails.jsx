@@ -412,7 +412,7 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
             <FaEnvelope /> <span>{request?.tenant?.email}</span>
           </div>
           <div className="flex gap-2 items-center text-sm">
-            <FaPhoneAlt /> <span>{request?.tenant?.phoneNo}</span>
+            <FaPhoneAlt /> <span>+1{request?.tenant?.phoneNo}</span>
           </div>
           <div className="flex gap-2 items-center text-sm">
             <TiWarning />{" "}
@@ -464,7 +464,7 @@ const TenantRequestDetails = ({ request, setUpdate }) => {
           </div>
           <div className="mb-4 border-b-[1px] pb-3">
             <p className="text-sm text-gray-500">Emergency Contact</p>
-            <p className="font-medium">{request?.tenant?.phoneNo}</p>
+            <p className="font-medium">+1 {request?.tenant?.phoneNo}</p>
           </div>
           <div className="mb-4 border-b-[1px] pb-3">
             <p className="text-sm text-gray-500">Last Four Digits of SSN</p>

@@ -374,13 +374,13 @@ const PropertyDetail = () => {
                         </p>
                         <p className="flex gap-2 items-center">
                           <FaPhoneAlt />
-                          {tenant?.phoneNo || "N/A"}
+                         +1 {tenant?.phoneNo || "N/A"}
                         </p>
                       </div>
                       <p className="flex gap-2 items-center mt-2">
                         <IoIosWarning />
                         Emergency:{" "}
-                        {tenant?.emergencyContact || "-- Not provided --"}
+                        +1 {tenant?.emergencyContact || "-- Not provided --"}
                       </p>
                     </div>
                   </div>

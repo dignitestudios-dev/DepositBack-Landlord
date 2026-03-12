@@ -14,27 +14,27 @@ export default function ForgetPassword() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate("");
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      navigate("/auth/verify-otp", { state: { email } });
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-      const response = await axios.post("/auth/sendPassOTP", {
-        email: email,
-        role: "landlord",
-      });
-      if (response.status === 200) {
-        SuccessToast("Otp Verified");
+  try {
+    setLoading(true);
 
-        navigate("/auth/verify-otp", { state: { email } });
-      }
-    } catch (error) {
-      ErrorToast(error.response.data.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const response = await axios.post("/auth/sendPassOTP", {
+      email,
+      role: "landlord",
+    });
+
+    SuccessToast("OTP Sent Successfully");
+
+    navigate("/auth/verify-otp", { state: { email } });
+
+  } catch (error) {
+    ErrorToast(error?.response?.data?.message || "Email not found");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex bg-[#f4f8ff] overflow-hidden">

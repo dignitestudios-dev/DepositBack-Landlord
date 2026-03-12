@@ -235,14 +235,26 @@ const Deposittracker = () => {
                         <h1 className="font-[500]">{item.title}</h1>
                         <p className="text-sm pt-1 pb-1">{item.description}</p>
 
-                        <span className="text-[14px] font-[500] pt-1 block">
+                        {/* <span className="text-[14px] font-[500] pt-1 block">
                           Date:{" "}
                           {new Date(item.date).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
                           })}
-                        </span>
+                            
+                        </span> */}
+
+                        <span className="text-[14px] font-[500] pt-1 block">
+  Date:{" "}
+  {item?.date
+    ? new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(item.date))
+    : "-"}
+</span>
 
                         <span className="text-[14px] font-[500] pt-1 block">
                           Deduction:{" "}

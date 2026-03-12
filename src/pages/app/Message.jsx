@@ -244,7 +244,7 @@ const Message = () => {
                     msg.senderId === userData?.uid ? "items-end" : "items-start"
                   }`}
                 >
-                  {Array.isArray(msg.content) ? (
+                  {/* {Array.isArray(msg.content) ? (
                     <div className="flex gap-2 flex-wrap">
                       {msg.content.map((url, index) => (
                         <img
@@ -268,7 +268,41 @@ const Message = () => {
                     >
                       {msg.content}
                     </div>
-                  )}
+                  )} */}
+
+                  {Array.isArray(msg.content) ? (
+  <div className="flex gap-2 flex-wrap">
+    {msg.content.map((url, index) => (
+      <img
+        key={index}
+        src={url}
+        alt="attachment"
+        onClick={() => window.open(url, "_blank")}
+        className="w-32 h-32 object-cover rounded-xl shadow cursor-pointer"
+      />
+    ))}
+  </div>
+) : typeof msg.content === "string" &&
+  msg.content.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
+  <img
+    src={msg.content}
+    alt="attachment"
+    onClick={() => window.open(msg.content, "_blank")}
+    className="w-32 h-32 object-cover rounded-xl shadow cursor-pointer"
+  />
+) : (
+  <div
+    className={`${
+      msg?.emergency
+        ? "bg-red-600 text-white"
+        : msg.senderId === userData?.uid
+        ? "bg-blue-700 text-white"
+        : "bg-gray-300 text-black"
+    } px-4 py-2 rounded-xl max-w-xs`}
+  >
+    {msg.content}
+  </div>
+)}
                   <span className="text-xs text-gray-400 mt-1">
                     {msg?.timestamp ? chatTime(msg.timestamp) : ""}
                   </span>

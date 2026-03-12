@@ -21,18 +21,36 @@ const UploadPropertyDocs = ({
   const [mediaFiles, setMediaFiles] = useState([]);
   const [documentFiles, setDocumentFiles] = useState([]);
 
-  const handleFileChange = (e) => {
-    setMediaError(null);
+ const handleFileChange = (e) => {
+  setMediaError(null);
 
-    const files = Array.from(e.target.files);
-    const imagesAndVideos = files.filter(
-      (file) => file.type.startsWith("image/") || file.type.startsWith("video/")
-    );
-    const documents = files.filter((file) => file.type === "application/pdf");
+  const files = Array.from(e.target.files);
+  
+  // 1. Separate the files by type
+  const newImagesAndVideos = files.filter(
+    (file) => file.type.startsWith("image/") || file.type.startsWith("video/")
+  );
+  const newDocuments = files.filter((file) => file.type === "application/pdf");
 
-    setMediaFiles([...mediaFiles, ...imagesAndVideos]);
-    setDocumentFiles([...documentFiles, ...documents]);
-  };
+  // 2. Define your limit
+  const MAX_LIMIT = 5;
+
+  // 3. Check Media Limit (Existing + New)
+  if (mediaFiles.length + newImagesAndVideos.length > MAX_LIMIT) {
+    setMediaError(`You can only upload a total of ${MAX_LIMIT} media files (images/videos).`);
+    return; // Stop the upload
+  }
+
+  // 4. Check Document Limit (Existing + New)
+  if (documentFiles.length + newDocuments.length > MAX_LIMIT) {
+    setMediaError(`You can only upload a total of ${MAX_LIMIT} PDF documents.`);
+    return; // Stop the upload
+  }
+
+  // 5. Update state only if limits are respected
+  setMediaFiles((prev) => [...prev, ...newImagesAndVideos]);
+  setDocumentFiles((prev) => [...prev, ...newDocuments]);
+};
 
   const removeMedia = (index) => {
     setMediaFiles(mediaFiles.filter((_, i) => i !== index));
@@ -121,7 +139,7 @@ const UploadPropertyDocs = ({
             className=" rounded-lg p-10 text-center cursor-pointer"
           >
             <p className="text-black">Upload “Documents”</p>
-            <p className="text-sm text-gray-400">Upto 20MB PDF, JPG, PNG</p>
+            <p className="text-sm text-gray-400">Upto 20MB PDF</p>
             <input
               type="file"
               id="fileUpload"

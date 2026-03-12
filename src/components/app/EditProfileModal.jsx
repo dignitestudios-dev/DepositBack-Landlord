@@ -319,8 +319,8 @@ const EditProfileModal = ({ onClose, userData }) => {
               <p className="text-red-500 text-xs">{errors.phone}</p>
             )}
           </div>
-          <div className="flex gap-[6em]">
-            <div className="mt-3">
+          <div className="flex w-full gap-[6em]">
+            <div className="mt-3 w-full">
               <Input
                 label="Last Four Digits Of SSN"
                 type="text"
@@ -334,13 +334,13 @@ const EditProfileModal = ({ onClose, userData }) => {
                   })
                 }
                 placeholder="XXXX"
-                className="bg-[#ECECEC] !w-[132%]"
+                className="bg-[#ECECEC]  w-full"
               />
               {errors.ssn && (
                 <p className="text-red-500 text-xs">{errors.ssn}</p>
               )}
             </div>
-            <div className="mt-3">
+            {/* <div className="mt-3">
               <div className="relative">
                 <div className="absolute top-[43px] z-20">
                   <p className="text-sm pl-[1px]">+1</p>
@@ -367,7 +367,7 @@ const EditProfileModal = ({ onClose, userData }) => {
                   {errors.emergencyContact}
                 </p>
               )}
-            </div>
+            </div> */}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
