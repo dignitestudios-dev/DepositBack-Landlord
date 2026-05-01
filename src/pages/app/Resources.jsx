@@ -55,6 +55,16 @@ const Resources = () => {
     }
   };
 
+  const categoryCounts = useMemo(() => {
+  const counts = { ALL: data.length };
+
+  data.forEach((item) => {
+    counts[item.type] = (counts[item.type] || 0) + 1;
+  });
+
+  return counts;
+}, [data]);
+
   return (
     <div className="max-w-[1260px] mx-auto px-6 pt-8 pb-20 text-[#333]">
       {/* Header */}
@@ -91,7 +101,7 @@ const Resources = () => {
           : "bg-gray-200 text-black"
       }`}
           >
-            All
+All ({categoryCounts.ALL || 0})
           </div>
 
           {/* OTHER CATEGORY TABS */}
@@ -114,7 +124,7 @@ const Resources = () => {
             : "bg-gray-200 text-black"
         }`}
               >
-                {formattedItem} {/* <-- CHANGE MADE HERE */}
+{formattedItem} ({categoryCounts[item] || 0})
               </div>
             );
           })}
@@ -122,45 +132,53 @@ const Resources = () => {
       </div>
 
       {/* Documents Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mt-10">
-        {loading
-          ? // Skeleton Loader (show 6 items as placeholder)
-            Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl p-6 text-center shadow cursor-pointer"
-              >
-                {/* Circle / Icon placeholder */}
-                <div className="h-[70px] w-[70px] mx-auto rounded-md bg-gray-200 animate-pulse" />
-
-                {/* Title placeholder */}
-                <div className="mt-4 h-4 w-3/4 mx-auto rounded bg-gray-200 animate-pulse" />
-              </div>
-            ))
-          : filteredLaws?.map((doc) => (
-              <div
-                onClick={() =>
-                  handleDocClick(
-                    doc?.formLink ? "form" : doc?.lawLink ? "link" : "text",
-                    doc?.formLink
-                      ? doc?.formLink
-                      : doc?.lawLink
-                      ? doc?.lawLink
-                      : doc?.text
-                  )
-                }
-                key={doc._id}
-                className="bg-white rounded-xl p-6 text-center shadow cursor-pointer hover:shadow-md transition"
-              >
-                <img
-                  src={doc?.icon || "https://placehold.co/400"}
-                  alt="PDF Icon"
-                  className="h-[70px] mx-auto"
-                />
-                <p className="mt-4 font-medium text-sm">{doc.title}</p>
-              </div>
-            ))}
+   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 mt-10">
+  {/* LOADING */}
+  {loading &&
+    Array.from({ length: 6 }).map((_, i) => (
+      <div
+        key={i}
+        className="bg-white rounded-xl p-6 text-center shadow"
+      >
+        <div className="h-[70px] w-[70px] mx-auto rounded-md bg-gray-200 animate-pulse" />
+        <div className="mt-4 h-4 w-3/4 mx-auto rounded bg-gray-200 animate-pulse" />
       </div>
+    ))}
+
+  {/* NO DATA */}
+  {!loading && filteredLaws.length === 0 && (
+    <div className="col-span-full text-center text-gray-500 text-lg py-10">
+      No Data Found
+    </div>
+  )}
+
+  {/* DATA */}
+  {!loading &&
+    filteredLaws.length > 0 &&
+    filteredLaws.map((doc) => (
+      <div
+        onClick={() =>
+          handleDocClick(
+            doc?.formLink ? "form" : doc?.lawLink ? "link" : "text",
+            doc?.formLink
+              ? doc?.formLink
+              : doc?.lawLink
+              ? doc?.lawLink
+              : doc?.text
+          )
+        }
+        key={doc._id}
+        className="bg-white rounded-xl p-6 text-center shadow cursor-pointer hover:shadow-md transition"
+      >
+        <img
+          src={doc?.icon || "https://placehold.co/400"}
+          alt="icon"
+          className="h-[70px] mx-auto"
+        />
+        <p className="mt-4 font-medium text-sm">{doc.title}</p>
+      </div>
+    ))}
+</div>
       <div className="mt-6 flex justify-end">
         <Pagination
           currentPage={pagination?.currentPage}
